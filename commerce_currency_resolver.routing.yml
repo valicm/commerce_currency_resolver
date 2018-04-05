@@ -1,0 +1,7 @@
+commerce_currency_resolver.configuration:
+  path: '/admin/commerce/config/commerce_currency_resolver'
+  defaults:
+    _form: 'Drupal\commerce_currency_resolver\Form\CommerceCurrencyResolverForm'
+    _title: 'Commerce currency resolver settings'
+  requirements:
+    _permission: 'access commerce administration pages'

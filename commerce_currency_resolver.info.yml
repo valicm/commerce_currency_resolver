@@ -1,0 +1,8 @@
+name: 'Commerce currency resolver'
+type: module
+description: 'Commerce 2 currency enhancements'
+core: 8.x
+package: Commerce
+
+dependencies:
+  - commerce:commerce_price

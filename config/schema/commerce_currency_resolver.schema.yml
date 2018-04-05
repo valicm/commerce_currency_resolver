@@ -1,0 +1,10 @@
+commerce_currency_resolver.settings:
+  type: config_object
+  label: 'Commerce multi currency conversion settings'
+  mapping:
+    currency_mapping:
+      type: string
+      label: 'Currency mapping'
+    currency_source:
+      type: string
+      label: 'Currency source'

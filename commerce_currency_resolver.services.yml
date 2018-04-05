@@ -1,0 +1,6 @@
+services:
+  commerce_currency_resolver.price_resolver:
+    class: Drupal\commerce_currency_resolver\Resolver\CommerceCurrencyResolver
+    arguments: ['@request_stack','@config.factory','@module_handler','@event_dispatcher']
+    tags:
+     - { name: commerce_price.price_resolver, priority: 600 }
