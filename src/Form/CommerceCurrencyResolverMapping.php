@@ -67,8 +67,10 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
 
     // Get current settings.
     $config = $this->config('commerce_currency_resolver.currency_mapping');
-    $currency_mapping = \Drupal::config('commerce_currency_resolver.settings')->get('currency_mapping');
-    $currency_default = \Drupal::config('commerce_currency_resolver.settings')->get('currency_default');
+    $currency_mapping = \Drupal::config('commerce_currency_resolver.settings')
+      ->get('currency_mapping');
+    $currency_default = \Drupal::config('commerce_currency_resolver.settings')
+      ->get('currency_default');
 
     // Get active currencies.
     $active_currencies = CurrencyHelper::getEnabledCurrency();
@@ -117,7 +119,7 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
             'currency' => t('Currency'),
           ],
           '#title' => t('Matrix logic'),
-          '#description' => t('How you want to create matrix. You can assign currency to each country separate, or assign multiple countries to currency'),
+          '#description' => t('How you want to create matrix. You can assign currency to each country separate, or assign multiple countries to each currency'),
         ];
 
         // Use mapping per country.
@@ -142,13 +144,24 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
               break;
 
             case 'currency':
+              $data = [];
+
+              // Process and reverse existing config from country->currency
+              // to currency -> countries list for autocomplete fields.
+              if (!empty($matrix)) {
+                foreach ($matrix as $country => $currency) {
+                  $data[$currency] .= $country;
+                }
+              }
+
+              // Render autocomplete fields for each currency.
               foreach ($active_currencies as $key => $currency) {
                 $form['matrix'][$key] = [
-                  '#type' => 'checkboxes',
-                  '#options' => $countries,
+                  '#type' => 'textfield',
+                  '#autocomplete_route_name' => 'commerce_currency_resolver.countries.autocomplete',
                   '#title' => $currency,
                   '#description' => t('Select countires which should be used with @currency currency', ['@currency' => $currency]),
-                  //'#default_value' => isset($matrix[$key]) ? $matrix[$key] : $currency_default,
+                  '#default_value' => isset($data[$key]) ? str_replace(' ', ', ', $data[$key]) : '',
                 ];
               }
 
@@ -174,10 +187,33 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->config('commerce_currency_resolver.currency_mapping');
 
+    // Get magtrix logic value.
+    $logic = $form_state->getValue('logic');
+
+    // Process results in some cases.
+    // We want to have same array in any type of currency matrix.
+    switch ($logic) {
+      case 'currency':
+        $raw_data = $form_state->getValue('matrix');
+        $matrix = [];
+        foreach ($raw_data as $currency => $list) {
+          $countries = explode(',', $list);
+
+          foreach ($countries as $country) {
+            $matrix[$country] = $currency;
+          }
+        }
+        break;
+
+      default:
+        $matrix = $form_state->getValue('matrix');
+        break;
+    }
+
     // Set values.
     $config->set('domicile_currency', $form_state->getValue('domicile_currency'))
-      ->set('logic', $form_state->getValue('logic'))
-      ->set('matrix', $form_state->getValue('matrix'))
+      ->set('logic', $logic)
+      ->set('matrix', $matrix)
       ->save();
 
     parent::submitForm($form, $form_state);

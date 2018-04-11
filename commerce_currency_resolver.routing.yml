@@ -19,3 +19,11 @@ commerce_currency_resolver.currency_mapping:
     _title: 'Currency mapping'
   requirements:
     _permission: 'access commerce administration pages'
+
+# Route to get autocomplete results for countries.
+commerce_currency_resolver.countries.autocomplete:
+  path: '/admin/commerce/config/commerce_currency_resolver/autocomplete'
+  defaults:
+    _controller: '\Drupal\commerce_currency_resolver\Controller\CommerceCurrencyResolverAutocomplete::countriesAutocomplete'
+  requirements:
+    _permission: 'access commerce administration pages'
