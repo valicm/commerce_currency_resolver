@@ -1,7 +1,21 @@
 commerce_currency_resolver.configuration:
-  path: '/admin/commerce/config/commerce_currency_resolver'
+  path: '/admin/commerce/config/commerce_currency_resolver/settings'
   defaults:
     _form: 'Drupal\commerce_currency_resolver\Form\CommerceCurrencyResolverForm'
-    _title: 'Commerce currency resolver settings'
+    _title: 'Commerce currency resolver'
+  requirements:
+    _permission: 'access commerce administration pages'
+commerce_currency_resolver.currency_conversion:
+  path: '/admin/commerce/config/commerce_currency_resolver/conversion'
+  defaults:
+    _form: 'Drupal\commerce_currency_resolver\Form\CommerceCurrencyResolverConversion'
+    _title: 'Currency conversion'
+  requirements:
+    _permission: 'access commerce administration pages'
+commerce_currency_resolver.currency_mapping:
+  path: '/admin/commerce/config/commerce_currency_resolver/mapping'
+  defaults:
+    _form: 'Drupal\commerce_currency_resolver\Form\CommerceCurrencyResolverMapping'
+    _title: 'Currency mapping'
   requirements:
     _permission: 'access commerce administration pages'

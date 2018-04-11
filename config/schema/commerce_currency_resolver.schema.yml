@@ -1,6 +1,6 @@
 commerce_currency_resolver.settings:
   type: config_object
-  label: 'Commerce multi currency conversion settings'
+  label: 'Commerce currency resolvers settings'
   mapping:
     currency_mapping:
       type: string
@@ -8,3 +8,36 @@ commerce_currency_resolver.settings:
     currency_source:
       type: string
       label: 'Currency source'
+    currency_default:
+      type: string
+      label: 'Currency default'
+
+commerce_currency_resolver.currency_conversion:
+  type: config_object
+  label: 'Currency conversion'
+  mapping:
+    source:
+      type: string
+      label: 'Currency exchange service'
+    use_cross_sync:
+      type: integer
+      label: 'Use cross conversion between non default currencies'
+    demo_amount:
+      type: string
+      label: 'Demo amount'
+
+commerce_currency_resolver.currency_mapping:
+  type: config_object
+  label: 'Currency mapping'
+  mapping:
+    domicile_currency:
+      type: string
+      label: 'Use domicile currency per country'
+    logic:
+      type: string
+      label: 'Matrix logic'
+    matrix:
+      type: sequence
+      label: 'Matrix'
+      sequence:
+        type: string

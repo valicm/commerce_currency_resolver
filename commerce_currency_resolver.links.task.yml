@@ -1,0 +1,14 @@
+commerce_currency_resolver.configuration:
+  route_name: commerce_currency_resolver.configuration
+  base_route: commerce_currency_resolver.configuration
+  title: 'Configuration'
+commerce_currency_resolver.currency_conversion:
+  route_name: commerce_currency_resolver.currency_conversion
+  base_route: commerce_currency_resolver.configuration
+  title: 'Conversion'
+  weight: 20
+commerce_currency_resolver.currency_mapping:
+  route_name: commerce_currency_resolver.currency_mapping
+  base_route: commerce_currency_resolver.configuration
+  title: 'Mapping'
+  weight: 40

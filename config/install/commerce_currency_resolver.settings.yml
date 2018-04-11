@@ -1,2 +1,3 @@
 currency_mapping: '0'
 currency_source: 'combo'
+currency_default: ''

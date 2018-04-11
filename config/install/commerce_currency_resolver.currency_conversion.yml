@@ -1,0 +1,3 @@
+source: 'ecb'
+use_cross_sync: 1
+demo_amount: '100'

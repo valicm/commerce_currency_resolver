@@ -1,6 +1,6 @@
 commerce_currency_resolver.configuration:
-  title: 'Commerce currency enhancements'
+  title: 'Currency resolver'
   route_name: commerce_currency_resolver.configuration
   parent: 'commerce.store_configuration'
-  description: 'Commerce currency enhancements.'
+  description: 'Commerce currency enhancements'
   weight: -20

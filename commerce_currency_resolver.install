@@ -1,5 +1,29 @@
 <?php
+
 /**
  * @file
- * Enhancements for the commerce currency resolver support.
+ * Install file for commerce_currency_resolver.
  */
+
+use CommerceGuys\Intl\Country\CountryRepository;
+use CommerceGuys\Intl\Currency\CurrencyRepository;
+
+/**
+ * Implements hook_install().
+ */
+function commerce_currency_resolver_install() {
+  // @see commerce_price_install().
+  if (!\Drupal::isConfigSyncing()) {
+    // Get default country and their currency.
+    $default_country = \Drupal::config('system.date')->get('country.default');
+    $default_country = $default_country ?: 'US';
+    $country_repository = new CountryRepository();
+    $country = $country_repository->get($default_country);
+    $currency_code = $country->getCurrencyCode();
+
+    // Set initial default currency by default country.
+    // User can change it later.
+    \Drupal::service('config.factory')->getEditable('commerce_currency_resolver.settings')->set('currency_default', $currency_code)->save();
+
+  }
+}
