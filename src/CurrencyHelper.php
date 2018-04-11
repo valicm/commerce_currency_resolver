@@ -97,17 +97,4 @@ class CurrencyHelper {
     return $currencies;
   }
 
-  public function getDefaultCurrency() {
-    $enabled_currencies = $this->entityTypeManager->getStorage('commerce_currency')
-      ->loadByProperties([
-        'status' => TRUE,
-      ]);
-
-    if (isset($enabled_currencies['USD'])) {
-      return $enabled_currencies['USD'];
-    }
-    else {
-      return reset($enabled_currencies);
-    }
-  }
 }
