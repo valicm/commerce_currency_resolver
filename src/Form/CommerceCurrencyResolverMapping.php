@@ -75,24 +75,26 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
     // Get active currencies.
     $active_currencies = CurrencyHelper::getEnabledCurrency();
 
-    $form['matrix'] = [
-      '#type' => 'details',
-      '#open' => FALSE,
-      '#title' => t('Currency matrix'),
-      '#tree' => TRUE,
-      '#weight' => 50,
-    ];
+    // Get mapped currency.
+    $matrix = $config->get('matrix');
 
     switch ($currency_mapping) {
       case 'lang':
         $languages = CurrencyHelper::getAvailableLanguages();
 
-        $form['matrix']['#open'] = TRUE;
+        $form['matrix'] = [
+          '#type' => 'details',
+          '#open' => TRUE,
+          '#title' => t('Currency matrix'),
+          '#tree' => TRUE,
+          '#weight' => 50,
+        ];
 
         foreach ($languages as $key => $lang) {
           $form['matrix'][$key] = [
             '#type' => 'radios',
             '#options' => $active_currencies,
+            '#default_value' => $matrix[$key],
             '#title' => $lang,
             '#description' => t('Select currency which should be used with @lang language', ['@lang' => $lang]),
           ];
@@ -102,28 +104,35 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
       case 'geo':
         $domicile_currency = $config->get('domicile_currency');
         $logic = !empty($config->get('logic')) ? $config->get('logic') : 'country';
-        $matrix = $config->get('matrix');
 
         $form['domicile_currency'] = [
           '#type' => 'checkbox',
           '#default_value' => $domicile_currency,
           '#title' => t('Use domicile currency per country.'),
-          '#description' => t('If domicile currency is enabled for specific country it will be considered as primary. Otherwise use default currency defined in settings as fallback.'),
-        ];
-
-        $form['logic'] = [
-          '#type' => 'select',
-          '#default_value' => $logic,
-          '#options' => [
-            'country' => t('Country'),
-            'currency' => t('Currency'),
-          ],
-          '#title' => t('Matrix logic'),
-          '#description' => t('How you want to create matrix. You can assign currency to each country separate, or assign multiple countries to each currency'),
+          '#description' => t('If domicile currency is enabled for specific country, it will be considered as primary currency. Otherwise currency resolver use default currency defined in settings as fallback.'),
         ];
 
         // Use mapping per country.
         if (empty($domicile_currency)) {
+
+          $form['logic'] = [
+            '#type' => 'select',
+            '#default_value' => $logic,
+            '#options' => [
+              'country' => t('Country'),
+              'currency' => t('Currency'),
+            ],
+            '#title' => t('Matrix logic'),
+            '#description' => t('How you want to create matrix. You can assign currency to each country separate, or assign multiple countries to each currency'),
+          ];
+
+          $form['matrix'] = [
+            '#type' => 'details',
+            '#open' => FALSE,
+            '#title' => t('Currency matrix'),
+            '#tree' => TRUE,
+            '#weight' => 50,
+          ];
 
           // Country list. Get country list which is already processed with
           // alters instead of taking static list.
