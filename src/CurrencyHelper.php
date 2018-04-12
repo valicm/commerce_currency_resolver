@@ -44,9 +44,7 @@ class CurrencyHelper {
 
     // Check if exist geo based modules.
     // We support for now two of them.
-    if (\Drupal::ModuleHandler()
-        ->moduleExists('smart_ip') || \Drupal::ModuleHandler()
-        ->moduleExists('geoip')) {
+    if (\Drupal::ModuleHandler()->moduleExists('smart_ip') || \Drupal::ModuleHandler()->moduleExists('geoip')) {
       $mapping['geo'] = t('By Country');
     }
 

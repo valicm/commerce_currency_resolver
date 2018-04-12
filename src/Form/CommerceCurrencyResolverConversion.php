@@ -38,6 +38,13 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
     // Get active currencies.
     $active_currencies = CurrencyHelper::getEnabledCurrency();
 
+    // Cross sync settings.
+    $cross_sync = $config->get('use_cross_sync');
+
+    // Get our default currency.
+    $currency_default = \Drupal::config('commerce_currency_resolver.settings')
+      ->get('currency_default');
+
     $form['source'] = [
       '#type' => 'select',
       '#title' => $this->t('3rd party exchange service'),
@@ -53,7 +60,7 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
 
     $form['use_cross_sync'] = array(
       '#type' => 'checkbox',
-      '#default_value' => $config->get('use_cross_sync'),
+      '#default_value' => $cross_sync,
       '#title' => t('Use cross conversion between non default currencies.'),
       '#description' => t('If enabled only the rates between the default currency and the other currencies have to be managed. The rates between the other currencies is derived from their rates relative to the default currency.'),
     );
@@ -65,29 +72,72 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
       '#default_value' => $config->get('demo_amount'),
     );
 
-    // Render options in form.
-    foreach ($active_currencies as $key => $item) {
+    $form['currency'] = [
+      '#type' => 'details',
+      '#title' => t('Currency exchange rates'),
+      '#open' => TRUE,
+      '#tree' => TRUE,
+    ];
 
-      $form['currency'][$key] = [
-        '#type' => 'details',
-        '#title' => $item,
-        '#open' => FALSE,
-      ];
+    // Based on cross sync value render form elements.
+    switch ($cross_sync) {
+      case '1':
+        $form['currency'][$currency_default] = [
+          '#type' => 'details',
+          '#title' => $currency_default,
+          '#open' => FALSE,
+        ];
+        foreach ($active_currencies as $key => $item) {
+          if ($key !== $currency_default) {
+            $form['currency'][$currency_default][$key]['value'] = [
+              '#type' => 'textfield',
+              '#title' => $key,
+              '#description' => t('Exchange rate from @initial to @currency.', [
+                '@initial' => $currency_default,
+                '@currency' => $item,
+              ]),
+              '#size' => 20,
+            ];
+            $form['currency'][$currency_default][$key]['sync'] = [
+              '#type' => 'checkboxes',
+              '#title' => '',
+              '#options' => [1 => 'Synchronize this conversion rate.'],
+            ];
+          }
+        }
+        break;
 
-      $form['currency'][$key]['value'] = [
-        '#type' => 'textfield',
-        '#title' => t('Exchange rate'),
-        '#description' => t('Exchange rate from United States Dollar to @currency.', ['@currency' => $item]),
-        '#size' => 20,
-      ];
-      $form['currency'][$key]['auto'] = [
-        '#type' => 'checkboxes',
-        '#title' => '',
-        '#options' => [1 => 'Synchronize this conversion rate.'],
-      ];
+      default:
+        // Render options in form.
+        foreach ($active_currencies as $key => $item) {
 
+          $form['currency'][$key] = [
+            '#type' => 'details',
+            '#title' => $item,
+            '#open' => FALSE,
+          ];
+
+          foreach ($active_currencies as $subkey => $subitem) {
+            if ($key != $subkey) {
+              $form['currency'][$key][$subkey]['value'] = [
+                '#type' => 'textfield',
+                '#title' => $subkey,
+                '#description' => t('Exchange rate from @initial to @currency.', [
+                  '@initial' => $item,
+                  '@currency' => $subitem,
+                ]),
+                '#size' => 20,
+              ];
+              $form['currency'][$key][$subkey]['sync'] = [
+                '#type' => 'checkboxes',
+                '#title' => '',
+                '#options' => [1 => 'Synchronize this conversion rate.'],
+              ];
+            }
+          }
+
+        }
     }
-
     $form['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Submit'),
@@ -106,6 +156,7 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
     $config->set('source', $form_state->getValue('source'))
       ->set('use_cross_sync', $form_state->getValue('use_cross_sync'))
       ->set('demo_amount', $form_state->getValue('demo_amount'))
+      ->set('exchange', $form_state->getValue('currency'))
       ->save();
 
     parent::submitForm($form, $form_state);

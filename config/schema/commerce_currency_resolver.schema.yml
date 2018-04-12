@@ -25,6 +25,21 @@ commerce_currency_resolver.currency_conversion:
     demo_amount:
       type: string
       label: 'Demo amount'
+    exchange:
+      type: sequence
+      label: 'Exchange rates'
+      sequence:
+        type: sequence
+        label: 'Currency upon exchanges is based'
+        sequence:
+          type: sequence
+          label: 'Other currencies exchange rates'
+          value:
+            type: string
+            label: 'Value'
+          sync:
+            type: string
+            label: 'Sync'
 
 commerce_currency_resolver.currency_mapping:
   type: config_object
