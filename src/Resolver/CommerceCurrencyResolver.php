@@ -109,7 +109,7 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
 
         // Convert if we have mapping request. Target currency different
         // then field currency.
-        if ($field_currency !== $convert_to) {
+        if ($convert_to && $field_currency !== $convert_to) {
           $currency_source = $settings->get('currency_source');
 
           switch ($currency_source) {
