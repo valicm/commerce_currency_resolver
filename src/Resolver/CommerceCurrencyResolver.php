@@ -44,7 +44,6 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
 
     // Get default commerce field price currency and amount.
     $field_currency = $entity->getPrice()->getCurrencyCode();
-    $field_amount = $entity->getPrice()->getNumber();
 
     // Enabled currencies.
     $enabled_currencies = CurrencyHelper::getEnabledCurrency();

@@ -3,7 +3,6 @@
 namespace Drupal\commerce_currency_resolver;
 
 use Drupal\commerce_price\Price;
-use CommerceGuys\Intl\Currency\CurrencyRepository;
 
 /**
  * Class CurrencyHelper.
@@ -142,8 +141,69 @@ class CurrencyHelper {
    *   Return updated price object with new currency.
    */
   public static function priceConversion(Price $price, $currency) {
-    $price = $price->convert($currency, 1);
+    // Get currency conversion settings.
+    $config = \Drupal::config('commerce_currency_resolver.currency_conversion');
+
+    // Get specific settings.
+    $cross_sync = $config->get('use_cross_sync');
+    $mapping = $config->get('exchange');
+
+    // Current currency.
+    $current_currency = $price->getCurrencyCode();
+
+    // Determine rate.
+    switch ($cross_sync) {
+      case '0':
+        $rate = $mapping[$current_currency][$currency]['value'];
+        break;
+
+      default:
+        $rate = self::crossSyncConversion($current_currency, $currency);
+    }
+
+    // Fallback to use 1 as rate.
+    if (empty($rate)) {
+      $rate = '1';
+    }
+
+    // Convert. Convert rate to string.
+    $price = $price->convert($currency, (string) $rate);
     return $price;
+  }
+
+  /**
+   * Conversion for currencies when we use cross sync conversion.
+   *
+   * @param string $current
+   *   Current currency.
+   * @param string $target
+   *   Target currency.
+   *
+   * @return float|int
+   *   Return rate for conversion calculation.
+   */
+  public static function crossSyncConversion($current, $target) {
+    $currency_default = \Drupal::config('commerce_currency_resolver.settings')
+      ->get('currency_default');
+
+    $mapping = \Drupal::config('commerce_currency_resolver.currency_conversion')
+      ->get('exchange');
+
+    if ($current === $currency_default) {
+      $rate = $mapping[$currency_default][$target]['value'];
+    }
+
+    elseif ($target === $currency_default) {
+      $rate = 1 / $mapping[$currency_default][$current]['value'];
+    }
+
+    else {
+      $current_rate = $mapping[$currency_default][$current]['value'];
+      $target_rate = $mapping[$currency_default][$target]['value'];
+      $rate = $target_rate / $current_rate;
+    }
+
+    return $rate;
   }
 
 }
