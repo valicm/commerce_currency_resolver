@@ -2,9 +2,8 @@
 
 namespace Drupal\commerce_currency_resolver;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\commerce_price\Price;
+use CommerceGuys\Intl\Currency\CurrencyRepository;
 
 /**
  * Class CurrencyHelper.
@@ -12,24 +11,6 @@ use Drupal\commerce_price\Price;
  * @package Drupal\commerce_currency_resolver
  */
 class CurrencyHelper {
-
-  /**
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface;
-   */
-  protected $entityTypeManager;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(ConfigFactoryInterface $configFactory, EntityTypeManagerInterface $entityTypeManager) {
-    $this->configFactory = $configFactory;
-    $this->entityTypeManager = $entityTypeManager;
-  }
 
   /**
    * Get all available option where currency could be mapped.
@@ -138,6 +119,12 @@ class CurrencyHelper {
         $ip_address = \Drupal::request()->getClientIp();
         $country = $geo_locator->geolocate($ip_address);
         break;
+    }
+
+    // If geolocation fails for any specific reason (most likely on local
+    // environment, use default country from Drupal.
+    if (empty($country)) {
+      $country = \Drupal::config('system.date')->get('country.default');
     }
 
     return $country;
