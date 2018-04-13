@@ -53,14 +53,18 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
     if (!empty($mapping)) {
       $currency_mapping = \Drupal::config('commerce_currency_resolver.currency_mapping');
 
+      // See if we use domicile currency per country.
+      $domicile_currency = $currency_mapping->get('domicile_currency');
+
       // Get currency matrix data. All mappings are inside.
+      // Only if we use domicile currency, mapping is empty.
       $matrix = $currency_mapping->get('matrix');
 
       // Target currency default.
       $convert_to = FALSE;
 
       // Check if matrix exist.
-      if (isset($matrix)) {
+      if (isset($matrix) || !empty($domicile_currency)) {
 
         // Process by mapping type.
         switch ($mapping) {
@@ -74,9 +78,6 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
             // Get user country.
             $geo_service = $settings->get('currency_geo');
             $current = CurrencyHelper::getUserCountry($geo_service);
-
-            // See if we use domicile currency per country.
-            $domicile_currency = $currency_mapping->get('domicile_currency');
 
             // If we use, we need to pull currency per country, and
             // check if this currency is enabled. If not use default currency
@@ -130,7 +131,8 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
                 // Calculate conversion for the combo mode if field does not
                 // exist.
                 if ($currency_source === 'combo') {
-                  // Run auto.
+                  $new_price = CurrencyHelper::priceConversion($entity->getPrice(), $convert_to);
+                  return $new_price;
                 }
               }
               break;
@@ -138,7 +140,8 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
             default:
             case 'auto':
               // Calculate conversion.
-              break;
+              $new_price = CurrencyHelper::priceConversion($entity->getPrice(), $convert_to);
+              return $new_price;
 
           }
         }

@@ -2,9 +2,9 @@
 
 namespace Drupal\commerce_currency_resolver;
 
-use CommerceGuys\Intl\Currency\CurrencyRepository;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\commerce_price\Price;
 
 /**
  * Class CurrencyHelper.
@@ -117,6 +117,15 @@ class CurrencyHelper {
     return $currencies;
   }
 
+  /**
+   * Get user country location from contrib modules.
+   *
+   * @param string $service
+   *   Type of geo service.
+   *
+   * @return mixed
+   *   Return 2 letter country code.
+   */
   public static function getUserCountry($service) {
     switch ($service) {
       case 'smart_ip':
@@ -132,6 +141,22 @@ class CurrencyHelper {
     }
 
     return $country;
+  }
+
+  /**
+   * Currency conversion for prices.
+   *
+   * @param \Drupal\commerce_price\Price $price
+   *   Price object.
+   * @param string $currency
+   *   Target currency.
+   *
+   * @return \Drupal\commerce_price\Price|static
+   *   Return updated price object with new currency.
+   */
+  public static function priceConversion(Price $price, $currency) {
+    $price = $price->convert($currency, 1);
+    return $price;
   }
 
 }
