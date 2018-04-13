@@ -7,6 +7,7 @@ use Drupal\commerce_price\Resolver\PriceResolverInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_currency_resolver\CurrencyHelper;
+use CommerceGuys\Intl\Country\CountryRepository;
 
 /**
  * Returns a price and currency depending of language or country.
@@ -45,9 +46,14 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
     $field_currency = $entity->getPrice()->getCurrencyCode();
     $field_amount = $entity->getPrice()->getNumber();
 
+    // Enabled currencies.
+    $enabled_currencies = CurrencyHelper::getEnabledCurrency();
+
     // Skip if mapping is none.
     if (!empty($mapping)) {
       $currency_mapping = \Drupal::config('commerce_currency_resolver.currency_mapping');
+
+      // Get currency matrix data. All mappings are inside.
       $matrix = $currency_mapping->get('matrix');
 
       // Target currency default.
@@ -65,13 +71,39 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
 
           default:
           case 'geo':
+            // Get user country.
             $geo_service = $settings->get('currency_geo');
             $current = CurrencyHelper::getUserCountry($geo_service);
+
+            // See if we use domicile currency per country.
+            $domicile_currency = $currency_mapping->get('domicile_currency');
+
+            // If we use, we need to pull currency per country, and
+            // check if this currency is enabled. If not use default currency
+            // defined in admin.
+            if (!empty($domicile_currency)) {
+              $country_repository = new CountryRepository();
+              $country = $country_repository->get($current);
+              $currency_code = $country->getCurrencyCode();
+
+              // If domicile currency is enabled show it. Otherwise use default.
+              if (isset($enabled_currencies[$currency_code])) {
+                $convert_to = $currency_code;
+              }
+
+              else {
+                $convert_to = $settings->get('currency_default');
+              }
+
+            }
             break;
         }
 
-        // We hit some mapping by language or geo.
-        if (isset($matrix[$current])) {
+        // We hit some mapping by language or geo and we don't have already
+        // set convert_to variable. Check for convert_to is added for specific
+        // case of using domicile currency in geo targeting. There already
+        // we have set convert_to variable.
+        if (isset($matrix[$current]) && !$convert_to) {
           $convert_to = $matrix[$current];
         }
 
@@ -86,7 +118,8 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
 
               // Check if we have field.
               if ($entity->hasField('field_price_' . strtolower($convert_to))) {
-                $price = $entity->get('field_price_' . strtolower($convert_to))->getValue();
+                $price = $entity->get('field_price_' . strtolower($convert_to))
+                  ->getValue();
                 $price = reset($price);
 
                 // Return price.
