@@ -65,7 +65,8 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
 
           default:
           case 'geo':
-            $current = 'US';
+            $geo_service = $settings->get('currency_geo');
+            $current = CurrencyHelper::getUserCountry($geo_service);
             break;
         }
 

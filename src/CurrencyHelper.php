@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_currency_resolver;
 
+use CommerceGuys\Intl\Currency\CurrencyRepository;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
@@ -44,7 +45,7 @@ class CurrencyHelper {
 
     // Check if exist geo based modules.
     // We support for now two of them.
-    if (\Drupal::ModuleHandler()->moduleExists('smart_ip') || \Drupal::ModuleHandler()->moduleExists('geoip')) {
+    if (!empty(self::getGeoModules())) {
       $mapping['geo'] = t('By Country');
     }
 
@@ -54,6 +55,26 @@ class CurrencyHelper {
     }
 
     return $mapping;
+  }
+
+  /**
+   * Get list of supported and enabled location modules.
+   *
+   * @return array
+   *   Return list of enabled geo modules.
+   */
+  public static function getGeoModules() {
+    $geo = [];
+
+    if (\Drupal::ModuleHandler()->moduleExists('smart_ip')) {
+      $geo['smart_ip'] = t('Smart IP');
+    }
+
+    if (\Drupal::ModuleHandler()->moduleExists('geoip')) {
+      $geo['geoip'] = t('GeoIP');
+    }
+
+    return $geo;
   }
 
   /**
@@ -94,6 +115,23 @@ class CurrencyHelper {
     }
 
     return $currencies;
+  }
+
+  public static function getUserCountry($service) {
+    switch ($service) {
+      case 'smart_ip':
+        $location = \Drupal::service('smart_ip.smart_ip_location');
+        $country = $location->get('countryCode');
+        break;
+
+      case 'geoip':
+        $geo_locator = \Drupal::service('geoip.geolocation');
+        $ip_address = \Drupal::request()->getClientIp();
+        $country = $geo_locator->geolocate($ip_address);
+        break;
+    }
+
+    return $country;
   }
 
 }

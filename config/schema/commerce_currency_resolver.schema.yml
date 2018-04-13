@@ -5,6 +5,9 @@ commerce_currency_resolver.settings:
     currency_mapping:
       type: string
       label: 'Currency mapping'
+    currency_geo:
+      type: string
+      label: 'Location modules'
     currency_source:
       type: string
       label: 'Currency source'

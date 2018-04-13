@@ -47,6 +47,17 @@ class CommerceCurrencyResolverForm extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
+    if (!empty(CurrencyHelper::getGeoModules()) && $config->get('currency_mapping') === 'geo') {
+      $form['currency_geo'] = [
+        '#type' => 'radios',
+        '#title' => $this->t('Location module'),
+        '#description' => $this->t('Select which module is used for geolocation services'),
+        '#options' => CurrencyHelper::getGeoModules(),
+        '#default_value' => $config->get('currency_geo'),
+        '#required' => TRUE,
+      ];
+    }
+
     $form['currency_source'] = [
       '#type' => 'radios',
       '#title' => $this->t('Currency source'),
@@ -85,6 +96,7 @@ class CommerceCurrencyResolverForm extends ConfigFormBase {
 
     // Set values.
     $config->set('currency_mapping', $form_state->getValue('currency_mapping'))
+      ->set('currency_geo', $form_state->getValue('currency_geo'))
       ->set('currency_source', $form_state->getValue('currency_source'))
       ->set('currency_default', $form_state->getValue('currency_default'))
       ->save();
