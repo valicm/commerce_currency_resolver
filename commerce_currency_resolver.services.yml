@@ -1,6 +1,10 @@
 services:
+  commerce_currency_resolver.current_currency:
+    class: Drupal\commerce_currency_resolver\CurrentCurrency
+    arguments: ['@language_manager', '@request_stack']
+
   commerce_currency_resolver.price_resolver:
     class: Drupal\commerce_currency_resolver\Resolver\CommerceCurrencyResolver
-    arguments: ['@language_manager']
+    arguments: ['@commerce_currency_resolver.current_currency']
     tags:
      - { name: commerce_price.price_resolver, priority: 1000 }
