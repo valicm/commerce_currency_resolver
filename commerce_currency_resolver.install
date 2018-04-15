@@ -6,7 +6,6 @@
  */
 
 use CommerceGuys\Intl\Country\CountryRepository;
-use CommerceGuys\Intl\Currency\CurrencyRepository;
 
 /**
  * Implements hook_install().
@@ -26,4 +25,14 @@ function commerce_currency_resolver_install() {
     \Drupal::service('config.factory')->getEditable('commerce_currency_resolver.settings')->set('currency_default', $currency_code)->save();
 
   }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function commerce_currency_resolver_uninstall() {
+  // Remove all stored states.
+  \Drupal::state()->deleteMultiple([
+    'commerce_currency_resolver.last_update_time',
+  ]);
 }

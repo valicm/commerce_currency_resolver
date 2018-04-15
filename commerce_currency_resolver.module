@@ -6,6 +6,8 @@
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\commerce_currency_resolver\Event\CommerceCurrencyResolverEvents;
+use Drupal\commerce_currency_resolver\Event\ExchangeImport;
 
 /**
  * Implements hook_help().
@@ -21,4 +23,30 @@ function commerce_currency_resolver_help($route_name, RouteMatchInterface $route
 
     default:
   }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function commerce_currency_resolver_cron() {
+
+  // Get last time when import was done.
+  $last_update = \Drupal::state()
+    ->get('commerce_currency_resolver.last_update_time');
+
+  // Get how much often cron should be running.
+  $cron = \Drupal::config('commerce_currency_resolver.currency_conversion')
+    ->get('cron');
+
+  // Check if is needed to update currency.
+  if (time() > ($last_update - $cron)) {
+    // Get which service exchange rate is used.
+    $service = \Drupal::config('commerce_currency_resolver.currency_conversion')
+      ->get('source');
+
+    // Start and dispatch event.
+    $event = new ExchangeImport($service);
+    \Drupal::service('event_dispatcher')->dispatch(CommerceCurrencyResolverEvents::IMPORT, $event);
+  }
+
 }
