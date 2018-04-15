@@ -8,3 +8,8 @@ services:
     arguments: ['@commerce_currency_resolver.current_currency']
     tags:
      - { name: commerce_price.price_resolver, priority: 1000 }
+
+  commerce_currency_resolver.european_central_bank:
+    class: Drupal\commerce_currency_resolver\EventSubscriber\EuropeanCentralBank
+    tags:
+      - { name: event_subscriber }

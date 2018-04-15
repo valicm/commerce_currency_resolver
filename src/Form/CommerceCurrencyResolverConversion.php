@@ -89,6 +89,9 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
         ];
         foreach ($active_currencies as $key => $item) {
           if ($key !== $currency_default) {
+
+            $disabled = $config->get('exchange')[$currency_default][$key]['sync'];
+
             $form['currency'][$currency_default][$key]['value'] = [
               '#type' => 'textfield',
               '#title' => $key,
@@ -97,11 +100,15 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
                 '@currency' => $item,
               ]),
               '#size' => 20,
+              '#default_value' => $config->get('exchange')[$currency_default][$key]['value'],
+              '#disabled' => empty($disabled[1]) ? TRUE : FALSE,
             ];
+
             $form['currency'][$currency_default][$key]['sync'] = [
               '#type' => 'checkboxes',
               '#title' => '',
-              '#options' => [1 => 'Synchronize this conversion rate.'],
+              '#options' => [1 => 'Enter manually exchange rate.'],
+              '#default_value' => $config->get('exchange')[$currency_default][$key]['sync'],
             ];
           }
         }
@@ -119,6 +126,9 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
 
           foreach ($active_currencies as $subkey => $subitem) {
             if ($key != $subkey) {
+
+              $disabled = $config->get('exchange')[$key][$subkey]['sync'];
+
               $form['currency'][$key][$subkey]['value'] = [
                 '#type' => 'textfield',
                 '#title' => $subkey,
@@ -127,12 +137,17 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
                   '@currency' => $subitem,
                 ]),
                 '#size' => 20,
+                '#default_value' => $config->get('exchange')[$key][$subkey]['value'],
+                '#disabled' => empty($disabled[1]) ? TRUE : FALSE,
               ];
+
               $form['currency'][$key][$subkey]['sync'] = [
                 '#type' => 'checkboxes',
                 '#title' => '',
-                '#options' => [1 => 'Synchronize this conversion rate.'],
+                '#options' => [1 => 'Enter manually exchange rate.'],
+                '#default_value' => $config->get('exchange')[$key][$subkey]['sync'],
               ];
+
             }
           }
 
