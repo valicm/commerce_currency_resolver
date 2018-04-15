@@ -98,6 +98,36 @@ class CurrencyHelper {
   }
 
   /**
+   * Get all Exchange rates services.
+   *
+   * @return array
+   *   Return array of available services.
+   */
+  public static function getExchangeServices() {
+    $container = \Drupal::getContainer();
+    $kernel = $container->get('kernel');
+
+    // Get all services.
+    $services = $kernel->getCachedContainerDefinition()['services'];
+
+    $options = [];
+    foreach ($services as $service_id => $value) {
+      // Split service id. Service could be in any module added, so we
+      // need to split service_id to rid of module name.
+      $name = explode('.', $service_id);
+
+      // Get second part of service name and check for specific string on
+      // the beginning.
+      if (isset($name[1]) && substr($name[1], 0, 13) === 'exchange_rate') {
+        $clean_name = str_replace('exchange_rate_', '', $name[1]);
+        $options[$name[1]] = str_replace('_', ' ', $clean_name);
+      }
+    }
+
+    return $options;
+  }
+
+  /**
    * Get user country location from contrib modules.
    *
    * @param string $service

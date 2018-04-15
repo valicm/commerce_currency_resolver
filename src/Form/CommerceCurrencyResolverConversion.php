@@ -49,12 +49,8 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
       '#type' => 'select',
       '#title' => $this->t('3rd party exchange service'),
       '#description' => $this->t('Select which external service you want to use for calucalting exchange rates between currencies'),
-      '#options' => [
-        'manual' => $this->t('Manual'),
-        'external' => $this->t('External'),
-        'combo' => $this->t('Combination'),
-      ],
-      '#default_value' => $config->get('currency_conversion'),
+      '#options' => CurrencyHelper::getExchangeServices(),
+      '#default_value' => $config->get('source'),
       '#required' => TRUE,
     ];
 

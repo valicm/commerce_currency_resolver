@@ -9,9 +9,9 @@ use SimpleXMLElement;
 use Drupal\commerce_currency_resolver\CurrencyHelper;
 
 /**
- * Class EuropeanCentralBank.
+ * Class ExchangeRateECB.
  */
-class EuropeanCentralBank implements EventSubscriberInterface {
+class ExchangeRateECB implements EventSubscriberInterface {
 
   /**
    * ECB daily XML url.

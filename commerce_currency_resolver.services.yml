@@ -9,7 +9,7 @@ services:
     tags:
      - { name: commerce_price.price_resolver, priority: 1000 }
 
-  commerce_currency_resolver.european_central_bank:
-    class: Drupal\commerce_currency_resolver\EventSubscriber\EuropeanCentralBank
+  commerce_currency_resolver.exchange_rate_ecb:
+    class: Drupal\commerce_currency_resolver\EventSubscriber\ExchangeRateECB
     tags:
-      - { name: event_subscriber }
+      - { name: event_subscriber, tag: vallic }
