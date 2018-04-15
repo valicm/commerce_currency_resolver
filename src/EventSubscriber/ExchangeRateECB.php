@@ -141,6 +141,10 @@ class ExchangeRateECB implements EventSubscriberInterface {
 
       // Set and save new message value.
       $config->set('exchange', $exchange_rates)->save();
+
+      // Set time when cron is done.
+      \Drupal::state()->set('commerce_currency_resolver.last_update_time', REQUEST_TIME);
+
     }
   }
 

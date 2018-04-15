@@ -47,10 +47,23 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
 
     $form['source'] = [
       '#type' => 'select',
-      '#title' => $this->t('3rd party exchange service'),
-      '#description' => $this->t('Select which external service you want to use for calucalting exchange rates between currencies'),
+      '#title' => $this->t('Exchange rate API'),
+      '#description' => $this->t('Select which external service you want to use for calculating exchange rates between currencies'),
       '#options' => CurrencyHelper::getExchangeServices(),
       '#default_value' => $config->get('source'),
+      '#required' => TRUE,
+    ];
+
+    $form['cron'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Exchange rate cron'),
+      '#description' => $this->t('Select how often exchange rates should be imported. Note about EBC, they update exchange rates once a day'),
+      '#options' => [
+        60 * 60 * 6 => '6 hours',
+        60 * 60 * 12 => '12 hours',
+        60 * 60 * 24 => 'Once a day',
+      ],
+      '#default_value' => (int) $config->get('cron'),
       '#required' => TRUE,
     ];
 
@@ -98,12 +111,21 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
               '#size' => 20,
               '#default_value' => $config->get('exchange')[$currency_default][$key]['value'],
               '#disabled' => empty($disabled[1]) ? TRUE : FALSE,
+              '#field_suffix' => t(
+                '* @demo_amount @currency_symbol = @amount @conversion_currency_symbol',
+                [
+                  '@demo_amount' => $config->get('demo_amount'),
+                  '@currency_symbol' => $currency_default,
+                  '@conversion_currency_symbol' => $key,
+                  '@amount' => ($config->get('demo_amount') * $config->get('exchange')[$currency_default][$key]['value']),
+                ]
+              ),
             ];
 
             $form['currency'][$currency_default][$key]['sync'] = [
               '#type' => 'checkboxes',
               '#title' => '',
-              '#options' => [1 => 'Enter manually exchange rate.'],
+              '#options' => [1 => 'Manually enter an exchange rate'],
               '#default_value' => $config->get('exchange')[$currency_default][$key]['sync'],
             ];
           }
@@ -135,12 +157,21 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
                 '#size' => 20,
                 '#default_value' => $config->get('exchange')[$key][$subkey]['value'],
                 '#disabled' => empty($disabled[1]) ? TRUE : FALSE,
+                '#field_suffix' => t(
+                  '* @demo_amount @currency_symbol = @amount @conversion_currency_symbol',
+                  [
+                    '@demo_amount' => $config->get('demo_amount'),
+                    '@currency_symbol' => $key,
+                    '@conversion_currency_symbol' => $subkey,
+                    '@amount' => ($config->get('demo_amount') * $config->get('exchange')[$key][$subkey]['value']),
+                  ]
+                ),
               ];
 
               $form['currency'][$key][$subkey]['sync'] = [
                 '#type' => 'checkboxes',
                 '#title' => '',
-                '#options' => [1 => 'Enter manually exchange rate.'],
+                '#options' => [1 => 'Manually enter an exchange rate'],
                 '#default_value' => $config->get('exchange')[$key][$subkey]['sync'],
               ];
 
@@ -165,6 +196,7 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
 
     // Set values.
     $config->set('source', $form_state->getValue('source'))
+      ->set('cron', (int) $form_state->getValue('cron'))
       ->set('use_cross_sync', $form_state->getValue('use_cross_sync'))
       ->set('demo_amount', $form_state->getValue('demo_amount'))
       ->set('exchange', $form_state->getValue('currency'))
