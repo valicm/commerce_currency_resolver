@@ -220,12 +220,22 @@ class CurrencyHelper {
    *   Return recalculated data.
    */
   public static function reverseCalculate($target_currency, $base_currency, array $data) {
-    $currency_default = 1 / $data[$target_currency];
+
+    // Get all enabled currencies.
+    $enabled = self::getEnabledCurrency();
+
+    // If we accidentally sent same target and base currency.
+    $rate_target_currency = !empty($data[$target_currency]) ? $data[$target_currency] : 1;
+
+    // Get rate based from base currency.
+    $currency_default = 1 / $rate_target_currency;
 
     $recalculated = [];
     $recalculated[$base_currency] = $currency_default;
+
+    // Recalculate all data.
     foreach ($data as $currency => $rate) {
-      if ($currency != $target_currency) {
+      if ($currency != $target_currency && isset($enabled[$currency])) {
         $recalculated[$currency] = $rate * $currency_default;
       }
     }

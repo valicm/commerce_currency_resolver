@@ -116,6 +116,26 @@ class EuropeanCentralBank implements EventSubscriberInterface {
         }
       }
 
+      else {
+
+        // For each currency built data.
+        foreach ($mapping as $currency_code => $value) {
+          $recalculate = CurrencyHelper::reverseCalculate($currency_code, 'EUR', $data);
+
+          $exchange_rates[$currency_code] = [];
+          foreach ($recalculate as $currency => $rate) {
+            if (empty($mapping[$currency_code][$currency]['sync'][1])) {
+              $exchange_rates[$currency_code][$currency]['value'] = $rate;
+              $exchange_rates[$currency_code][$currency]['sync'] = $mapping[$currency_code][$currency]['sync'];
+            }
+
+            else {
+              $exchange_rates[$currency_code][$currency] = $mapping[$currency_code][$currency];
+            }
+          }
+        }
+      }
+
       // Get config.
       $config = \Drupal::service('config.factory')->getEditable('commerce_currency_resolver.currency_conversion');
 
