@@ -99,7 +99,8 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
         foreach ($active_currencies as $key => $item) {
           if ($key !== $currency_default) {
 
-            $disabled = $config->get('exchange')[$currency_default][$key]['sync'];
+            $default_rate = isset($config->get('exchange')[$currency_default][$key]['value']) ? $config->get('exchange')[$currency_default][$key]['value'] : 0;
+            $default_sync = isset($config->get('exchange')[$currency_default][$key]['sync']) ? $config->get('exchange')[$currency_default][$key]['sync'] : [];
 
             $form['currency'][$currency_default][$key]['value'] = [
               '#type' => 'textfield',
@@ -109,15 +110,15 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
                 '@currency' => $item,
               ]),
               '#size' => 20,
-              '#default_value' => $config->get('exchange')[$currency_default][$key]['value'],
-              '#disabled' => empty($disabled[1]) ? TRUE : FALSE,
+              '#default_value' => $default_rate,
+              '#disabled' => empty($default_sync[1]) ? TRUE : FALSE,
               '#field_suffix' => t(
                 '* @demo_amount @currency_symbol = @amount @conversion_currency_symbol',
                 [
                   '@demo_amount' => $config->get('demo_amount'),
                   '@currency_symbol' => $currency_default,
                   '@conversion_currency_symbol' => $key,
-                  '@amount' => ($config->get('demo_amount') * $config->get('exchange')[$currency_default][$key]['value']),
+                  '@amount' => ($config->get('demo_amount') * $default_rate),
                 ]
               ),
             ];
@@ -126,7 +127,7 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
               '#type' => 'checkboxes',
               '#title' => '',
               '#options' => [1 => 'Manually enter an exchange rate'],
-              '#default_value' => $config->get('exchange')[$currency_default][$key]['sync'],
+              '#default_value' => $default_sync,
             ];
           }
         }
@@ -145,7 +146,8 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
           foreach ($active_currencies as $subkey => $subitem) {
             if ($key != $subkey) {
 
-              $disabled = $config->get('exchange')[$key][$subkey]['sync'];
+              $default_rate = isset($config->get('exchange')[$key][$subkey]['value']) ? $config->get('exchange')[$key][$subkey]['value'] : 0;
+              $default_sync = isset($config->get('exchange')[$key][$subkey]['sync']) ? $config->get('exchange')[$key][$subkey]['sync'] : [];
 
               $form['currency'][$key][$subkey]['value'] = [
                 '#type' => 'textfield',
@@ -155,15 +157,15 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
                   '@currency' => $subitem,
                 ]),
                 '#size' => 20,
-                '#default_value' => $config->get('exchange')[$key][$subkey]['value'],
-                '#disabled' => empty($disabled[1]) ? TRUE : FALSE,
+                '#default_value' => $default_rate,
+                '#disabled' => empty($default_sync[1]) ? TRUE : FALSE,
                 '#field_suffix' => t(
                   '* @demo_amount @currency_symbol = @amount @conversion_currency_symbol',
                   [
                     '@demo_amount' => $config->get('demo_amount'),
                     '@currency_symbol' => $key,
                     '@conversion_currency_symbol' => $subkey,
-                    '@amount' => ($config->get('demo_amount') * $config->get('exchange')[$key][$subkey]['value']),
+                    '@amount' => ($config->get('demo_amount') * $default_rate),
                   ]
                 ),
               ];
@@ -172,7 +174,7 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
                 '#type' => 'checkboxes',
                 '#title' => '',
                 '#options' => [1 => 'Manually enter an exchange rate'],
-                '#default_value' => $config->get('exchange')[$key][$subkey]['sync'],
+                '#default_value' => $default_sync,
               ];
 
             }
