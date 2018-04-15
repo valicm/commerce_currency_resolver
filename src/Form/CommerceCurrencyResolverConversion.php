@@ -54,6 +54,15 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
+    $source_readable = CurrencyHelper::getExchangeServices()[$config->get('source')];
+
+    $form['api_key'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('API Key', ['@source' => $source_readable]),
+      '#description' => $this->t('Enter API key. ECB does not require API key'),
+      '#default_value' => $config->get('api_key'),
+    ];
+
     $form['cron'] = [
       '#type' => 'select',
       '#title' => $this->t('Exchange rate cron'),
@@ -188,6 +197,16 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
     ];
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    parent::validateForm($form, $form_state);
+    if ($form_state->getValue('source') != 'exchange_rate_ecb') {
+      $form_state->setErrorByName('api_key', $this->t('API key is required'));
+    }
   }
 
   /**

@@ -22,6 +22,9 @@ commerce_currency_resolver.currency_conversion:
     source:
       type: string
       label: 'Currency exchange service'
+    api_key:
+      type: string
+      label: 'API key'
     cron:
       type: integer
       label: 'Exchange rate cron'

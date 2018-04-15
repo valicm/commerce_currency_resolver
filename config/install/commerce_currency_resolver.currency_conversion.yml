@@ -1,4 +1,5 @@
 source: 'exchange_rate_ecb'
+api_key: ''
 cron: 86400
 use_cross_sync: 1
 demo_amount: '100'
