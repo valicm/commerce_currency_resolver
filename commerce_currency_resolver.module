@@ -39,7 +39,7 @@ function commerce_currency_resolver_cron() {
     ->get('cron');
 
   // Check if is needed to update currency.
-  if (time() > ($last_update - $cron)) {
+  if (time() < ($last_update - $cron)) {
     // Get which service exchange rate is used.
     $service = \Drupal::config('commerce_currency_resolver.currency_conversion')
       ->get('source');
