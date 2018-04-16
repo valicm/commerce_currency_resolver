@@ -12,4 +12,9 @@ services:
   commerce_currency_resolver.exchange_rate_ecb:
     class: Drupal\commerce_currency_resolver\EventSubscriber\ExchangeRateECB
     tags:
-      - { name: event_subscriber, tag: vallic }
+      - { name: event_subscriber }
+
+  commerce_currency_resolver.exchange_rate_fixer:
+    class: Drupal\commerce_currency_resolver\EventSubscriber\ExchangeRateFixer
+    tags:
+      - { name: event_subscriber }
