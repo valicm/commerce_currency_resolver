@@ -8,6 +8,7 @@
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\commerce_currency_resolver\Event\CommerceCurrencyResolverEvents;
 use Drupal\commerce_currency_resolver\Event\ExchangeImport;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Implements hook_help().
@@ -22,6 +23,16 @@ function commerce_currency_resolver_help($route_name, RouteMatchInterface $route
       return $output;
 
     default:
+  }
+}
+
+/**
+ * Implements hook_entity_build_defaults_alter().
+ */
+function commerce_currency_resolver_entity_view_alter(array &$build, EntityInterface $entity, $view_mode) {
+  // Add our cache context.
+  if (isset($build['#commerce_product']) || isset($build['#commerce_product_variation'])) {
+    $build['#cache']['contexts'][] = 'currency_resolver';
   }
 }
 

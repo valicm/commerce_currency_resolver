@@ -114,6 +114,19 @@ class CurrentCurrency implements CurrentCurrencyInterface {
 
         }
       }
+
+      else {
+        // Cookie solution check.
+        if ($request->cookies->has('commerce_currency')) {
+          $cookie = $request->cookies->get('commerce_currency');
+
+          // Check if value is among enabled currencies.
+          if (isset($enabled_currencies[$cookie])) {
+            $resolved_currency = $cookie;
+          }
+
+        }
+      }
       $this->currency[$request] = $resolved_currency;
     }
 

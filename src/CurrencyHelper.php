@@ -21,7 +21,7 @@ class CurrencyHelper {
     $mapping = [];
 
     // Default none.
-    $mapping['0'] = t('None');
+    $mapping['0'] = t('Cookie (currency block selector)');
 
     // Check if exist geo based modules.
     // We support for now two of them.
