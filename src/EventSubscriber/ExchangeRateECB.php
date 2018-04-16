@@ -91,13 +91,10 @@ class ExchangeRateECB extends ExchangeRateEventSubscriberBase {
    * {@inheritdoc}
    */
   public function processAllCurrencies() {
+    $exchange_rates = [];
     $data = $this->getExternalData();
 
     if ($data) {
-
-      // Default currency.
-      $currency_default = \Drupal::config('commerce_currency_resolver.settings')
-        ->get('currency_default');
 
       // Enabled currency.
       $enabled = CurrencyHelper::getEnabledCurrency();
@@ -113,6 +110,8 @@ class ExchangeRateECB extends ExchangeRateEventSubscriberBase {
         $exchange_rates[$currency_code] = $get_rates[$currency_code];
       }
     }
+
+    return $exchange_rates;
   }
 
 }
