@@ -5,6 +5,8 @@ namespace Drupal\commerce_currency_resolver\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\commerce_currency_resolver\CurrencyHelper;
+use Drupal\commerce_currency_resolver\Event\ExchangeImport;
+use Drupal\commerce_currency_resolver\Event\CommerceCurrencyResolverEvents;
 
 /**
  * Class CommerceCurrencyResolverConversion.
@@ -88,6 +90,13 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
       '#title' => t('Amount for example conversions:'),
       '#size' => 10,
       '#default_value' => $config->get('demo_amount'),
+    );
+
+    $form['synchronize'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Synchronize rates on save'),
+      '#size' => 10,
+      '#default_value' => 0,
     );
 
     $form['currency'] = [
@@ -225,6 +234,13 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
       ->save();
 
     parent::submitForm($form, $form_state);
+
+    // Synchronize exchange rates after form submit.
+    if (!empty($form_state->getValue('synchronize'))) {
+      // Start and dispatch event.
+      $event = new ExchangeImport($form_state->getValue('source'));
+      \Drupal::service('event_dispatcher')->dispatch(CommerceCurrencyResolverEvents::IMPORT, $event);
+    }
   }
 
 }
