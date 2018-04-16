@@ -30,8 +30,13 @@ function commerce_currency_resolver_help($route_name, RouteMatchInterface $route
  * Implements hook_entity_build_defaults_alter().
  */
 function commerce_currency_resolver_entity_view_alter(array &$build, EntityInterface $entity, $view_mode) {
+
+  // Check enabled source. We use cache context only for cookie based
+  // currency switch.
+  $source = \Drupal::config('commerce_currency_resolver.settings')->get('currency_source');
+
   // Add our cache context.
-  if (isset($build['#commerce_product']) || isset($build['#commerce_product_variation'])) {
+  if (empty($source) && (isset($build['#commerce_product']) || isset($build['#commerce_product_variation']))) {
     $build['#cache']['contexts'][] = 'currency_resolver';
   }
 }
