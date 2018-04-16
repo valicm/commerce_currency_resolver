@@ -236,41 +236,4 @@ class CurrencyHelper {
     return $rate;
   }
 
-  /**
-   * Recalculate currencies from exchange rate between two other currencies.
-   *
-   * @param string $target_currency
-   *   Currency to which should be exchange rate calculated.
-   * @param string $base_currency
-   *   Base currency upon which we have exchange rates.
-   * @param array $data
-   *   Currency and rate array.
-   *
-   * @return array
-   *   Return recalculated data.
-   */
-  public static function reverseCalculate($target_currency, $base_currency, array $data) {
-
-    // Get all enabled currencies.
-    $enabled = self::getEnabledCurrency();
-
-    // If we accidentally sent same target and base currency.
-    $rate_target_currency = !empty($data[$target_currency]) ? $data[$target_currency] : 1;
-
-    // Get rate based from base currency.
-    $currency_default = 1 / $rate_target_currency;
-
-    $recalculated = [];
-    $recalculated[$base_currency] = $currency_default;
-
-    // Recalculate all data.
-    foreach ($data as $currency => $rate) {
-      if ($currency != $target_currency && isset($enabled[$currency])) {
-        $recalculated[$currency] = $rate * $currency_default;
-      }
-    }
-
-    return $recalculated;
-  }
-
 }

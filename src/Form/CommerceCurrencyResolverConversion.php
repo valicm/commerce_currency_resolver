@@ -204,7 +204,7 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
-    if ($form_state->getValue('source') != 'exchange_rate_ecb') {
+    if ($form_state->getValue('source') != 'exchange_rate_ecb' && empty($form_state->getValue('api_key'))) {
       $form_state->setErrorByName('api_key', $this->t('API key is required'));
     }
   }
@@ -217,6 +217,7 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
 
     // Set values.
     $config->set('source', $form_state->getValue('source'))
+      ->set('api_key', $form_state->getValue('api_key'))
       ->set('cron', (int) $form_state->getValue('cron'))
       ->set('use_cross_sync', $form_state->getValue('use_cross_sync'))
       ->set('demo_amount', $form_state->getValue('demo_amount'))

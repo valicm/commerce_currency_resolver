@@ -2,65 +2,60 @@
 
 namespace Drupal\commerce_currency_resolver\EventSubscriber;
 
-use Drupal\commerce_currency_resolver\Event\CommerceCurrencyResolverEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use GuzzleHttp\Exception\RequestException;
+use Drupal\commerce_currency_resolver\ExchangeRateEventSubscriberBase;
 use SimpleXMLElement;
 use Drupal\commerce_currency_resolver\CurrencyHelper;
 
 /**
  * Class ExchangeRateECB.
  */
-class ExchangeRateECB implements EventSubscriberInterface {
+class ExchangeRateECB extends ExchangeRateEventSubscriberBase {
 
   /**
-   * ECB daily XML url.
+   * {@inheritdoc}
    */
-  const API_URL = 'http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml';
-
-  /**
-   * Fetch external data.
-   */
-  public function getExternalData() {
-    $data = NULL;
-
-    // Prepare for client.
-    $client = \Drupal::httpClient();
-    $url = self::API_URL;
-    $method = 'GET';
-    $options = [];
-
-    try {
-      $response = $client->request($method, $url, $options);
-      // Expected result.
-      $xml = $response->getBody()->getContents();
-      $data = $this->parseExternalData($xml);
-    }
-    catch (RequestException $e) {
-      \Drupal::logger('commerce_currency_resolver')->debug($e->getMessage());
-    }
-
-    return $data;
+  public static function apiUrl() {
+    return 'http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml';
   }
 
   /**
-   * Parse the xml.
+   * {@inheritdoc}
    */
-  private function parseExternalData($raw_xml) {
-    try {
-      $xml = new SimpleXMLElement($raw_xml);
-    }
-    catch (\Exception $e) {
-      \Drupal::logger('commerce_currency_resolver')->debug($e->getMessage());
-    }
+  public static function sourceId() {
+    return 'exchange_rate_ecb';
+  }
 
-    $data = [];
+  /**
+   * {@inheritdoc}
+   */
+  public function getExternalData($base_currency = NULL) {
+    $data = NULL;
 
-    // Loop and build array.
-    foreach ($xml->Cube->Cube->Cube as $rate) {
-      $code = (string) $rate['currency'];
-      $rate = (string) $rate['rate'];
-      $data[$code] = $rate;
+    // Prepare for client.
+    $url = self::apiUrl();
+    $method = 'GET';
+    $options = [];
+
+    $request = $this->apiClient($method, $url, $options);
+
+    if ($request) {
+
+      try {
+        $xml = new SimpleXMLElement($request);
+      }
+      catch (\Exception $e) {
+        \Drupal::logger('commerce_currency_resolver')->debug($e->getMessage());
+      }
+
+      $data = [];
+
+      // Loop and build array.
+      foreach ($xml->Cube->Cube->Cube as $rate) {
+        $code = (string) $rate['currency'];
+        $rate = (string) $rate['rate'];
+        $data[$code] = $rate;
+      }
+
     }
 
     return $data;
@@ -69,82 +64,54 @@ class ExchangeRateECB implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
-    $events[CommerceCurrencyResolverEvents::IMPORT] = ['import'];
-    return $events;
-  }
-
-  /**
-   * This method is called whenever the import event is dispatched.
-   */
-  public function import() {
+  public function processDefaultCurrency() {
+    $exchange_rates = [];
     $data = $this->getExternalData();
 
     if ($data) {
+      // Default currency.
+      $currency_default = \Drupal::config('commerce_currency_resolver.settings')
+        ->get('currency_default');
 
-      // Get existing settings.
-      $settings = \Drupal::config('commerce_currency_resolver.currency_conversion');
+      // ECB uses EUR as base currency.
+      // If euro is not main currence we need recalculate.
+      if ($currency_default != 'EUR') {
+        $data = $this->reverseCalculate($currency_default, 'EUR', $data);
+      }
 
-      // Get cross sync settings.
-      $cross_sync = $settings->get('use_cross_sync');
+      // Prepare data for saving.
+      $exchange_rates = $this->mapExchangeRates($data, $currency_default);
+    }
 
-      // Get current mapping.
-      $mapping = $settings->get('exchange');
+    return $exchange_rates;
+
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function processAllCurrencies() {
+    $data = $this->getExternalData();
+
+    if ($data) {
 
       // Default currency.
       $currency_default = \Drupal::config('commerce_currency_resolver.settings')
         ->get('currency_default');
 
-      $exchange_rates = [];
-      if (!empty($cross_sync)) {
-        // ECB uses EUR as base currency.
-        // If euro is not main currence we need recaclulate.
-        if ($currency_default != 'EUR') {
-          $data = CurrencyHelper::reverseCalculate($currency_default, 'EUR', $data);
-        }
+      // Enabled currency.
+      $enabled = CurrencyHelper::getEnabledCurrency();
 
-        $exchange_rates[$currency_default] = [];
-        foreach ($data as $currency => $rate) {
-          if (empty($mapping[$currency_default][$currency]['sync'][1])) {
-            $exchange_rates[$currency_default][$currency]['value'] = $rate;
-            $exchange_rates[$currency_default][$currency]['sync'] = $mapping[$currency_default][$currency]['sync'];
-          }
+      // For each currency built data.
+      foreach ($enabled as $currency_code => $value) {
+        // ECB uses only EUR as base currency, so we need to
+        // recalculate other currencies.
+        $recalculate = $this->reverseCalculate($currency_code, 'EUR', $data);
 
-          else {
-            $exchange_rates[$currency_default][$currency] = $mapping[$currency_default][$currency];
-          }
-        }
+        // Prepare data.
+        $get_rates = $this->mapExchangeRates($recalculate, $currency_code);
+        $exchange_rates[$currency_code] = $get_rates[$currency_code];
       }
-
-      else {
-
-        // For each currency built data.
-        foreach ($mapping as $currency_code => $value) {
-          $recalculate = CurrencyHelper::reverseCalculate($currency_code, 'EUR', $data);
-
-          $exchange_rates[$currency_code] = [];
-          foreach ($recalculate as $currency => $rate) {
-            if (empty($mapping[$currency_code][$currency]['sync'][1])) {
-              $exchange_rates[$currency_code][$currency]['value'] = $rate;
-              $exchange_rates[$currency_code][$currency]['sync'] = $mapping[$currency_code][$currency]['sync'];
-            }
-
-            else {
-              $exchange_rates[$currency_code][$currency] = $mapping[$currency_code][$currency];
-            }
-          }
-        }
-      }
-
-      // Get config.
-      $config = \Drupal::service('config.factory')->getEditable('commerce_currency_resolver.currency_conversion');
-
-      // Set and save new message value.
-      $config->set('exchange', $exchange_rates)->save();
-
-      // Set time when cron is done.
-      \Drupal::state()->set('commerce_currency_resolver.last_update_time', REQUEST_TIME);
-
     }
   }
 
