@@ -67,7 +67,8 @@ abstract class ExchangeRateEventSubscriberBase implements EventSubscriberInterfa
     foreach ($data as $currency => $rate) {
       if (empty($mapping[$base_currency][$currency]['sync'][1])) {
         $exchange_rates[$base_currency][$currency]['value'] = $rate;
-        $exchange_rates[$base_currency][$currency]['sync'] = $mapping[$base_currency][$currency]['sync'];
+        $sync_settings = isset($mapping[$base_currency][$currency]['sync']) ? $mapping[$base_currency][$currency]['sync'] : [1 => 0];
+        $exchange_rates[$base_currency][$currency]['sync'] = $sync_settings;
       }
 
       else {
