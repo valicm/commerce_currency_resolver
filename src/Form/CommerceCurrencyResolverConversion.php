@@ -78,30 +78,30 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
-    $form['use_cross_sync'] = array(
+    $form['use_cross_sync'] = [
       '#type' => 'checkbox',
       '#default_value' => $cross_sync,
-      '#title' => t('Use cross conversion between non default currencies.'),
-      '#description' => t('If enabled only the rates between the default currency and the other currencies have to be managed. The rates between the other currencies is derived from their rates relative to the default currency.'),
-    );
+      '#title' => $this->t('Use cross conversion between non default currencies.'),
+      '#description' => $this->t('If enabled only the rates between the default currency and the other currencies have to be managed. The rates between the other currencies is derived from their rates relative to the default currency.'),
+    ];
 
-    $form['demo_amount'] = array(
+    $form['demo_amount'] = [
       '#type' => 'textfield',
-      '#title' => t('Amount for example conversions:'),
+      '#title' => $this->t('Amount for example conversions:'),
       '#size' => 10,
       '#default_value' => $config->get('demo_amount'),
-    );
+    ];
 
-    $form['synchronize'] = array(
+    $form['synchronize'] = [
       '#type' => 'checkbox',
-      '#title' => t('Synchronize rates on save'),
+      '#title' => $this->t('Synchronize rates on save'),
       '#size' => 10,
       '#default_value' => 0,
-    );
+    ];
 
     $form['currency'] = [
       '#type' => 'details',
-      '#title' => t('Currency exchange rates'),
+      '#title' => $this->t('Currency exchange rates'),
       '#open' => TRUE,
       '#tree' => TRUE,
     ];
@@ -123,14 +123,14 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
             $form['currency'][$currency_default][$key]['value'] = [
               '#type' => 'textfield',
               '#title' => $key,
-              '#description' => t('Exchange rate from @initial to @currency.', [
+              '#description' => $this->t('Exchange rate from @initial to @currency.', [
                 '@initial' => $currency_default,
                 '@currency' => $item,
               ]),
               '#size' => 20,
               '#default_value' => $default_rate,
               '#disabled' => empty($default_sync[1]) ? TRUE : FALSE,
-              '#field_suffix' => t(
+              '#field_suffix' => $this->t(
                 '* @demo_amount @currency_symbol = @amount @conversion_currency_symbol',
                 [
                   '@demo_amount' => $config->get('demo_amount'),
@@ -170,14 +170,14 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
               $form['currency'][$key][$subkey]['value'] = [
                 '#type' => 'textfield',
                 '#title' => $subkey,
-                '#description' => t('Exchange rate from @initial to @currency.', [
+                '#description' => $this->t('Exchange rate from @initial to @currency.', [
                   '@initial' => $item,
                   '@currency' => $subitem,
                 ]),
                 '#size' => 20,
                 '#default_value' => $default_rate,
                 '#disabled' => empty($default_sync[1]) ? TRUE : FALSE,
-                '#field_suffix' => t(
+                '#field_suffix' => $this->t(
                   '* @demo_amount @currency_symbol = @amount @conversion_currency_symbol',
                   [
                     '@demo_amount' => $config->get('demo_amount'),

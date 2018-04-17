@@ -85,7 +85,7 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
         $form['matrix'] = [
           '#type' => 'details',
           '#open' => TRUE,
-          '#title' => t('Currency matrix'),
+          '#title' => $this->t('Currency matrix'),
           '#tree' => TRUE,
           '#weight' => 50,
         ];
@@ -96,7 +96,7 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
             '#options' => $active_currencies,
             '#default_value' => $matrix[$key],
             '#title' => $lang,
-            '#description' => t('Select currency which should be used with @lang language', ['@lang' => $lang]),
+            '#description' => $this->t('Select currency which should be used with @lang language', ['@lang' => $lang]),
           ];
         }
         break;
@@ -108,8 +108,8 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
         $form['domicile_currency'] = [
           '#type' => 'checkbox',
           '#default_value' => $domicile_currency,
-          '#title' => t('Use domicile currency per country.'),
-          '#description' => t('If domicile currency is enabled for specific country, it will be considered as primary currency. Otherwise currency resolver use default currency defined in settings as fallback.'),
+          '#title' => $this->t('Use domicile currency per country.'),
+          '#description' => $this->t('If domicile currency is enabled for specific country, it will be considered as primary currency. Otherwise currency resolver use default currency defined in settings as fallback.'),
         ];
 
         // Use mapping per country.
@@ -119,17 +119,17 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
             '#type' => 'select',
             '#default_value' => $logic,
             '#options' => [
-              'country' => t('Country'),
-              'currency' => t('Currency'),
+              'country' => $this->t('Country'),
+              'currency' => $this->t('Currency'),
             ],
-            '#title' => t('Matrix logic'),
-            '#description' => t('How you want to create matrix. You can assign currency to each country separate, or assign multiple countries to each currency'),
+            '#title' => $this->t('Matrix logic'),
+            '#description' => $this->t('How you want to create matrix. You can assign currency to each country separate, or assign multiple countries to each currency'),
           ];
 
           $form['matrix'] = [
             '#type' => 'details',
             '#open' => FALSE,
-            '#title' => t('Currency matrix'),
+            '#title' => $this->t('Currency matrix'),
             '#tree' => TRUE,
             '#weight' => 50,
           ];
@@ -146,7 +146,7 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
                   '#type' => 'select',
                   '#options' => $active_currencies,
                   '#title' => $value->render(),
-                  '#description' => t('Select currency which should be used with @lang language', ['@lang' => $value->render()]),
+                  '#description' => $this->t('Select currency which should be used with @lang language', ['@lang' => $value->render()]),
                   '#default_value' => isset($matrix[$key]) ? $matrix[$key] : $currency_default,
                 ];
               }
@@ -169,7 +169,7 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
                   '#type' => 'textfield',
                   '#autocomplete_route_name' => 'commerce_currency_resolver.countries.autocomplete',
                   '#title' => $currency,
-                  '#description' => t('Select countires which should be used with @currency currency', ['@currency' => $currency]),
+                  '#description' => $this->t('Select countires which should be used with @currency currency', ['@currency' => $currency]),
                   '#default_value' => isset($data[$key]) ? str_replace(' ', ', ', $data[$key]) : '',
                 ];
               }

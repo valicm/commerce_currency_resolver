@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\commerce_currency_resolver\Resolver;
 
 use Drupal\commerce\Context;

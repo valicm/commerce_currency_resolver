@@ -45,10 +45,10 @@ class CommerceCurrencyResolverAutocomplete extends ControllerBase {
   /**
    * Retrieves group suggestions for a context.
    *
-   * @param Request $request
+   * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request.
    *
-   * @return JsonResponse
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response with groups matching the query.
    */
   public function countriesAutocomplete(Request $request) {

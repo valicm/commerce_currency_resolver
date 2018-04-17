@@ -17,4 +17,5 @@ final class CommerceCurrencyResolverEvents {
    * @var string
    */
   const IMPORT = 'commerce_currency_resolver.exchange_import';
+
 }
