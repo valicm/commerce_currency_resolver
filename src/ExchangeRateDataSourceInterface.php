@@ -117,4 +117,5 @@ interface ExchangeRateDataSourceInterface {
    *   Event which is triggered.
    */
   public function import(ExchangeImport $event);
+
 }

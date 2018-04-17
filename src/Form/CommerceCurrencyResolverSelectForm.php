@@ -77,7 +77,7 @@ class CommerceCurrencyResolverSelectForm extends FormBase {
 
     $form['submit'] = [
       '#type' => 'submit',
-      '#value' => t('Submit'),
+      '#value' => $this->t('Submit'),
     ];
 
     // Add currency cache context.

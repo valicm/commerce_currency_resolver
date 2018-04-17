@@ -150,4 +150,5 @@ abstract class ExchangeRateEventSubscriberBase implements EventSubscriberInterfa
     }
 
   }
+
 }
