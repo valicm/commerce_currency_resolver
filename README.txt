@@ -61,10 +61,10 @@ Each Exchange rate service is Event Subscriber.
 First in .services.yml file inside your custom module add definition
 for your Event Subscriber:
 
-  your_custom_module_name.exchange_rate_YOURSERVICE:
-    class: Drupal\commerce_currency_resolver\EventSubscriber\ExchangeRateYOURSERVICE
-    tags:
-      - { name: event_subscriber }
+your_custom_module_name.exchange_rate_YOURSERVICE:
+  class: Drupal\commerce_currency_resolver\EventSubscriber\ExchangeRateName
+  tags:
+    - { name: event_subscriber }
 
 Important is that you prefix your event subscriber with exhange_rate_,
 so that is automatically added on admin settings page.
@@ -83,6 +83,7 @@ The 8.x-1.x branch was created by:
 
  * Valentino Medimorec (valic) - https://www.drupal.org/u/valic
 
-This module was created and sponsored by Foreo, Swedish multi-national beauty brand.
+This module was created and sponsored by Foreo,
+Swedish multi-national beauty brand.
 
  * Foreo - https://www.foreo.com/

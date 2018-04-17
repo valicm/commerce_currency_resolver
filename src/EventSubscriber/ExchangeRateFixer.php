@@ -61,7 +61,7 @@ class ExchangeRateFixer extends ExchangeRateEventSubscriberBase {
       }
 
       else {
-        \Drupal::logger('commerce_currency_resolver')->debug($get_data->error->info);
+        \Drupal::logger('commerce_currency_resolver')->debug($json->error->info);
         return FALSE;
       }
     }
