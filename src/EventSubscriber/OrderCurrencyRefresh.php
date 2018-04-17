@@ -30,7 +30,7 @@ class OrderCurrencyRefresh implements EventSubscriberInterface {
   protected $orderStorage;
 
   /**
-   * Currency currency.
+   * Current currency.
    *
    * @var \Drupal\commerce_currency_resolver\CurrentCurrencyInterface
    */
@@ -65,19 +65,29 @@ class OrderCurrencyRefresh implements EventSubscriberInterface {
     // Get order data.
     $order = $event->getOrder();
     $total = $order->getTotalPrice();
+    $subtotal = $order->getSubtotalPrice();
 
-    // Get order total currency.
+    // Get order total and subtotal currency.
     $currency_total = $total->getCurrencyCode();
+    $currency_subtotal = $subtotal->getCurrencyCode();
 
     // Get main currency.
     $currency_main = $this->currentCurrency->getCurrency();
 
-    // Compare order total and main resolved currency.
-    // If they are different refresh order.
-    if (isset($currency_main)) {
-      if ($currency_total != $currency_main) {
-        $this->orderRefresh->refresh($order);
-      }
+    // Compare order subtotal and main resolved currency.
+    // Refresh order if they are different.
+    // We are comparing with order subtotal, not total
+    // while total_price causes loop for refresh. Deal separately with
+    // order total.
+    if ($currency_subtotal !== $currency_main) {
+      // Refresh order.
+      $this->orderRefresh->refresh($order);
+    }
+
+    // Check order total. Convert if needed for display purposes.
+    // TODO: find a better way for this.
+    if ($currency_total !== $currency_main) {
+      $order->recalculateTotalPrice();
     }
   }
 
