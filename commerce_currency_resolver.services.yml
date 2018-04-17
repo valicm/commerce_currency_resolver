@@ -9,6 +9,12 @@ services:
     tags:
      - { name: commerce_price.price_resolver, priority: 1000 }
 
+  commerce_currency_resolver.order_currency:
+    class: Drupal\commerce_currency_resolver\EventSubscriber\OrderCurrencyRefresh
+    arguments: ['@entity_type.manager', '@commerce_currency_resolver.current_currency', '@commerce_order.order_refresh']
+    tags:
+      - { name: event_subscriber }
+
   commerce_currency_resolver.exchange_rate_ecb:
     class: Drupal\commerce_currency_resolver\EventSubscriber\ExchangeRateECB
     tags:
