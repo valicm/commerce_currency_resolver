@@ -7,3 +7,4 @@ package: Commerce
 dependencies:
   - commerce:commerce
   - commerce:commerce_price
+  - commerce:commerce_order
