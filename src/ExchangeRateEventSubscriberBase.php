@@ -22,7 +22,7 @@ abstract class ExchangeRateEventSubscriberBase implements EventSubscriberInterfa
   /**
    * {@inheritdoc}
    */
-  public function apiClient($method, $url, $options) {
+  public function apiClient($method, $url, array $options) {
     $data = FALSE;
 
     // Prepare for client.
