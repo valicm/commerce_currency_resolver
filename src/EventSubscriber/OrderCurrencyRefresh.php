@@ -67,27 +67,32 @@ class OrderCurrencyRefresh implements EventSubscriberInterface {
     $total = $order->getTotalPrice();
     $subtotal = $order->getSubtotalPrice();
 
-    // Get order total and subtotal currency.
-    $currency_total = $total->getCurrencyCode();
-    $currency_subtotal = $subtotal->getCurrencyCode();
+    // Check if we order total and subtotal is not empty.
+    // Case when you add product first time to cart, order total does not exist.
+    // So we don't need to do anything here.
+    if (!empty($subtotal) && !empty($total)) {
+      // Get order total and subtotal currency.
+      $currency_total = $total->getCurrencyCode();
+      $currency_subtotal = $subtotal->getCurrencyCode();
 
-    // Get main currency.
-    $currency_main = $this->currentCurrency->getCurrency();
+      // Get main currency.
+      $currency_main = $this->currentCurrency->getCurrency();
 
-    // Compare order subtotal and main resolved currency.
-    // Refresh order if they are different.
-    // We are comparing with order subtotal, not total
-    // while total_price causes loop for refresh. Deal separately with
-    // order total.
-    if ($currency_subtotal !== $currency_main) {
-      // Refresh order.
-      $this->orderRefresh->refresh($order);
-    }
+      // Compare order subtotal and main resolved currency.
+      // Refresh order if they are different.
+      // We are comparing with order subtotal, not total
+      // while total_price causes loop for refresh. Deal separately with
+      // order total.
+      if ($currency_subtotal !== $currency_main) {
+        // Refresh order.
+        $this->orderRefresh->refresh($order);
+      }
 
-    // Check order total. Convert if needed for display purposes.
-    // TODO: find a better way for this.
-    if ($currency_total !== $currency_main) {
-      $order->recalculateTotalPrice();
+      // Check order total. Convert if needed for display purposes.
+      // TODO: find a better way for this.
+      if ($currency_total !== $currency_main) {
+        $order->recalculateTotalPrice();
+      }
     }
   }
 
