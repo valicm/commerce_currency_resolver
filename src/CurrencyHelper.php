@@ -182,14 +182,7 @@ class CurrencyHelper {
     $current_currency = $price->getCurrencyCode();
 
     // Determine rate.
-    switch ($cross_sync) {
-      case '0':
-        $rate = $mapping[$current_currency][$currency]['value'];
-        break;
-
-      default:
-        $rate = self::crossSyncConversion($current_currency, $currency);
-    }
+    $rate = $mapping[$current_currency][$currency]['value'];
 
     // Fallback to use 1 as rate.
     if (empty($rate)) {
@@ -211,6 +204,8 @@ class CurrencyHelper {
    *
    * @return float|int
    *   Return rate for conversion calculation.
+   *
+   * @todo Remove in never version. Deprecated.
    */
   public static function crossSyncConversion($current, $target) {
     $currency_default = \Drupal::config('commerce_currency_resolver.settings')
