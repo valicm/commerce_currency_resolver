@@ -175,7 +175,6 @@ class CurrencyHelper {
     $config = \Drupal::config('commerce_currency_resolver.currency_conversion');
 
     // Get specific settings.
-    $cross_sync = $config->get('use_cross_sync');
     $mapping = $config->get('exchange');
 
     // Current currency.
