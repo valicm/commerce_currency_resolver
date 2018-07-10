@@ -106,100 +106,65 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
       '#tree' => TRUE,
     ];
 
-    // Based on cross sync value render form elements.
-    switch ($cross_sync) {
-      case '1':
-        $form['currency'][$currency_default] = [
-          '#type' => 'details',
-          '#title' => $currency_default,
-          '#open' => FALSE,
-        ];
-        foreach ($active_currencies as $key => $item) {
-          if ($key !== $currency_default) {
+    // Render options in form.
+    foreach ($active_currencies as $key => $item) {
 
-            $default_rate = isset($config->get('exchange')[$currency_default][$key]['value']) ? $config->get('exchange')[$currency_default][$key]['value'] : 0;
-            $default_sync = isset($config->get('exchange')[$currency_default][$key]['sync']) ? $config->get('exchange')[$currency_default][$key]['sync'] : [];
+      $form['currency'][$key] = [
+        '#type' => 'details',
+        '#title' => $item,
+        '#open' => FALSE,
+      ];
 
-            $form['currency'][$currency_default][$key]['value'] = [
-              '#type' => 'textfield',
-              '#title' => $key,
-              '#description' => $this->t('Exchange rate from @initial to @currency.', [
-                '@initial' => $currency_default,
-                '@currency' => $item,
-              ]),
-              '#size' => 20,
-              '#default_value' => $default_rate,
-              '#disabled' => empty($default_sync[1]) ? TRUE : FALSE,
-              '#field_suffix' => $this->t(
-                '* @demo_amount @currency_symbol = @amount @conversion_currency_symbol',
-                [
-                  '@demo_amount' => $config->get('demo_amount'),
-                  '@currency_symbol' => $currency_default,
-                  '@conversion_currency_symbol' => $key,
-                  '@amount' => ($config->get('demo_amount') * $default_rate),
-                ]
-              ),
-            ];
+      foreach ($active_currencies as $subkey => $subitem) {
+        if ($key != $subkey) {
 
-            $form['currency'][$currency_default][$key]['sync'] = [
-              '#type' => 'checkboxes',
-              '#title' => '',
-              '#options' => [1 => 'Manually enter an exchange rate'],
-              '#default_value' => $default_sync,
-            ];
-          }
-        }
-        break;
+          $default_rate = isset($config->get('exchange')[$key][$subkey]['value']) ? $config->get('exchange')[$key][$subkey]['value'] : 0;
+          $default_sync = isset($config->get('exchange')[$key][$subkey]['sync']) ? $config->get('exchange')[$key][$subkey]['sync'] : [];
 
-      default:
-        // Render options in form.
-        foreach ($active_currencies as $key => $item) {
-
-          $form['currency'][$key] = [
-            '#type' => 'details',
-            '#title' => $item,
-            '#open' => FALSE,
+          $form['currency'][$key][$subkey]['value'] = [
+            '#type' => 'textfield',
+            '#title' => $subkey,
+            '#size' => 20,
+            '#default_value' => $default_rate,
+            '#disabled' => empty($default_sync[1]) ? TRUE : FALSE,
+            '#field_suffix' => $this->t(
+              '* @demo_amount @currency_symbol = @amount @conversion_currency_symbol',
+              [
+                '@demo_amount' => $config->get('demo_amount'),
+                '@currency_symbol' => $key,
+                '@conversion_currency_symbol' => $subkey,
+                '@amount' => ($config->get('demo_amount') * $default_rate),
+              ]
+            ),
           ];
 
-          foreach ($active_currencies as $subkey => $subitem) {
-            if ($key != $subkey) {
+          // Based on cross sync value render form elements.
+          switch ($cross_sync) {
+            case '1':
+              $form['currency'][$key][$subkey]['value']['#description'] = $this->t('Exchange rate derived from @initial using cross sync.', [
+                '@initial' => $currency_default,
+              ]);
+              break;
 
-              $default_rate = isset($config->get('exchange')[$key][$subkey]['value']) ? $config->get('exchange')[$key][$subkey]['value'] : 0;
-              $default_sync = isset($config->get('exchange')[$key][$subkey]['sync']) ? $config->get('exchange')[$key][$subkey]['sync'] : [];
-
-              $form['currency'][$key][$subkey]['value'] = [
-                '#type' => 'textfield',
-                '#title' => $subkey,
-                '#description' => $this->t('Exchange rate from @initial to @currency.', [
-                  '@initial' => $item,
-                  '@currency' => $subitem,
-                ]),
-                '#size' => 20,
-                '#default_value' => $default_rate,
-                '#disabled' => empty($default_sync[1]) ? TRUE : FALSE,
-                '#field_suffix' => $this->t(
-                  '* @demo_amount @currency_symbol = @amount @conversion_currency_symbol',
-                  [
-                    '@demo_amount' => $config->get('demo_amount'),
-                    '@currency_symbol' => $key,
-                    '@conversion_currency_symbol' => $subkey,
-                    '@amount' => ($config->get('demo_amount') * $default_rate),
-                  ]
-                ),
-              ];
-
-              $form['currency'][$key][$subkey]['sync'] = [
-                '#type' => 'checkboxes',
-                '#title' => '',
-                '#options' => [1 => 'Manually enter an exchange rate'],
-                '#default_value' => $default_sync,
-              ];
-
-            }
+            default:
+              $form['currency'][$key][$subkey]['value']['#description'] = $this->t('Exchange rate from @initial to @currency.', [
+                '@initial' => $item,
+                '@currency' => $subitem,
+              ]);
           }
 
+          $form['currency'][$key][$subkey]['sync'] = [
+            '#type' => 'checkboxes',
+            '#title' => '',
+            '#options' => [1 => 'Manually enter an exchange rate'],
+            '#default_value' => $default_sync,
+          ];
+
         }
+      }
+
     }
+
     $form['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Submit'),
