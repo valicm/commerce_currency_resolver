@@ -92,7 +92,7 @@ interface ExchangeRateDataSourceInterface {
    * @param string $base_currency
    *   Base currency upon which we have exchange rates.
    * @param array $data
-   *   Currency and rate array.
+   *   Currency and rate array. Data should be in format: $data[$code] = $rate.
    *
    * @return array
    *   Return data prepared for saving.
