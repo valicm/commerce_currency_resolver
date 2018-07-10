@@ -109,6 +109,28 @@ abstract class ExchangeRateEventSubscriberBase implements EventSubscriberInterfa
   /**
    * {@inheritdoc}
    */
+  public function crossSyncCalculate($base_currency, array $data) {
+    $exchange_rates = [];
+
+    // Enabled currency.
+    $enabled = CurrencyHelper::getEnabledCurrency();
+
+    if ($data) {
+      foreach ($enabled as $currency_code => $name) {
+        $recalculate = $this->reverseCalculate($currency_code, $base_currency, $data);
+
+        // Prepare data.
+        $get_rates = $this->mapExchangeRates($recalculate, $currency_code);
+        $exchange_rates[$currency_code] = $get_rates[$currency_code];
+      }
+    }
+
+    return $exchange_rates;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function saveExchangeRatesConfig(array $exchange_rates) {
     // Get config.
     $config = \Drupal::service('config.factory')
@@ -130,18 +152,7 @@ abstract class ExchangeRateEventSubscriberBase implements EventSubscriberInterfa
     // Check if we trigger correct EventSubscriber.
     if ($event->getLabel() === $this->sourceId()) {
 
-      // Get cross sync settings.
-      $cross_sync = \Drupal::config('commerce_currency_resolver.currency_conversion')->get('use_cross_sync');
-
-      // Based on cross sync settings fetch and process data.
-      if (!empty($cross_sync)) {
-        $exchange_rates = $this->processDefaultCurrency();
-
-      }
-
-      else {
-        $exchange_rates = $this->processAllCurrencies();
-      }
+      $exchange_rates = $this->processCurrencies();
 
       // Write new data.
       if (!empty($exchange_rates)) {

@@ -3,11 +3,12 @@
 namespace Drupal\commerce_currency_resolver\EventSubscriber;
 
 use Drupal\commerce_currency_resolver\ExchangeRateEventSubscriberBase;
+use Drupal\commerce_currency_resolver\CurrencyHelper;
 
 /**
  * Class ExchangeRateFixer.
  */
-class ExchangeRateFixer extends ExchangeRateEventSubscriberBase {
+class ExchangeRateFixerPaid extends ExchangeRateEventSubscriberBase {
 
   /**
    * {@inheritdoc}
@@ -20,7 +21,7 @@ class ExchangeRateFixer extends ExchangeRateEventSubscriberBase {
    * {@inheritdoc}
    */
   public static function sourceId() {
-    return 'exchange_rate_fixer';
+    return 'exchange_rate_fixer_paid';
   }
 
   /**
@@ -72,20 +73,47 @@ class ExchangeRateFixer extends ExchangeRateEventSubscriberBase {
    * {@inheritdoc}
    */
   public function processCurrencies() {
-    // Currency is tied to your account on Fixer.io, so we need to be sure
-    // to get correct data. You cannot choose base currency on free
-    // account. For this reason calculation for all currencies is same
-    // even if you using cross sync or not.
     $exchange_rates = [];
 
     // Foreach enabled currency fetch others.
     $data = $this->getExternalData();
 
     if ($data) {
-      // Currency is tied to your account on Fixer.io, so we need to be sure
-      // to get correct data.
-      $exchange_rates = $this->crossSyncCalculate($data['base'], $data['rates']);
+      // Get cross sync settings.
+      $cross_sync = \Drupal::config('commerce_currency_resolver.currency_conversion')
+        ->get('use_cross_sync');
 
+      // Based on cross sync settings fetch and process data.
+      if (!empty($cross_sync)) {
+        $exchange_rates = $this->crossSyncCalculate($data['base'], $data['rates']);
+      }
+
+      // Fetch each currency.
+      else {
+        $exchange_rates = $this->eachCurrencyCalculate();
+      }
+    }
+
+    return $exchange_rates;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function eachCurrencyCalculate() {
+    $exchange_rates = [];
+
+    $data = $this->getExternalData();
+
+    // Enabled currency.
+    $enabled = CurrencyHelper::getEnabledCurrency();
+
+    foreach ($enabled as $base => $name) {
+      // Foreach enabled currency fetch others.
+      if ($data[$base]) {
+        $get_rates = $this->mapExchangeRates($data[$base]['rates'], $base);
+        $exchange_rates[$base] = $get_rates[$base];
+      }
     }
 
     return $exchange_rates;

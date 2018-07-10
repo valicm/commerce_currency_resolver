@@ -87,6 +87,19 @@ interface ExchangeRateDataSourceInterface {
   public function reverseCalculate($target_currency, $base_currency, array $data);
 
   /**
+   * Rates calculation for currencies when we use cross sync conversion.
+   *
+   * @param string $base_currency
+   *   Base currency upon which we have exchange rates.
+   * @param array $data
+   *   Currency and rate array.
+   *
+   * @return array
+   *   Return data prepared for saving.
+   */
+  public function crossSyncCalculate($base_currency, array $data);
+
+  /**
    * Save exchanges rates to config. Update last cron update for import.
    *
    * @param array $exchange_rates
@@ -95,20 +108,12 @@ interface ExchangeRateDataSourceInterface {
   public function saveExchangeRatesConfig(array $exchange_rates);
 
   /**
-   * Import only currency rates for default currency.
-   *
-   * @return array
-   *   Return prepared data for saving.
-   */
-  public function processDefaultCurrency();
-
-  /**
    * Process all currencies for rates for other currencies.
    *
    * @return array
    *   Return prepared data for saving.
    */
-  public function processAllCurrencies();
+  public function processCurrencies();
 
   /**
    * This method is called whenever the import event is dispatched.

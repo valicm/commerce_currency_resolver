@@ -4,7 +4,6 @@ namespace Drupal\commerce_currency_resolver\EventSubscriber;
 
 use Drupal\commerce_currency_resolver\ExchangeRateEventSubscriberBase;
 use SimpleXMLElement;
-use Drupal\commerce_currency_resolver\CurrencyHelper;
 
 /**
  * Class ExchangeRateECB.
@@ -64,51 +63,17 @@ class ExchangeRateECB extends ExchangeRateEventSubscriberBase {
   /**
    * {@inheritdoc}
    */
-  public function processDefaultCurrency() {
+  public function processCurrencies() {
+    // ECB have only one currency. With this issue
+    // https://www.drupal.org/project/commerce_currency_resolver/issues/2984828
+    // we have only one import.
     $exchange_rates = [];
     $data = $this->getExternalData();
 
     if ($data) {
-      // Default currency.
-      $currency_default = \Drupal::config('commerce_currency_resolver.settings')
-        ->get('currency_default');
-
-      // ECB uses EUR as base currency.
-      // If euro is not main currence we need recalculate.
-      if ($currency_default != 'EUR') {
-        $data = $this->reverseCalculate($currency_default, 'EUR', $data);
-      }
-
-      // Prepare data for saving.
-      $exchange_rates = $this->mapExchangeRates($data, $currency_default);
-    }
-
-    return $exchange_rates;
-
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function processAllCurrencies() {
-    $exchange_rates = [];
-    $data = $this->getExternalData();
-
-    if ($data) {
-
-      // Enabled currency.
-      $enabled = CurrencyHelper::getEnabledCurrency();
-
-      // For each currency built data.
-      foreach ($enabled as $currency_code => $value) {
-        // ECB uses only EUR as base currency, so we need to
-        // recalculate other currencies.
-        $recalculate = $this->reverseCalculate($currency_code, 'EUR', $data);
-
-        // Prepare data.
-        $get_rates = $this->mapExchangeRates($recalculate, $currency_code);
-        $exchange_rates[$currency_code] = $get_rates[$currency_code];
-      }
+      // ECB uses only EUR as base currency, so we need to
+      // recalculate other currencies.
+      $exchange_rates = $this->crossSyncCalculate('EUR', $data);
     }
 
     return $exchange_rates;
