@@ -90,7 +90,7 @@ class ExchangeRateFixerPaid extends ExchangeRateEventSubscriberBase {
 
       // Fetch each currency.
       else {
-        $exchange_rates = $this->eachCurrencyCalculate();
+        $exchange_rates = $this->eachCurrencyCalculate($data);
       }
     }
 
@@ -100,10 +100,8 @@ class ExchangeRateFixerPaid extends ExchangeRateEventSubscriberBase {
   /**
    * {@inheritdoc}
    */
-  public function eachCurrencyCalculate() {
+  public function eachCurrencyCalculate($data) {
     $exchange_rates = [];
-
-    $data = $this->getExternalData();
 
     // Enabled currency.
     $enabled = CurrencyHelper::getEnabledCurrency();
