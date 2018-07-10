@@ -5,7 +5,7 @@
  * Install file for commerce_currency_resolver.
  */
 
-use CommerceGuys\Intl\Country\CountryRepository;
+use CommerceGuys\Addressing\Country\CountryRepository;
 
 /**
  * Implements hook_install().
