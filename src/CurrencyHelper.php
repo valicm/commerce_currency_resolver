@@ -181,7 +181,10 @@ class CurrencyHelper {
     $current_currency = $price->getCurrencyCode();
 
     // Determine rate.
-    $rate = $mapping[$current_currency][$currency]['value'];
+    $rate = NULL;
+    if (isset($mapping[$current_currency][$currency])) {
+      $rate = $mapping[$current_currency][$currency]['value'];
+    }
 
     // Fallback to use 1 as rate.
     if (empty($rate)) {
