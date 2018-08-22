@@ -47,8 +47,8 @@ trait CommerceCurrencyResolverAmountTrait {
 
     $form['autocalculate'] = [
       '#type' => 'radios',
-      '#title' => t('Autocalculate'),
-      '#description' => t('If you want to ignore specific currency fields, you cou'),
+      '#title' => $this->t('Autocalculate'),
+      '#description' => $this->t('By current exchange rates it calculate amount in other currencies - ignores completely fields per currency'),
       '#options' => $this->getAutoCalculateValues(),
       '#default_value' => $this->configuration['autocalculate'],
       '#required' => TRUE,
