@@ -30,9 +30,17 @@ class OrderFixedAmountOff extends CommerceOrderFixedAmountOff {
     $order = $entity;
     $subtotal_price = $order->getSubTotalPrice();
     $amount = $this->getAmount();
-    if ($subtotal_price->getCurrencyCode() != $amount->getCurrencyCode()) {
-      return;
+
+    // Check currency, make conversion if needed.
+    if ($subtotal_price->getCurrencyCode() !== $amount->getCurrencyCode()) {
+      // Convert prices.
+      $amount = $this->convertPrice($subtotal_price, $amount);
+
+      if (!$amount) {
+        return FALSE;
+      }
     }
+
     // The promotion amount can't be larger than the subtotal, to avoid
     // potentially having a negative order total.
     if ($amount->greaterThan($subtotal_price)) {

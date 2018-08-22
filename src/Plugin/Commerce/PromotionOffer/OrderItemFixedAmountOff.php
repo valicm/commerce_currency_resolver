@@ -30,9 +30,17 @@ class OrderItemFixedAmountOff extends CommerceOrderItemFixedAmountOff {
     $order_item = $entity;
     $total_price = $order_item->getTotalPrice();
     $amount = $this->getAmount();
-    if ($total_price->getCurrencyCode() != $amount->getCurrencyCode()) {
-      return;
+
+    // Check currency, make conversion if needed.
+    if ($total_price->getCurrencyCode() !== $amount->getCurrencyCode()) {
+      // Convert prices.
+      $amount = $this->convertPrice($total_price, $amount);
+
+      if (!$amount) {
+        return;
+      }
     }
+
     $adjustment_amount = $amount->multiply($order_item->getQuantity());
     $adjustment_amount = $this->rounder->round($adjustment_amount);
     // Don't reduce the order item total price past zero.

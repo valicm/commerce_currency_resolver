@@ -102,4 +102,44 @@ trait CommerceCurrencyResolverAmountTrait {
     }
   }
 
+  /**
+   * Convert prices for Commerce condition or Promotion offers.
+   *
+   * @param mixed $input_price
+   *   Price which is received from order.
+   * @param mixed $check_price
+   *   Price which is in condition or promotion offer entered.
+   *
+   * @return bool|\Drupal\commerce_price\Price
+   *   Return FALSE or Price object.
+   */
+  public function convertPrice($input_price, $check_price) {
+
+    // Defaults.
+    $calculatedPrice = FALSE;
+
+    if ($input_price instanceof Price && $check_price instanceof Price) {
+
+      // If we have autocalculate option enabled, transfer condition price to
+      // order currency code.
+      if (!empty($this->configuration['autocalculate'])) {
+        // We rely on order price.
+        $currentCurrency = $input_price->getCurrencyCode();
+
+        // Convert prices.
+        $calculatedPrice = CurrencyHelper::priceConversion($check_price, $currentCurrency);
+      }
+
+      else {
+        // If we have specified price listed.
+        if (isset($this->configuration['fields'][$input_price->getCurrencyCode()])) {
+          $priceField = $this->configuration['fields'][$input_price->getCurrencyCode()];
+          $calculatedPrice = new Price($priceField['number'], $priceField['currency_code']);
+        }
+      }
+    }
+
+    return $calculatedPrice;
+  }
+
 }
