@@ -78,7 +78,7 @@ trait CommerceCurrencyResolverAmountTrait {
 
       $form['fields'][$key] = [
         '#type' => 'commerce_price',
-        '#title' => t('Amount'),
+        '#title' => $this->t('Amount'),
         '#default_value' => $amount_key,
         '#required' => FALSE,
         '#available_currencies' => [$key],
