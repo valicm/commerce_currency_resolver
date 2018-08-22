@@ -11,6 +11,11 @@ use CommerceGuys\Addressing\Country\CountryRepository;
  * Implements hook_install().
  */
 function commerce_currency_resolver_install() {
+
+  // Set module weight to 10. We are extending some commerce stuff,
+  // where this module should be after commerce_promotion.
+  module_set_weight('commerce_currency_resolver', 10);
+
   // @see commerce_price_install().
   if (!\Drupal::isConfigSyncing()) {
     // Get default country and their currency.
@@ -35,4 +40,13 @@ function commerce_currency_resolver_uninstall() {
   \Drupal::state()->deleteMultiple([
     'commerce_currency_resolver.last_update_time',
   ]);
+}
+
+/**
+ * Fix issues with plugin discovery and using same plugin ID.
+ */
+function commerce_currency_resolver_update_8001() {
+  // Set module weight to 10. We are extending some commerce stuff,
+  // where this module should be after commerce_promotion.
+  module_set_weight('commerce_currency_resolver', 10);
 }
