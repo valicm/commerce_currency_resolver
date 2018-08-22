@@ -193,6 +193,8 @@ class CurrencyHelper {
 
     // Convert. Convert rate to string.
     $price = $price->convert($currency, (string) $rate);
+    $rounder = \Drupal::service('commerce_price.rounder');
+    $price = $rounder->round($price);
     return $price;
   }
 
