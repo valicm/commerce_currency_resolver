@@ -120,12 +120,12 @@ trait CommerceCurrencyResolverAmountTrait {
 
     if ($input_price instanceof Price && $check_price instanceof Price) {
 
+      // We rely on order price.
+      $currentCurrency = $input_price->getCurrencyCode();
+
       // If we have autocalculate option enabled, transfer condition price to
       // order currency code.
       if (!empty($this->configuration['autocalculate'])) {
-        // We rely on order price.
-        $currentCurrency = $input_price->getCurrencyCode();
-
         // Convert prices.
         $calculatedPrice = CurrencyHelper::priceConversion($check_price, $currentCurrency);
       }
@@ -134,9 +134,21 @@ trait CommerceCurrencyResolverAmountTrait {
         // If we have specified price listed.
         if (isset($this->configuration['fields'][$input_price->getCurrencyCode()])) {
           $priceField = $this->configuration['fields'][$input_price->getCurrencyCode()];
-          $calculatedPrice = new Price($priceField['number'], $priceField['currency_code']);
+
+          // Added check if prices is empty
+          // (etc. after migration of old discounts).
+          if (!empty($priceField['number'])) {
+            $calculatedPrice = new Price($priceField['number'], $priceField['currency_code']);
+          }
         }
       }
+
+      // Fallback always on autocalculate regardless of setting.
+      // TODO: refactor later this entire function.
+      if (!$calculatedPrice) {
+        $calculatedPrice = CurrencyHelper::priceConversion($check_price, $currentCurrency);
+      }
+
     }
 
     return $calculatedPrice;
