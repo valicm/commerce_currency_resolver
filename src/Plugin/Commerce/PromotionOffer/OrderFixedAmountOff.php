@@ -28,7 +28,7 @@ class OrderFixedAmountOff extends CommerceOrderFixedAmountOff {
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
-    $subtotal_price = $order->getSubTotalPrice();
+    $subtotal_price = $order->getSubtotalPrice();
     $amount = $this->getAmount();
 
     // Check currency, make conversion if needed.
