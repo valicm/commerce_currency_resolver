@@ -116,3 +116,5 @@ This module was created and sponsored by Foreo,
 Swedish multi-national beauty brand.
 
  * Foreo - https://www.foreo.com/
+
+Codacy Badge
