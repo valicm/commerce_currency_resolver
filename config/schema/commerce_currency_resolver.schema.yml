@@ -65,22 +65,3 @@ commerce_currency_resolver.currency_mapping:
       label: 'Matrix'
       sequence:
         type: string
-
-commerce_currency_resolver.commerce_condition.plugin.order_total_price_currency:
-  type: commerce_condition_configuration
-  mapping:
-    operator:
-      type: string
-      label: 'Operator'
-    amount:
-      type: field.value.commerce_price
-      label: 'Amount'
-    autocalculate:
-      type: integer
-      label: 'Autocalculate'
-    fields:
-      type: sequence
-      label: 'Fields'
-      sequence:
-        type: field.value.commerce_price
-        label: 'Amount'

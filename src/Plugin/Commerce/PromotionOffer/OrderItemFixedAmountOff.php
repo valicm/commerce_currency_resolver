@@ -31,13 +31,16 @@ class OrderItemFixedAmountOff extends CommerceOrderItemFixedAmountOff {
     $total_price = $order_item->getTotalPrice();
     $amount = $this->getAmount();
 
-    // Check currency, make conversion if needed.
-    if ($total_price->getCurrencyCode() !== $amount->getCurrencyCode()) {
-      // Convert prices.
-      $amount = $this->convertPrice($total_price, $amount);
+    // Check if we need to use multicurrency logic.
+    if ($this->configuration['multicurrency']) {
+      // Check currency, make conversion if needed.
+      if ($this->currentCurrency() !== $amount->getCurrencyCode()) {
+        // Convert prices.
+        $amount = $this->getPrice($amount, $this->currentCurrency());
 
-      if (!$amount) {
-        return;
+        if (!$amount) {
+          return;
+        }
       }
     }
 

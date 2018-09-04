@@ -3,7 +3,7 @@
 namespace Drupal\commerce_currency_resolver\Plugin\Commerce\Condition;
 
 use Drupal\commerce_currency_resolver\Plugin\Commerce\CommerceCurrencyResolverAmountTrait;
-use Drupal\commerce_order\Plugin\Commerce\Condition\OrderTotalPrice;
+use Drupal\commerce_order\Plugin\Commerce\Condition\OrderTotalPrice as CommerceOrderTotalPrice;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\commerce_price\Price;
 
@@ -11,16 +11,16 @@ use Drupal\commerce_price\Price;
  * Provides the total price condition for orders per currency.
  *
  * @CommerceCondition(
- *   id = "order_total_price_currency",
+ *   id = "order_total_price",
  *   label = @Translation("Total price"),
- *   display_label = @Translation("Current order total per currency"),
+ *   display_label = @Translation("Current order total"),
  *   category = @Translation("Order"),
  *   entity_type = "commerce_order",
  * )
  *
  * @see \Drupal\commerce_order\Plugin\Commerce\Condition\OrderTotalPrice
  */
-class OrderTotalPriceCurrency extends OrderTotalPrice {
+class OrderTotalPrice extends CommerceOrderTotalPrice {
 
   use CommerceCurrencyResolverAmountTrait;
 
@@ -34,16 +34,19 @@ class OrderTotalPriceCurrency extends OrderTotalPrice {
     $total_price = $order->getTotalPrice();
     $condition_price = new Price($this->configuration['amount']['number'], $this->configuration['amount']['currency_code']);
 
-    // Check currency, make conversion if needed.
-    if ($total_price->getCurrencyCode() !== $condition_price->getCurrencyCode()) {
+    // Check if multicurrency should be used.
+    if ($this->configuration['multicurrency']) {
+      // Check currency, make conversion if needed.
+      if ($this->currentCurrency() !== $condition_price->getCurrencyCode()) {
 
-      // Convert prices.
-      $condition_price = $this->convertPrice($total_price, $condition_price);
+        // Convert prices.
+        $condition_price = $this->getPrice($condition_price, $this->currentCurrency());
 
-      if (!$condition_price) {
-        return FALSE;
+        if (!$condition_price) {
+          return FALSE;
+        }
+
       }
-
     }
 
     switch ($this->configuration['operator']) {

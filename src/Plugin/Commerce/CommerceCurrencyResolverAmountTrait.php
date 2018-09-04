@@ -2,9 +2,9 @@
 
 namespace Drupal\commerce_currency_resolver\Plugin\Commerce;
 
-use Drupal\commerce_price\Price;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\commerce_currency_resolver\CurrencyHelper;
+use Drupal\commerce_price\Price;
 
 /**
  * Provides common configuration for fixed amount off offers.
@@ -16,6 +16,7 @@ trait CommerceCurrencyResolverAmountTrait {
    */
   public function defaultConfiguration() {
     return [
+      'multicurrency' => 1,
       'autocalculate' => 0,
     ] + parent::defaultConfiguration();
   }
@@ -34,21 +35,58 @@ trait CommerceCurrencyResolverAmountTrait {
   }
 
   /**
+   * Get resolved currency.
+   */
+  public function currentCurrency() {
+    return \Drupal::service('commerce_currency_resolver.current_currency')->getCurrency();
+  }
+
+  /**
+   * Get resolved currency.
+   */
+  public function defaultCurrency() {
+    return \Drupal::config('commerce_currency_resolver.settings')
+      ->get('currency_default');
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
     // Get default currency.
-    $defaultCurrency = \Drupal::config('commerce_currency_resolver.settings')
-      ->get('currency_default');
+    $defaultCurrency = $this->defaultCurrency();
 
-    $form['amount']['#available_currencies'] = [$defaultCurrency];
+    // If we handle shipping.
+    if (isset($form['rate_amount']) && empty($form['rate_amount']['#default_value'])) {
+      $form['rate_amount']['#default_value'] = [
+        'number' => '',
+        'currency_code' => $defaultCurrency,
+      ];
+    }
+
+    // If we handle commerce conditions and promotions.
+    if (isset($form['amount']) && empty($form['amount']['#default_value'])) {
+      $form['amount']['#default_value'] = [
+        'number' => '',
+        'currency_code' => $defaultCurrency,
+      ];
+    }
+
+    $form['multicurrency'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Use multicurrency'),
+      '#description' => $this->t('If you want to use multicurrency logic select yes, otherwise it will be ignored and processed without multicurrency resolver.'),
+      '#options' => $this->getAutoCalculateValues(),
+      '#default_value' => $this->configuration['multicurrency'],
+      '#required' => TRUE,
+    ];
 
     $form['autocalculate'] = [
       '#type' => 'radios',
       '#title' => $this->t('Autocalculate'),
-      '#description' => $this->t('By current exchange rates it calculate amount in other currencies - ignores completely fields per currency'),
+      '#description' => $this->t('By current exchange rates it calculates amount in other currencies - ignores completely fields per currency.'),
       '#options' => $this->getAutoCalculateValues(),
       '#default_value' => $this->configuration['autocalculate'],
       '#required' => TRUE,
@@ -63,9 +101,6 @@ trait CommerceCurrencyResolverAmountTrait {
 
     // Get all enabled currencies.
     $enabledCurrencies = CurrencyHelper::getEnabledCurrency();
-
-    // Remove default from the list.
-    unset($enabledCurrencies[$defaultCurrency]);
 
     foreach ($enabledCurrencies as $key => $currency) {
 
@@ -103,11 +138,58 @@ trait CommerceCurrencyResolverAmountTrait {
   }
 
   /**
+   * Get price based on currency price and target currency.
+   *
+   * @param \Drupal\commerce_price\Price $input_price
+   *    Default price added in condition, offer, etc.
+   * @param string $target_currency
+   *    Currency code resolved from CurrentCurrency.
+   *
+   * @return bool|\Drupal\commerce_price\Price
+   *   Return Price object or FALSE.
+   */
+  public function getPrice($input_price, $target_currency) {
+
+    // Defaults.
+    $calculatedPrice = FALSE;
+
+    // If we have autocalculate option enabled, transfer condition price to
+    // order currency code.
+    if (!$this->configuration['autocalculate']) {
+
+      // If we have specified price listed.
+      if (isset($this->configuration['fields'][$target_currency])) {
+        $priceField = $this->configuration['fields'][$target_currency];
+
+        // Added check if prices is empty
+        // (etc. after migration of old discounts).
+        if (!empty($priceField['number'])) {
+          $calculatedPrice = new Price($priceField['number'], $priceField['currency_code']);
+        }
+      }
+    }
+
+    // Always autocalculate. Even if autocalculate is not selected.
+    // Reason is that price field could be empty, and we will get different
+    // price and Currency mismatch.
+    // Second reason is that exist flag "use multicurrency" if site owner
+    // want's to make condition without use of multicurrency or fear that
+    // something will be autocalculated.
+    if (!$calculatedPrice) {
+      $calculatedPrice = CurrencyHelper::priceConversion($input_price, $target_currency);
+    }
+
+
+    return $calculatedPrice;
+
+  }
+
+  /**
    * Convert prices for Commerce condition or Promotion offers.
    *
-   * @param mixed $input_price
+   * @param  \Drupal\commerce_price\Price $input_price
    *   Price which is received from order.
-   * @param mixed $check_price
+   * @param  \Drupal\commerce_price\Price $check_price
    *   Price which is in condition or promotion offer entered.
    *
    * @return bool|\Drupal\commerce_price\Price
@@ -118,38 +200,35 @@ trait CommerceCurrencyResolverAmountTrait {
     // Defaults.
     $calculatedPrice = FALSE;
 
-    if ($input_price instanceof Price && $check_price instanceof Price) {
+    // We rely on order price.
+    $currentCurrency = $input_price->getCurrencyCode();
 
-      // We rely on order price.
-      $currentCurrency = $input_price->getCurrencyCode();
+    // If we have autocalculate option enabled, transfer condition price to
+    // order currency code.
+    if (!empty($this->configuration['autocalculate'])) {
+      // Convert prices.
+      $calculatedPrice = CurrencyHelper::priceConversion($check_price, $currentCurrency);
+    }
 
-      // If we have autocalculate option enabled, transfer condition price to
-      // order currency code.
-      if (!empty($this->configuration['autocalculate'])) {
-        // Convert prices.
-        $calculatedPrice = CurrencyHelper::priceConversion($check_price, $currentCurrency);
-      }
+    else {
+      // If we have specified price listed.
+      if (isset($this->configuration['fields'][$input_price->getCurrencyCode()])) {
+        $priceField = $this->configuration['fields'][$input_price->getCurrencyCode()];
 
-      else {
-        // If we have specified price listed.
-        if (isset($this->configuration['fields'][$input_price->getCurrencyCode()])) {
-          $priceField = $this->configuration['fields'][$input_price->getCurrencyCode()];
-
-          // Added check if prices is empty
-          // (etc. after migration of old discounts).
-          if (!empty($priceField['number'])) {
-            $calculatedPrice = new Price($priceField['number'], $priceField['currency_code']);
-          }
+        // Added check if prices is empty
+        // (etc. after migration of old discounts).
+        if (!empty($priceField['number'])) {
+          $calculatedPrice = new Price($priceField['number'], $priceField['currency_code']);
         }
       }
-
-      // Fallback always on autocalculate regardless of setting.
-      // TODO: refactor later this entire function.
-      if (!$calculatedPrice) {
-        $calculatedPrice = CurrencyHelper::priceConversion($check_price, $currentCurrency);
-      }
-
     }
+
+    // Fallback always on autocalculate regardless of setting.
+    // TODO: refactor later this entire function.
+    if (!$calculatedPrice) {
+      $calculatedPrice = CurrencyHelper::priceConversion($check_price, $currentCurrency);
+    }
+
 
     return $calculatedPrice;
   }

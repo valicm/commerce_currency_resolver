@@ -31,13 +31,16 @@ class OrderFixedAmountOff extends CommerceOrderFixedAmountOff {
     $subtotal_price = $order->getSubtotalPrice();
     $amount = $this->getAmount();
 
-    // Check currency, make conversion if needed.
-    if ($subtotal_price->getCurrencyCode() !== $amount->getCurrencyCode()) {
-      // Convert prices.
-      $amount = $this->convertPrice($subtotal_price, $amount);
+    // Check if multicurrency is used.
+    if ($this->configuration['multicurrency']) {
+      // Check currency, make conversion if needed.
+      if ($this->currentCurrency() !== $amount->getCurrencyCode()) {
+        // Convert prices.
+        $amount = $this->getPrice($amount, $this->currentCurrency());
 
-      if (!$amount) {
-        return FALSE;
+        if (!$amount) {
+          return FALSE;
+        }
       }
     }
 
