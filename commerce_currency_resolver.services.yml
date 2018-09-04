@@ -29,3 +29,8 @@ services:
     arguments: ['@commerce_currency_resolver.current_currency']
     tags:
       - { name: cache.context}
+  commerce_currency_resolver.order_currency:
+    class: Drupal\commerce_currency_resolver\EventSubscriber\OrderCurrencyRefresh
+    arguments: ['@entity_type.manager', '@commerce_currency_resolver.current_currency', '@commerce_order.order_refresh','@current_route_match']
+    tags:
+    - { name: event_subscriber }
