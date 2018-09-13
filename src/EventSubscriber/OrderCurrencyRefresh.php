@@ -97,11 +97,41 @@ class OrderCurrencyRefresh implements EventSubscriberInterface {
       // Case when you add product first time to cart,
       // order total does not exist.
       // So we don't need to do anything here.
-      if ($subtotal !== NULL && $total !== NULL) {
+      if ($subtotal && $total) {
 
         // Get order total and subtotal currency.
         $currency_total = $total->getCurrencyCode();
         $currency_subtotal = $subtotal->getCurrencyCode();
+
+        // Handle shipping module.
+        if (\Drupal::service('module_handler')->moduleExists('commerce_shipping')) {
+
+          if ($order->hasField('shipments') || !$order->get('shipments')->isEmpty()) {
+            $shipments = $order->shipments->referencedEntities();
+
+            $updateShipping = FALSE;
+
+            /** @var \Drupal\commerce_shipping\Entity\Shipment $shipment */
+            foreach ($shipments as $key => $shipment) {
+              if ($shipment->getAmount()->getCurrencyCode() !== $currency_main) {
+                // Recalculate rates.
+                if ($shipment->getShippingMethod()) {
+                  $rates = $shipment->getShippingMethod()->getPlugin()->calculateRates($shipment);
+                  if (!empty($rates)) {
+                    $rate = reset($rates);
+                    $shipment->getShippingMethod()->getPlugin()->selectRate($shipment, $rate);
+                    $shipments[$key] = $shipment;
+                    $updateShipping = TRUE;
+                  }
+                }
+              }
+            }
+
+            if ($updateShipping) {
+              $order->set('shipments', $shipments);
+            }
+          }
+        }
 
         // Compare order subtotal and main resolved currency.
         // Refresh order if they are different.
