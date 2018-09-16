@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_currency_resolver;
 
+use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -76,7 +77,7 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
     $total = $order->getTotalPrice();
 
     // Get main currency.
-    $currency_main = $this->currentCurrency->getCurrency();
+    $resolved_currency = $this->currentCurrency->getCurrency();
 
     // This is used only to ensure that order have resolved currency.
     // In combination with check on order load we can ensure that currency is
@@ -85,9 +86,15 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
     // on order load event on currency switch (if we don't explicitly set
     // currency for total price when we switch currency.
     // @see \Drupal\commerce_currency_resolver\EventSubscriber\OrderCurrencyRefresh
-    if ($total->getCurrencyCode() !== $currency_main) {
-      $refresh = $order->recalculateTotalPrice();
-      $order->set('total_price', $refresh->getTotalPrice());
+    if ($total->getCurrencyCode() !== $resolved_currency) {
+      // Get new total price.
+      $order = $order->recalculateTotalPrice();
+
+      // Refresh order on load. Shipping fix. Probably all other potential
+      // unlocked adjustments which are not set correctly.
+      $order->setRefreshState(Order::REFRESH_ON_LOAD);
+
+      // Save order.
       $order->save();
     }
 
