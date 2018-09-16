@@ -84,9 +84,10 @@ class OrderCurrencyRefresh implements EventSubscriberInterface {
     $admin_path = \Drupal::service('router.admin_context')->isAdminRoute($route);
 
     // Resolve only prices on cart or checkout pages.
-    // We don't want alter data on administration pages.
-    // Disable this event for admin pages.
-    if ($cart && !$admin_path) {
+    // We don't want alter data on administration pages while
+    // this change depends on current resolved currency.
+    // Disable this event for admin and administration pages.
+    if ($cart && $route !== NULL && !$admin_path) {
 
       // Get order total currency.
       if ($order_total = $order->getTotalPrice()) {
@@ -100,7 +101,6 @@ class OrderCurrencyRefresh implements EventSubscriberInterface {
         if ($order_currency !== $resolved_currency) {
           // Refresh order.
           $this->orderRefresh->refresh($order);
-          $order->setRefreshState(Order::REFRESH_ON_LOAD);
         }
       }
     }

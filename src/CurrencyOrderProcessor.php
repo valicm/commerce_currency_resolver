@@ -5,6 +5,7 @@ namespace Drupal\commerce_currency_resolver;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
  * Applies taxes to orders during the order refresh process.
@@ -26,17 +27,50 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
   protected $currentCurrency;
 
   /**
+   * The current route match.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $routeMatch;
+
+  /**
    * {@inheritdoc}
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, CurrentCurrency $currency) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, CurrentCurrency $currency, RouteMatchInterface $route_match) {
     $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
     $this->currentCurrency = $currency;
+    $this->routeMatch = $route_match;
   }
 
   /**
    * {@inheritdoc}
    */
   public function process(OrderInterface $order) {
+    // Run this processor only on cart and checkout.
+    // Not on administration pages, it's depending on currentl resolved currency
+    // so you could alter other people orders.
+    // Get current route.
+    $route = $this->routeMatch->getRouteObject();
+
+    // Probably edit page, etc..
+    if ($route === NULL) {
+      return;
+    }
+
+    // Check admin path.
+    $admin_path = \Drupal::service('router.admin_context')->isAdminRoute($route);
+
+    if ($admin_path) {
+      return;
+    }
+
+    // See if order is considered as cart.
+    $cart = (bool) $order->cart->get(0)->value;
+
+    // We only check cart orders.
+    if (!$cart) {
+      return;
+    }
 
     // Get order total.
     $total = $order->getTotalPrice();
