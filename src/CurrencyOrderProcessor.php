@@ -7,6 +7,8 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\commerce_cart\CartSessionInterface;
+use Drupal\commerce_cart\CartSession;
 
 /**
  * Applies taxes to orders during the order refresh process.
@@ -35,12 +37,20 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
   protected $routeMatch;
 
   /**
+   * The cart session.
+   *
+   * @var \Drupal\commerce_cart\CartSessionInterface
+   */
+  protected $cartSession;
+
+  /**
    * {@inheritdoc}
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, CurrentCurrency $currency, RouteMatchInterface $route_match) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, CurrentCurrency $currency, RouteMatchInterface $route_match, CartSessionInterface $cart_session) {
     $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
     $this->currentCurrency = $currency;
     $this->routeMatch = $route_match;
+    $this->cartSession = $cart_session;
   }
 
   /**
@@ -48,28 +58,24 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
    */
   public function process(OrderInterface $order) {
     // Run this processor only on cart and checkout.
-    // Not on administration pages, it's depending on currentl resolved currency
-    // so you could alter other people orders.
-    // Get current route.
-    $route = $this->routeMatch->getRouteObject();
-
-    // Probably edit page, etc..
-    if ($route === NULL) {
-      return;
-    }
-
-    // Check admin path.
-    $admin_path = \Drupal::service('router.admin_context')->isAdminRoute($route);
-
-    if ($admin_path) {
-      return;
-    }
-
+    // Not on administration pages, it's depending on currently resolved
+    // currency so you could alter other people orders.
     // See if order is considered as cart.
-    $cart = (bool) $order->cart->get(0)->value;
-
     // We only check cart orders.
-    if (!$cart) {
+    $cart = (bool) $order->cart->get(0)->value;
+    if (!$cart || $order->getState()->value !== 'draft') {
+      return;
+    }
+
+    // Skip other peoples cart. (admin related).
+    $active_cart = $this->cartSession->hasCartId($order->id(), CartSession::ACTIVE);
+    if (!$active_cart) {
+      return;
+    }
+
+    // Get current route. Skip admin path.
+    $route = $this->routeMatch->getRouteObject();
+    if (\Drupal::service('router.admin_context')->isAdminRoute($route)) {
       return;
     }
 
