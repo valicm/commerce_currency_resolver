@@ -30,12 +30,12 @@ services:
     tags:
       - { name: cache.context}
   commerce_currency_resolver.order_currency:
-    class: Drupal\commerce_currency_resolver\EventSubscriber\OrderCurrencyRefresh
-    arguments: ['@entity_type.manager', '@commerce_currency_resolver.current_currency', '@commerce_order.order_refresh','@current_route_match', '@commerce_cart.cart_session']
+    class: Drupal\commerce_currency_resolver\EventSubscriber\CurrencyOrderRefresh
+    arguments: ['@entity_type.manager', '@commerce_currency_resolver.current_currency', '@commerce_order.order_refresh','@current_route_match']
     tags:
     - { name: event_subscriber }
   commerce_currency_resolver.order_processor:
     class: Drupal\commerce_currency_resolver\CurrencyOrderProcessor
-    arguments: ['@entity_type.manager', '@commerce_currency_resolver.current_currency','@current_route_match', '@commerce_cart.cart_session']
+    arguments: ['@entity_type.manager', '@commerce_currency_resolver.current_currency','@current_route_match']
     tags:
     - { name: commerce_order.order_processor, priority: 1000 }
