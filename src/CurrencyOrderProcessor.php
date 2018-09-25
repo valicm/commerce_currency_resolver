@@ -7,6 +7,7 @@ use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Applies taxes to orders during the order refresh process.
@@ -30,6 +31,13 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
   protected $currentCurrency;
 
   /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $account;
+
+  /**
    * The current route match.
    *
    * @var \Drupal\Core\Routing\RouteMatchInterface
@@ -39,29 +47,17 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
   /**
    * {@inheritdoc}
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, CurrentCurrency $currency, RouteMatchInterface $route_match) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, CurrentCurrency $currency, AccountInterface $account, RouteMatchInterface $route_match) {
     $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
-    $this->currentCurrency = $currency;
     $this->routeMatch = $route_match;
+    $this->account = $account;
+    $this->currentCurrency = $currency;
   }
 
   /**
    * {@inheritdoc}
    */
   public function process(OrderInterface $order) {
-    // Run this processor only on cart and checkout.
-    // Not on administration pages, it's depending on currently resolved
-    // currency so you could alter other people orders.
-    // See if order is considered as cart.
-    // We only check cart orders.
-    // See if order is considered as cart.
-    // Skip orders which are not cart or not in draft status.
-    // Skip admin route or any /admin path (edit order pages is not
-    // flagged as admin route)
-    $cart = (bool) $order->cart->get(0)->value;
-    if (!$cart || $order->getState()->value !== 'draft' || $this->stopCurrencyRefresh()) {
-      return;
-    }
 
     // Get order total.
     $total = $order->getTotalPrice();
@@ -76,7 +72,7 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
     // on order load event on currency switch (if we don't explicitly set
     // currency for total price when we switch currency.
     // @see \Drupal\commerce_currency_resolver\EventSubscriber\OrderCurrencyRefresh
-    if ($total->getCurrencyCode() !== $resolved_currency) {
+    if ($total->getCurrencyCode() !== $resolved_currency && $this->shouldCurrencyRefresh($order)) {
       // Get new total price.
       $order = $order->recalculateTotalPrice();
 

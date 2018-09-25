@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_currency_resolver;
 
+use Drupal\commerce_order\Entity\OrderInterface;
+
 /**
  * Handle access where currency resolver can refresh order.
  *
@@ -18,20 +20,30 @@ trait CommerceCurrencyResolversRefreshTrait {
   }
 
   /**
-   * Check for specific access where currency resolving should not happend.
+   * Check if order belongs to current user.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   Order object.
    *
    * @return bool
-   *   Return true if is matched.
+   *   Return true if this is not order owner.
    */
-  public function checkExcludedUrl() {
-    $current_path = \Drupal::service('path.current')->getPath();
-    $pathParts = explode('/', $current_path);
-    // Check for any admin path.
-    if (isset($pathParts[1]) && $pathParts[1] === 'admin') {
-      return TRUE;
-    }
+  public function checkOrderOwner(OrderInterface $order) {
+    return (int) $order->getCustomerId() !== (int) $this->account->id();
+  }
 
-    return FALSE;
+  /**
+   * Check if order is in draft status.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   Order object.
+   *
+   * @return bool
+   *   Return true if order is not in draft state.
+   */
+  public function checkOrderStatus(OrderInterface $order) {
+    // Only draft orders should be recalculated.
+    return $order->getState()->value !== 'draft';
   }
 
   /**
@@ -40,16 +52,23 @@ trait CommerceCurrencyResolversRefreshTrait {
    * @return bool
    *   Return true or false.
    */
-  public function stopCurrencyRefresh() {
-    if ($this->checkExcludedUrl()) {
-      return TRUE;
+  public function shouldCurrencyRefresh(OrderInterface $order) {
+    // Not owner of order.
+    if ($this->checkOrderOwner($order)) {
+      return FALSE;
     }
 
+    // Order is not in draft status.
+    if ($this->checkOrderStatus($order)) {
+      return FALSE;
+    }
+
+    // Admin route.
     if ($this->checkAdminRoute()) {
-      return TRUE;
+      return FALSE;
     }
 
-    return FALSE;
+    return TRUE;
   }
 
 }

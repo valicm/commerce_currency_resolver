@@ -4,6 +4,7 @@ namespace Drupal\commerce_currency_resolver\EventSubscriber;
 
 use Drupal\commerce_currency_resolver\CommerceCurrencyResolversRefreshTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\commerce_currency_resolver\CurrentCurrency;
 use Drupal\commerce_order\Event\OrderEvent;
@@ -41,6 +42,13 @@ class CurrencyOrderRefresh implements EventSubscriberInterface {
   protected $currentCurrency;
 
   /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $account;
+
+  /**
    * The current route match.
    *
    * @var \Drupal\Core\Routing\RouteMatchInterface
@@ -50,11 +58,12 @@ class CurrencyOrderRefresh implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, CurrentCurrency $currency, OrderRefreshInterface $order_refresh, RouteMatchInterface $route_match) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, CurrentCurrency $currency, OrderRefreshInterface $order_refresh, AccountInterface $account, RouteMatchInterface $route_match) {
     $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
+    $this->account = $account;
+    $this->routeMatch = $route_match;
     $this->currentCurrency = $currency;
     $this->orderRefresh = $order_refresh;
-    $this->routeMatch = $route_match;
   }
 
   /**
@@ -78,15 +87,6 @@ class CurrencyOrderRefresh implements EventSubscriberInterface {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $event->getOrder();
 
-    // See if order is considered as cart.
-    // Skip orders which are not cart or not in draft status.
-    // Skip admin route or any /admin path (edit order pages is not
-    // flagged as admin route)
-    $cart = (bool) $order->cart->get(0)->value;
-    if (!$cart || $order->getState()->value !== 'draft' || $this->stopCurrencyRefresh()) {
-      return;
-    }
-
     // Get order total currency.
     if ($order_total = $order->getTotalPrice()) {
       $order_currency = $order_total->getCurrencyCode();
@@ -96,8 +96,9 @@ class CurrencyOrderRefresh implements EventSubscriberInterface {
       // Refresh order if they are different. We need then alter total price.
       // This will trigger order processor which will handle
       // correction of total order price and currency.
-      if ($order_currency !== $resolved_currency) {
-        // Refresh order.
+      if ($order_currency !== $resolved_currency && $this->shouldCurrencyRefresh($order)) {
+
+        // Check if we can refresh order.
         $this->orderRefresh->refresh($order);
       }
     }
