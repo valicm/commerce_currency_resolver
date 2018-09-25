@@ -61,14 +61,13 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
             return new Price($price['number'], $price['currency_code']);
           }
 
-          else {
-            // Calculate conversion for the combo mode if field does not
-            // exist.
-            if ($currency_source === 'combo') {
-              $new_price = CurrencyHelper::priceConversion($entity->getPrice(), $convert_to);
-              return $new_price;
-            }
+          // Calculate conversion for the combo mode if field does not
+          // exist.
+          if ($currency_source === 'combo') {
+            $new_price = CurrencyHelper::priceConversion($entity->getPrice(), $convert_to);
+            return $new_price;
           }
+
           break;
 
         default:
