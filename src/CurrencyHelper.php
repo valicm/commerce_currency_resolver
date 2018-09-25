@@ -80,6 +80,9 @@ class CurrencyHelper {
    *
    * @return array
    *   Array of currencies.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public static function getEnabledCurrency() {
     $enabled_currencies = \Drupal::EntityTypeManager()
