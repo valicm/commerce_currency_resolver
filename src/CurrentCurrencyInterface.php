@@ -15,4 +15,23 @@ interface CurrentCurrencyInterface {
    */
   public function getCurrency();
 
+  /**
+   * Gets user country location.
+   *
+   * @param string $service
+   *   Geolocation service used on site.
+   *
+   * @return string
+   *   2-letter country code.
+   */
+  public function getUserCountry($service);
+
+  /**
+   * List all enabled currencies.
+   *
+   * @return string
+   *   Return array of all enabled currencies.
+   */
+  public function getEnabledCurrencies();
+
 }

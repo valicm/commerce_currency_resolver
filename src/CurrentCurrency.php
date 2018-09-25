@@ -52,11 +52,11 @@ class CurrentCurrency implements CurrentCurrencyInterface {
       // Get main currency settings.
       $settings = \Drupal::config('commerce_currency_resolver.settings');
 
+      // Enabled currencies.
+      $enabled_currencies = $this->getEnabledCurrencies();
+
       // Get how currency should be mapped.
       $mapping = $settings->get('currency_mapping');
-
-      // Enabled currencies.
-      $enabled_currencies = CurrencyHelper::getEnabledCurrency();
 
       // Target currency default.
       $resolved_currency = $settings->get('currency_default');
@@ -86,7 +86,7 @@ class CurrentCurrency implements CurrentCurrencyInterface {
             case 'geo':
               // Get user country.
               $geo_service = $settings->get('currency_geo');
-              $current = CurrencyHelper::getUserCountry($geo_service);
+              $current = $this->getUserCountry($geo_service);
 
               // If we use, we need to pull currency per country, and
               // check if this currency is enabled. If not use default currency
@@ -131,6 +131,20 @@ class CurrentCurrency implements CurrentCurrencyInterface {
     }
 
     return $this->currency[$request];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUserCountry($service) {
+    return CurrencyHelper::getUserCountry($service);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEnabledCurrencies() {
+    return CurrencyHelper::getEnabledCurrency();
   }
 
 }
