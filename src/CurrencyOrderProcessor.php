@@ -72,7 +72,7 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
     // on order load event on currency switch (if we don't explicitly set
     // currency for total price when we switch currency.
     // @see \Drupal\commerce_currency_resolver\EventSubscriber\OrderCurrencyRefresh
-    if ($total->getCurrencyCode() !== $resolved_currency && $this->shouldCurrencyRefresh($order)) {
+    if ($total !== NULL && $total->getCurrencyCode() !== $resolved_currency && $this->shouldCurrencyRefresh($order)) {
       // Get new total price.
       $order = $order->recalculateTotalPrice();
 
