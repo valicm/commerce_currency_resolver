@@ -53,6 +53,14 @@ trait CommerceCurrencyResolversRefreshTrait {
    *   Return true or false.
    */
   public function shouldCurrencyRefresh(OrderInterface $order) {
+
+    // Do not trigger currency refresh in cli - drush, cron, etc.
+    // If we load order in cli, we don't want to manipulate order
+    // with currency refresh.
+    if (PHP_SAPI === 'cli') {
+      return FALSE;
+    }
+
     // Not owner of order.
     if ($this->checkOrderOwner($order)) {
       return FALSE;
