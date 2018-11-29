@@ -31,43 +31,47 @@ class OrderTotalPrice extends CommerceOrderTotalPrice {
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
-    $total_price = $order->getTotalPrice();
-    $condition_price = new Price($this->configuration['amount']['number'], $this->configuration['amount']['currency_code']);
 
-    // Check if multicurrency should be used.
-    if ($this->configuration['multicurrency']) {
-      // Check currency, make conversion if needed.
-      if ($this->currentCurrency() !== $condition_price->getCurrencyCode()) {
+    if ($total_price = $order->getTotalPrice()) {
+      $condition_price = new Price($this->configuration['amount']['number'], $this->configuration['amount']['currency_code']);
 
-        // Convert prices.
-        $condition_price = $this->getPrice($condition_price, $this->currentCurrency());
+      // Check if multicurrency should be used.
+      if ($this->configuration['multicurrency']) {
+        // Check currency, make conversion if needed.
+        if ($this->currentCurrency() !== $condition_price->getCurrencyCode()) {
 
-        if (!$condition_price) {
-          return FALSE;
+          // Convert prices.
+          $condition_price = $this->getPrice($condition_price, $this->currentCurrency());
+
+          if (!$condition_price) {
+            return FALSE;
+          }
+
         }
+      }
 
+      switch ($this->configuration['operator']) {
+        case '>=':
+          return $total_price->greaterThanOrEqual($condition_price);
+
+        case '>':
+          return $total_price->greaterThan($condition_price);
+
+        case '<=':
+          return $total_price->lessThanOrEqual($condition_price);
+
+        case '<':
+          return $total_price->lessThan($condition_price);
+
+        case '==':
+          return $total_price->equals($condition_price);
+
+        default:
+          throw new \InvalidArgumentException("Invalid operator {$this->configuration['operator']}");
       }
     }
 
-    switch ($this->configuration['operator']) {
-      case '>=':
-        return $total_price->greaterThanOrEqual($condition_price);
-
-      case '>':
-        return $total_price->greaterThan($condition_price);
-
-      case '<=':
-        return $total_price->lessThanOrEqual($condition_price);
-
-      case '<':
-        return $total_price->lessThan($condition_price);
-
-      case '==':
-        return $total_price->equals($condition_price);
-
-      default:
-        throw new \InvalidArgumentException("Invalid operator {$this->configuration['operator']}");
-    }
+    return FALSE;
   }
 
 }
