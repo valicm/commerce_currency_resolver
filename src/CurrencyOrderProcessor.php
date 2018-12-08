@@ -61,17 +61,30 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
 
     // Get order total.
     if ($total = $order->getTotalPrice()) {
+
       // Get main currency.
       $resolved_currency = $this->currentCurrency->getCurrency();
 
-      // This is used only to ensure that order have resolved currency.
-      // In combination with check on order load we can ensure that currency is
-      // same accross entire order.
-      // This solution provides avoiding constant recalculation
-      // on order load event on currency switch (if we don't explicitly set
-      // currency for total price when we switch currency.
+      // Triggered on event order load to ensure that new currency and prices
+      // are properly saved.
       // @see \Drupal\commerce_currency_resolver\EventSubscriber\OrderCurrencyRefresh
       if ($total->getCurrencyCode() !== $resolved_currency && $this->shouldCurrencyRefresh($order)) {
+
+        // Handle shipping module.
+        if (\Drupal::service('module_handler')->moduleExists('commerce_shipping')) {
+          if ($order->hasField('shipments') || !$order->get('shipments')->isEmpty()) {
+
+            // Get order shipments.
+            $shipments = $order->shipments->referencedEntities();
+
+            $update_shipments = $this->processShipments($shipments, $resolved_currency);
+
+            if ($update_shipments) {
+              $order->set('shipments', $shipments);
+            }
+          }
+        }
+
         // Get new total price.
         $order = $order->recalculateTotalPrice();
 
@@ -84,6 +97,50 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
       }
     }
 
+  }
+
+  /**
+   * Handle shipments on currency change.
+   *
+   * @param \Drupal\commerce_shipping\Entity\Shipment[] $shipments
+   *   List of shipments attached to the order.
+   * @param string $resolved_currency
+   *   Currency code.
+   *
+   * @return bool|\Drupal\commerce_shipping\Entity\Shipment[]
+   *   FALSE if is auto-calculated, and shipments if they need to be updated.
+   */
+  protected function processShipments($shipments, $resolved_currency) {
+
+    $updateShipping = FALSE;
+
+    foreach ($shipments as $key => $shipment) {
+      if ($amount = $shipment->getAmount()) {
+        if ($amount->getCurrencyCode() !== $resolved_currency) {
+          // Recalculate rates.
+          if ($shipment->getShippingMethod()) {
+
+            // Get rates.
+            $rates = $shipment->getShippingMethod()->getPlugin()->calculateRates($shipment);
+
+            // If we have found match, update with new rate.
+            if (!empty($rates)) {
+              $rate = reset($rates);
+              $shipment->getShippingMethod()->getPlugin()->selectRate($shipment, $rate);
+              $shipments[$key] = $shipment;
+              $updateShipping = $shipments;
+            }
+
+            // We haven't found anything, automatically convert price.
+            else {
+              $shipment->setAmount(CurrencyHelper::priceConversion($shipment->getAmount(), $resolved_currency));
+            }
+          }
+        }
+      }
+    }
+
+    return $updateShipping;
   }
 
 }
