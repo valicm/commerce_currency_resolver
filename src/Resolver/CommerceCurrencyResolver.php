@@ -4,8 +4,8 @@ namespace Drupal\commerce_currency_resolver\Resolver;
 
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_currency_resolver\CommerceCurrencyResolverTrait;
 use Drupal\commerce_price\Resolver\PriceResolverInterface;
-use Drupal\commerce_price\Price;
 use Drupal\commerce_currency_resolver\CurrencyHelper;
 use Drupal\commerce_currency_resolver\CurrentCurrencyInterface;
 
@@ -13,6 +13,8 @@ use Drupal\commerce_currency_resolver\CurrentCurrencyInterface;
  * Returns a price and currency depending of language or country.
  */
 class CommerceCurrencyResolver implements PriceResolverInterface {
+
+  use CommerceCurrencyResolverTrait;
 
   /**
    * The current currency.
@@ -35,49 +37,64 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
    * {@inheritdoc}
    */
   public function resolve(PurchasableEntityInterface $entity, $quantity, Context $context) {
-    // Get resolved currency.
-    $convert_to = $this->currentCurrency->getCurrency();
 
-    // Get default commerce field price currency and amount.
-    $field_currency = $entity->getPrice()->getCurrencyCode();
+    // Default price.
+    $price = NULL;
 
-    // Convert if we have mapping request. Target only currency which are
-    // different then field currency.
-    if ($field_currency !== $convert_to) {
-      $currency_source = \Drupal::config('commerce_currency_resolver.settings')
-        ->get('currency_source');
+    // Get field from context.
+    $field_name = $context->getData('field_name', 'price');
 
-      switch ($currency_source) {
-        case 'combo':
-        case 'field':
+    // @see \Drupal\commerce_price\Resolver\DefaultPriceResolver
+    if ($field_name === 'price') {
+      $price = $entity->getPrice();
+    }
+    elseif ($entity->hasField($field_name) && !$entity->get($field_name)->isEmpty()) {
+      $price = $entity->get($field_name)->first()->toPrice();
+    }
+
+    // If we have price.
+    if ($price) {
+
+      // Get current resolved currency.
+      $resolved_currency = $this->currentCurrency->getCurrency();
+
+      // Different currencies, we need resolve to new price.
+      if ($resolved_currency !== $price->getCurrencyCode()) {
+
+        // Get how price should be calculated.
+        $currency_source = $this->getCurrencySource();
+
+        // Auto-calculate price by default. Fallback for all cases regardless
+        // of chosen currency source mode.
+        $resolved_price = CurrencyHelper::priceConversion($price, $resolved_currency);
+
+        // Specific cases for field and combo. Even we had autocalculated
+        // price, in combo mode we could have field with price.
+        if ($currency_source === 'combo' || $currency_source === 'field') {
+
+          // Backward compatibility for older version, and inital setup
+          // that default price fields are mapped to field_price_currency_code
+          // instead to price_currency_code.
+          if ($field_name === 'price') {
+            $field_name = 'field_price';
+          }
+
+          $resolved_field = $field_name . '_' . strtolower($resolved_currency);
 
           // Check if we have field.
-          if ($entity->hasField('field_price_' . strtolower($convert_to))) {
-            $price = $entity->get('field_price_' . strtolower($convert_to))
-              ->getValue();
-            $price = reset($price);
-
-            // Return price.
-            return new Price($price['number'], $price['currency_code']);
+          if ($entity->hasField($resolved_field) && !$entity->get($resolved_field)->isEmpty()) {
+            $resolved_price = $entity->get($resolved_field)->first()->toPrice();
           }
+        }
 
-          // Calculate conversion for the combo mode if field does not
-          // exist.
-          if ($currency_source === 'combo') {
-            $new_price = CurrencyHelper::priceConversion($entity->getPrice(), $convert_to);
-            return $new_price;
-          }
-
-          break;
-
-        default:
-        case 'auto':
-          // Calculate conversion.
-          $new_price = CurrencyHelper::priceConversion($entity->getPrice(), $convert_to);
-          return $new_price;
+        return $resolved_price;
 
       }
+
+      // Return price if conversion is not needed.
+      return $price;
     }
+
   }
 
 }
