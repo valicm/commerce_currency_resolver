@@ -9,7 +9,7 @@ use Drupal\Core\Block\BlockBase;
  *
  * @Block(
  *   id = "commerce_currency_resolver",
- *   admin_label = @Translation("Currency block."),
+ *   admin_label = @Translation("Currency block"),
  *   category = @Translation("Blocks")
  * )
  */
@@ -22,8 +22,7 @@ class CommerceCurrencyResolverSelectBlock extends BlockBase {
 
     $markup = [];
 
-    $form = \Drupal::formBuilder()
-      ->getForm('Drupal\commerce_currency_resolver\Form\CommerceCurrencyResolverSelectForm');
+    $form = \Drupal::formBuilder()->getForm('Drupal\commerce_currency_resolver\Form\CommerceCurrencyResolverSelectForm');
 
     $markup['form'] = $form;
 
