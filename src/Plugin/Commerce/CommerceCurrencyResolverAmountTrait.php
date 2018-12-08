@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_currency_resolver\Plugin\Commerce;
 
+use Drupal\commerce_currency_resolver\CommerceCurrencyResolverTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\commerce_currency_resolver\CurrencyHelper;
 use Drupal\commerce_price\Price;
@@ -10,6 +11,8 @@ use Drupal\commerce_price\Price;
  * Provides common configuration for fixed amount off offers.
  */
 trait CommerceCurrencyResolverAmountTrait {
+
+  use CommerceCurrencyResolverTrait;
 
   /**
    * {@inheritdoc}
@@ -42,21 +45,13 @@ trait CommerceCurrencyResolverAmountTrait {
   }
 
   /**
-   * Get resolved currency.
-   */
-  public function defaultCurrency() {
-    return \Drupal::config('commerce_currency_resolver.settings')
-      ->get('currency_default');
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
     // Get default currency.
-    $defaultCurrency = $this->defaultCurrency();
+    $defaultCurrency = $this->fallbackCurrencyCode();
 
     // If we handle shipping.
     if (isset($form['rate_amount']) && empty($form['rate_amount']['#default_value'])) {
@@ -100,11 +95,11 @@ trait CommerceCurrencyResolverAmountTrait {
     ];
 
     // Get all enabled currencies.
-    $enabledCurrencies = CurrencyHelper::getEnabledCurrency();
+    $enabledCurrencies = $this->getEnabledCurrencies();
 
     foreach ($enabledCurrencies as $key => $currency) {
 
-      $amount_key = isset($this->configuration['fields'][$key]) ? $this->configuration['fields'][$key] : NULL;
+      $amount_key = $this->configuration['fields'][$key] ?? NULL;
 
       // An #ajax bug can cause $amount_key to be incomplete.
       if (isset($amount_key) && !isset($amount_key['number'], $amount_key['currency_code'])) {
