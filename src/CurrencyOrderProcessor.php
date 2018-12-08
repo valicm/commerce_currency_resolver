@@ -120,13 +120,22 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
           // Recalculate rates.
           if ($shipment->getShippingMethod()) {
 
-            // Get rates.
+            // Get rates. User can have conditions based on Currency,
+            // or they can use multicurrency addon implementation on shipment.
             $rates = $shipment->getShippingMethod()->getPlugin()->calculateRates($shipment);
 
             // If we have found match, update with new rate.
             if (!empty($rates)) {
               $rate = reset($rates);
               $shipment->getShippingMethod()->getPlugin()->selectRate($shipment, $rate);
+
+              // We have get new rate. But again duo to fact that we don't
+              // know if user is using multicurrency conditions or not,
+              // convert price just in case if is different currency.
+              if ($shipment->getAmount()->getCurrencyCode() !== $resolved_currency) {
+                $shipment->setAmount(CurrencyHelper::priceConversion($shipment->getAmount(), $resolved_currency));
+              }
+
               $shipments[$key] = $shipment;
               $updateShipping = $shipments;
             }
