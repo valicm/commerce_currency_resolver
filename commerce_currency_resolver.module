@@ -36,7 +36,7 @@ function commerce_currency_resolver_entity_view_alter(array &$build, EntityInter
   $source = \Drupal::config('commerce_currency_resolver.settings')->get('currency_mapping');
 
   // Add our cache context.
-  if (empty($source) && (isset($build['#commerce_product']) || isset($build['#commerce_product_variation']))) {
+  if ($source === 'cookie' && (isset($build['#commerce_product']) || isset($build['#commerce_product_variation']))) {
     $build['#cache']['contexts'][] = 'currency_resolver';
   }
 }

@@ -20,8 +20,9 @@ class CurrencyHelper {
   public static function getAvailableMapping() {
     $mapping = [];
 
-    // Default none.
-    $mapping['0'] = t('Cookie (currency block selector)');
+    // Default store.
+    $mapping['store'] = t('Store (default Commerce 2 behavior)');
+    $mapping['cookie'] = t('Cookie (currency block selector)');
 
     // Check if exist geo based modules.
     // We support for now two of them.
