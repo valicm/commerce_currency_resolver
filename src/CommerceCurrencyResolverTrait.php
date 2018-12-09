@@ -12,9 +12,6 @@ trait CommerceCurrencyResolverTrait {
   /**
    * Gets user country location.
    *
-   * @param string $service
-   *   Geolocation service used on site.
-   *
    * @return string
    *   2-letter country code.
    */
@@ -48,7 +45,7 @@ trait CommerceCurrencyResolverTrait {
    * Get how currency is added and calculated, automatic, by field.
    *
    * @return string
-   *  Return source for calculating prices.
+   *   Return source for calculating prices.
    *
    * @see commerce_currency_resolver.settings
    */

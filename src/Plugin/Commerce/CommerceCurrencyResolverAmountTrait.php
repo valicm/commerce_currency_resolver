@@ -115,7 +115,6 @@ trait CommerceCurrencyResolverAmountTrait {
       ];
     }
 
-
     return $form;
   }
 
@@ -136,14 +135,14 @@ trait CommerceCurrencyResolverAmountTrait {
    * Get price based on currency price and target currency.
    *
    * @param \Drupal\commerce_price\Price $input_price
-   *    Default price added in condition, offer, etc.
+   *   Default price added in condition, offer, etc.
    * @param string $target_currency
-   *    Currency code resolved from CurrentCurrency.
+   *   Currency code resolved from CurrentCurrency.
    *
    * @return bool|\Drupal\commerce_price\Price
    *   Return Price object or FALSE.
    */
-  public function getPrice($input_price, $target_currency) {
+  public function getPrice(Price $input_price, $target_currency) {
 
     // Defaults.
     $calculatedPrice = FALSE;
@@ -174,7 +173,6 @@ trait CommerceCurrencyResolverAmountTrait {
       $calculatedPrice = CurrencyHelper::priceConversion($input_price, $target_currency);
     }
 
-
     return $calculatedPrice;
 
   }
@@ -182,9 +180,9 @@ trait CommerceCurrencyResolverAmountTrait {
   /**
    * Convert prices for Commerce condition or Promotion offers.
    *
-   * @param  \Drupal\commerce_price\Price $input_price
+   * @param \Drupal\commerce_price\Price $input_price
    *   Price which is received from order.
-   * @param  \Drupal\commerce_price\Price $check_price
+   * @param \Drupal\commerce_price\Price $check_price
    *   Price which is in condition or promotion offer entered.
    *
    * @return bool|\Drupal\commerce_price\Price
@@ -223,7 +221,6 @@ trait CommerceCurrencyResolverAmountTrait {
     if (!$calculatedPrice) {
       $calculatedPrice = CurrencyHelper::priceConversion($check_price, $currentCurrency);
     }
-
 
     return $calculatedPrice;
   }

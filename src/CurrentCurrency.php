@@ -65,7 +65,7 @@ class CurrentCurrency implements CurrentCurrencyInterface {
           $current_language = \Drupal::service('language_manager')->getCurrentLanguage()->getId();
 
           // Get mapping language by currency.
-          $matrix =  \Drupal::config('commerce_currency_resolver.currency_mapping')->get('matrix');
+          $matrix = \Drupal::config('commerce_currency_resolver.currency_mapping')->get('matrix');
 
           if (isset($matrix[$current_language])) {
             $resolved_currency = $matrix[$current_language];
@@ -81,7 +81,7 @@ class CurrentCurrency implements CurrentCurrencyInterface {
 
           // Get currency matrix data. All mappings are inside.
           // Only if we use domicile currency, mapping is empty.
-          $matrix =  $currency_mapping->get('matrix') ?? [];
+          $matrix = $currency_mapping->get('matrix') ?? [];
 
           // We hit some mapping by language or geo and we don't use domicile
           // currency under geo settings.

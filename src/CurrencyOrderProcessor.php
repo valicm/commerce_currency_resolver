@@ -124,7 +124,7 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
    * @return bool|\Drupal\commerce_shipping\Entity\Shipment[]
    *   FALSE if is auto-calculated, and shipments if they need to be updated.
    */
-  protected function processShipments($shipments, $resolved_currency) {
+  protected function processShipments(array $shipments, $resolved_currency) {
 
     $updateShipping = FALSE;
 
