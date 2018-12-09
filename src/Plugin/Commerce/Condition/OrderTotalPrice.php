@@ -36,10 +36,9 @@ class OrderTotalPrice extends CommerceOrderTotalPrice {
       $condition_price = new Price($this->configuration['amount']['number'], $this->configuration['amount']['currency_code']);
 
       // Check if multicurrency should be used.
-      if ($this->configuration['multicurrency']) {
+      if ($this->shouldCurrencyRefresh()) {
         // Check currency, make conversion if needed.
         if ($this->currentCurrency() !== $condition_price->getCurrencyCode()) {
-
           // Convert prices.
           $condition_price = $this->getPrice($condition_price, $this->currentCurrency());
 

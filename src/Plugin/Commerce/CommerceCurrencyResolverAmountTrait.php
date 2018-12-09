@@ -228,4 +228,25 @@ trait CommerceCurrencyResolverAmountTrait {
     return $calculatedPrice;
   }
 
+  /**
+   * Do not run conditions currency conversion on specific conditions.
+   *
+   * @return bool
+   *   Return TRUE if is allowed.
+   */
+  public function shouldCurrencyRefresh() {
+
+    // Disallow in cli mode.
+    if (PHP_SAPI === 'cli') {
+      return FALSE;
+    }
+
+    // Check if multicurrency is enabled on condition.
+    if ($this->configuration['multicurrency']) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
 }

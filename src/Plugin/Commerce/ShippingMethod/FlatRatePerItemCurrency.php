@@ -34,7 +34,7 @@ class FlatRatePerItemCurrency extends FlatRateCurrency {
     $amount = new Price($amount['number'], $amount['currency_code']);
 
     // Check if is enabled multicurrency.
-    if ($this->configuration['multicurrency']) {
+    if ($this->shouldCurrencyRefresh()) {
       // If current currency does not match to shipment code.
       if ($this->currentCurrency() !== $amount->getCurrencyCode()) {
         $amount = $this->getPrice($amount, $this->currentCurrency());

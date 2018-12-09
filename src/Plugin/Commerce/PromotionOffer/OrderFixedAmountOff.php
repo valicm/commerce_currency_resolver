@@ -32,7 +32,7 @@ class OrderFixedAmountOff extends CommerceOrderFixedAmountOff {
     $amount = $this->getAmount();
 
     // Check if multicurrency is used.
-    if ($this->configuration['multicurrency']) {
+    if ($this->shouldCurrencyRefresh()) {
       // Check currency, make conversion if needed.
       if ($this->currentCurrency() !== $amount->getCurrencyCode()) {
         // Convert prices.
