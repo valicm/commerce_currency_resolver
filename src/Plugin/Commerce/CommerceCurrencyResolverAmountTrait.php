@@ -188,7 +188,7 @@ trait CommerceCurrencyResolverAmountTrait {
    * @return bool|\Drupal\commerce_price\Price
    *   Return FALSE or Price object.
    */
-  public function convertPrice($input_price, $check_price) {
+  public function convertPrice(Price $input_price, Price $check_price) {
 
     // Defaults.
     $calculatedPrice = FALSE;
