@@ -55,6 +55,14 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
     // If we have price.
     if ($price) {
 
+      // Loading orders trough drush, or any cli task
+      // will resolve price by current conditions in which cli is
+      // (country, language, current store) - this will result in
+      // currency exception. We need to return existing price.
+      if (PHP_SAPI === 'cli') {
+        return $price;
+      }
+
       // Get current resolved currency.
       $resolved_currency = $this->currentCurrency->getCurrency();
 
