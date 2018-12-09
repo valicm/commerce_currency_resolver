@@ -2,9 +2,13 @@ name: 'Commerce Currency Resolver'
 type: module
 description: 'Commerce 2 currency enhancements'
 core: 8.x
-package: Commerce
+package: Commerce (Contrib)
+
+configure: commerce_currency_resolver.configuration
 
 dependencies:
-  - commerce:commerce
+  - commerce:commerce (>=8.x-2.10)
   - commerce:commerce_price
   - commerce:commerce_order
+
+php: 7.0

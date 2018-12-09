@@ -1,0 +1,11 @@
+{
+    "name": "drupal/commerce_currency_resolver",
+    "type": "drupal-module",
+    "description": "Commerce 2 currency enhancements.",
+    "homepage": "https://www.drupal.org/project/commerce_currency_resolver",
+    "license": "GPL-2.0+",
+    "require": {
+        "drupal/commerce": "~2.10"
+    },
+    "minimum-stability": "dev"
+}
