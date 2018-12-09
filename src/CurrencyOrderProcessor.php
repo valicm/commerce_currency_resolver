@@ -70,6 +70,20 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
       // @see \Drupal\commerce_currency_resolver\EventSubscriber\OrderCurrencyRefresh
       if ($total->getCurrencyCode() !== $resolved_currency && $this->shouldCurrencyRefresh($order)) {
 
+        // Get order items.
+        $items = $order->getItems();
+
+        // Loop trough all order items and find ones without PurchasableEntity
+        // They need to automatically converted.
+        foreach ($items as $item) {
+          /** @var \Drupal\commerce_order\Entity\OrderItem $item */
+          if (!$item->hasPurchasedEntity()) {
+            $price = $item->getUnitPrice();
+            // Auto calculate price.
+            $item->setUnitPrice(CurrencyHelper::priceConversion($price, $resolved_currency));
+          }
+        }
+
         // Handle shipping module.
         if (\Drupal::service('module_handler')->moduleExists('commerce_shipping')) {
           if ($order->hasField('shipments') || !$order->get('shipments')->isEmpty()) {
