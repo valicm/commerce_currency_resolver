@@ -54,6 +54,11 @@ trait CommerceCurrencyResolversRefreshTrait {
    */
   public function shouldCurrencyRefresh(OrderInterface $order) {
 
+    // If order have specific flag set, skip refreshing currency.
+    if ($skip_resolving = $order->getData('currency_resolver_skip')) {
+      return FALSE;
+    }
+
     // Do not trigger currency refresh in cli - drush, cron, etc.
     // If we load order in cli, we don't want to manipulate order
     // with currency refresh.
