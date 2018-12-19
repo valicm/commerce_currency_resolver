@@ -86,7 +86,7 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
 
         // Handle shipping module.
         if (\Drupal::service('module_handler')->moduleExists('commerce_shipping')) {
-          if ($order->hasField('shipments') || !$order->get('shipments')->isEmpty()) {
+          if ($order->hasField('shipments') && !$order->get('shipments')->isEmpty()) {
 
             // Get order shipments.
             $shipments = $order->shipments->referencedEntities();
