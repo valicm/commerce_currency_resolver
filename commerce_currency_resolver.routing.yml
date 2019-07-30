@@ -26,4 +26,5 @@ commerce_currency_resolver.countries.autocomplete:
   defaults:
     _controller: '\Drupal\commerce_currency_resolver\Controller\CommerceCurrencyResolverAutocomplete::countriesAutocomplete'
   requirements:
-    _permission: 'administer commerce currency resolver settings'
+    # use OR conjunction
+    _permission: 'administer commerce currency resolver settings+access commerce currency resolver autocomplete'
