@@ -52,8 +52,12 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
       $price = $entity->get($field_name)->first()->toPrice();
     }
 
-    // If we have price.
-    if ($price) {
+    // Get current resolved currency.
+    $resolved_currency = $this->currentCurrency->getCurrency();
+
+    // If we have price, and the resolved price currency is different than the
+    // current currency.
+    if ($price && $resolved_currency !== $price->getCurrencyCode()) {
 
       // Loading orders trough drush, or any cli task
       // will resolve price by current conditions in which cli is
@@ -62,9 +66,6 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
       if (PHP_SAPI === 'cli') {
         return $price;
       }
-
-      // Get current resolved currency.
-      $resolved_currency = $this->currentCurrency->getCurrency();
 
       // Different currencies, we need resolve to new price.
       if ($resolved_currency !== $price->getCurrencyCode()) {
@@ -96,11 +97,7 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
         }
 
         return $resolved_price;
-
       }
-
-      // Return price if conversion is not needed.
-      return $price;
     }
 
   }
