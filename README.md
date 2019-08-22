@@ -104,6 +104,48 @@ If you have source for each currency, you can switch between cross sync
 settings and implement your own per currency data.
 @see \Drupal\commerce_currency_resolver\EventSubscriber\ExchangeRateFixerPaid
 
+EXAMPLES
+-----------
+
+### Adding order item programmatically  
+If you are adding order items programmatically in your code,
+you need take in account possible conflicts with prices. To avoid that
+is best that you using resolver to resolve prices for certain item to the cart. 
+
+Example below shows entire process in custom add to cart process, where we add
+item to the cart.
+
+```
+** 
+@var \Drupal\commerce_cart\CartManagerInterface $cart_manager */
+$cart_manager = \Drupal::service('commerce_cart.cart_manager');
+
+/** @var \Drupal\commerce_order\Resolver\OrderTypeResolverInterface $order_type_resolver */
+$order_type_resolver = \Drupal::service('commerce_order.chain_order_type_resolver');
+
+/** @var \Drupal\commerce_store\CurrentStoreInterface $current_store */
+$current_store = \Drupal::service('commerce_store.current_store');
+
+/** @var \Drupal\commerce_cart\CartProviderInterface $cart_provider */
+$cart_provider = \Drupal::service('commerce_cart.cart_provider');
+
+/** @var \Drupal\commerce_order\OrderItemStorage $order_item_storage */
+$order_item_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_order_item');
+$store = $current_store->getStore();
+
+$context = $context = new Context(\Drupal::currentUser(), $store);
+$resolved_price = \Drupal::service('commerce_currency_resolver.price_resolver')->resolve($product, 1, $context);
+$order_item = $order_item_storage->createFromPurchasableEntity($product, ['unit_price' => $resolved_price]);
+
+$order_type_id = $order_type_resolver->resolve($order_item);
+
+$cart = $cart_provider->getCart($order_type_id, $store);
+if (!$cart) {
+  $cart = $cart_provider->createCart($order_type_id, $store);
+}
+
+$cart_manager->addOrderItem($cart, $order_item);
+```
 
 MAINTAINERS
 -----------
