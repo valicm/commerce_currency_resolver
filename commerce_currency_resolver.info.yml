@@ -7,7 +7,6 @@ package: Commerce (Contrib)
 configure: commerce_currency_resolver.configuration
 
 dependencies:
-  - commerce:commerce (>=8.x-2.10)
   - commerce:commerce_price
   - commerce:commerce_order
 
