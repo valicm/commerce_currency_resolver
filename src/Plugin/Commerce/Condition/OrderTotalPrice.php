@@ -38,9 +38,12 @@ class OrderTotalPrice extends CommerceOrderTotalPrice {
     $order = $entity;
 
     $total_price = $order->getTotalPrice();
-    $original_condition_price = new Price($this->configuration['amount']['number'], $this->configuration['amount']['currency_code']);
-    $condition_price = $this->getPrice($original_condition_price);
+    if (!$total_price) {
+      return FALSE;
+    }
 
+    $original_condition_price = Price::fromArray($this->configuration['amount']);
+    $condition_price = $this->getPrice($original_condition_price);
 
     switch ($this->configuration['operator']) {
       case '>=':
