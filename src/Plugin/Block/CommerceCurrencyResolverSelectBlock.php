@@ -3,6 +3,7 @@
 namespace Drupal\commerce_currency_resolver\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
+use Drupal\commerce_currency_resolver\Form\CommerceCurrencyResolverSelectForm;
 
 /**
  * Provides Commerce currency block.
@@ -22,7 +23,7 @@ class CommerceCurrencyResolverSelectBlock extends BlockBase {
 
     $markup = [];
 
-    $form = \Drupal::formBuilder()->getForm('Drupal\commerce_currency_resolver\Form\CommerceCurrencyResolverSelectForm');
+    $form = \Drupal::formBuilder()->getForm(CommerceCurrencyResolverSelectForm::class);
 
     $markup['form'] = $form;
 

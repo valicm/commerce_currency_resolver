@@ -108,7 +108,7 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
         // Handle custom adjustments.
         if ($adjustments = $order->getAdjustments()) {
 
-          foreach ($adjustments as $key => $adjustment) {
+          foreach ($adjustments as $adjustment) {
 
             assert($adjustment instanceof Adjustment);
 

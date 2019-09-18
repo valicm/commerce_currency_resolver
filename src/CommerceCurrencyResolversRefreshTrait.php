@@ -49,13 +49,16 @@ trait CommerceCurrencyResolversRefreshTrait {
   /**
    * Get refresh state based on path.
    *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   Order object to check for currency changes.
+   *
    * @return bool
    *   Return true or false.
    */
   public function shouldCurrencyRefresh(OrderInterface $order) {
 
     // If order have specific flag set, skip refreshing currency.
-    if ($skip_resolving = $order->getData('currency_resolver_skip')) {
+    if ($order->getData('currency_resolver_skip')) {
       return FALSE;
     }
 
