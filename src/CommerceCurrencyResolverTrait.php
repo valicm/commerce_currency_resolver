@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_currency_resolver;
 
+use Drupal\commerce_store\Entity\StoreInterface;
+
 /**
  * Defaults for resolver.
  *
@@ -60,7 +62,12 @@ trait CommerceCurrencyResolverTrait {
    *   Return currency code.
    */
   public function defaultCurrencyCode() {
-    return \Drupal::service('commerce_store.current_store')->getStore()->getDefaultCurrencyCode() ?? $this->fallbackCurrencyCode();
+    /** @var StoreInterface $store */
+    if ($store = \Drupal::service('commerce_store.current_store')->getStore()) {
+      return $store->getDefaultCurrencyCode();
+    }
+
+    return $this->fallbackCurrencyCode();
   }
 
   /**
