@@ -24,20 +24,18 @@ class FlatRateCurrency extends ShippingFlateRate {
    * {@inheritdoc}
    */
   public function calculateRates(ShipmentInterface $shipment) {
+    // Nothing to do. Go to parent.
+    if (!$this->shouldCurrencyRefresh($this->configuration['rate_amount']['currency_code'])) {
+      return parent::calculateRates($shipment);
+    }
+
     // Rate IDs aren't used in a flat rate scenario because there's always a
     // single rate per plugin, and there's no support for purchasing rates.
     $rate_id = 0;
     $amount = $this->configuration['rate_amount'];
-
     $amount = new Price($amount['number'], $amount['currency_code']);
-
-    // Check if is enabled multicurrency.
-    if ($this->shouldCurrencyRefresh()) {
-      // If current currency does not match to shipment code.
-      if ($this->currentCurrency() !== $amount->getCurrencyCode()) {
-        $amount = $this->getPrice($amount, $this->currentCurrency());
-      }
-    }
+    // Get resolved price from original price.
+    $amount = $this->getPrice($amount);
 
     $rates = [];
     $rates[] = new ShippingRate($rate_id, $this->services['default'], $amount);

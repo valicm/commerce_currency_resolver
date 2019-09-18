@@ -23,7 +23,12 @@ class FlatRatePerItemCurrency extends FlatRateCurrency {
    * {@inheritdoc}
    */
   public function calculateRates(ShipmentInterface $shipment) {
-    $quantity = 0;
+    // Nothing to do. Go to parent.
+    if (!$this->shouldCurrencyRefresh($this->configuration['rate_amount']['currency_code'])) {
+      return parent::calculateRates($shipment);
+    }
+
+      $quantity = 0;
     foreach ($shipment->getItems() as $shipment_item) {
       $quantity += $shipment_item->getQuantity();
     }
@@ -32,14 +37,8 @@ class FlatRatePerItemCurrency extends FlatRateCurrency {
     $rate_id = 0;
     $amount = $this->configuration['rate_amount'];
     $amount = new Price($amount['number'], $amount['currency_code']);
-
-    // Check if is enabled multicurrency.
-    if ($this->shouldCurrencyRefresh()) {
-      // If current currency does not match to shipment code.
-      if ($this->currentCurrency() !== $amount->getCurrencyCode()) {
-        $amount = $this->getPrice($amount, $this->currentCurrency());
-      }
-    }
+    // Get resolved price from original price.
+    $amount = $this->getPrice($amount);
 
     $amount = $amount->multiply((string) $quantity);
     $rates = [];

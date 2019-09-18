@@ -25,28 +25,18 @@ class OrderFixedAmountOff extends CommerceOrderFixedAmountOff {
    * {@inheritdoc}
    */
   public function apply(EntityInterface $entity, PromotionInterface $promotion) {
+    // Nothing to do. Go to parent.
+    if (!$this->shouldCurrencyRefresh($this->getAmount()->getCurrencyCode())) {
+      return parent::apply($entity, $promotion);
+    }
+
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
-    $subtotal_price = $order->getSubtotalPrice();
-    $amount = $this->getAmount();
+    $subtotal_price = $order->getSubTotalPrice();
 
-    // Check if multicurrency is used.
-    if ($this->shouldCurrencyRefresh()) {
-      // Check currency, make conversion if needed.
-      if ($this->currentCurrency() !== $amount->getCurrencyCode()) {
-        // Convert prices.
-        $amount = $this->getPrice($amount, $this->currentCurrency());
+    $amount = $this->getPrice($this->getAmount());
 
-        if (!$amount) {
-          return FALSE;
-        }
-      }
-    }
-
-    if ($subtotal_price->getCurrencyCode() != $amount->getCurrencyCode()) {
-      return;
-    }
     // The promotion amount can't be larger than the subtotal, to avoid
     // potentially having a negative order total.
     if ($amount->greaterThan($subtotal_price)) {

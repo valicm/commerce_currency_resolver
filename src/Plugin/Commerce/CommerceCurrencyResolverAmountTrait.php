@@ -95,13 +95,13 @@ trait CommerceCurrencyResolverAmountTrait {
    *
    * @param \Drupal\commerce_price\Price $input_price
    *   Default price added in condition, offer, etc.
-   * @param string $target_currency
-   *   Currency code resolved from CurrentCurrency.
    *
    * @return \Drupal\commerce_price\Price
-   *   Return Price object or FALSE.
+   *   Return Price object.
    */
-  public function getPrice(Price $input_price, string $target_currency) {
+  public function getPrice(Price $input_price) {
+
+    $target_currency = $this->currentCurrency();
 
     // If we have specified price listed.
     if (isset($this->configuration['fields'][$target_currency])) {
@@ -120,43 +120,21 @@ trait CommerceCurrencyResolverAmountTrait {
   }
 
   /**
-   * Convert prices for Commerce condition or Promotion offers.
-   *
-   * @param \Drupal\commerce_price\Price $input_price
-   *   Price which is received from order.
-   * @param \Drupal\commerce_price\Price $check_price
-   *   Price which is in condition or promotion offer entered.
-   *
-   * @return \Drupal\commerce_price\Price
-   *   Return Price object.
-   */
-  public function convertPrice(Price $input_price, Price $check_price) {
-
-    // We rely on order price.
-    $currentCurrency = $input_price->getCurrencyCode();
-
-    // If we have specified price listed.
-    if (isset($this->configuration['fields'][$currentCurrency])) {
-      $priceField = $this->configuration['fields'][$currentCurrency];
-
-      // Added check if prices is empty
-      // (etc. after migration of old discounts).
-      if (!empty($priceField['number'])) {
-        return new Price($priceField['number'], $priceField['currency_code']);
-      }
-    }
-
-    return CurrencyHelper::priceConversion($check_price, $currentCurrency);
-  }
-
-  /**
    * Do not run conditions currency conversion on specific conditions.
    *
+   * @param string $currency_code
+   *   Current currency on plugin.
    * @return bool
    *   Return TRUE if is allowed.
    */
-  public function shouldCurrencyRefresh() {
-    return !(PHP_SAPI === 'cli');
+  public function shouldCurrencyRefresh($currency_code) {
+    // No conversion for CLI tasks.
+    if (PHP_SAPI === 'cli') {
+      return FALSE;
+    }
+
+    // Different currencies, it is needed to refresh.
+    return $this->currentCurrency() !== $currency_code;
   }
 
 }
