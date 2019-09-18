@@ -44,6 +44,9 @@ class OrderFixedAmountOff extends CommerceOrderFixedAmountOff {
       }
     }
 
+    if ($subtotal_price->getCurrencyCode() != $amount->getCurrencyCode()) {
+      return;
+    }
     // The promotion amount can't be larger than the subtotal, to avoid
     // potentially having a negative order total.
     if ($amount->greaterThan($subtotal_price)) {
