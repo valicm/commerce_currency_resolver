@@ -11,11 +11,7 @@ use Drupal\Core\Entity\EntityInterface;
 /**
  * Provides the percentage off offer for order items with multicurrency support.
  *
- * @CommercePromotionOffer(
- *   id = "order_item_fixed_amount_off",
- *   label = @Translation("Fixed amount off each matching product"),
- *   entity_type = "commerce_order_item",
- * )
+ * @see \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderItemFixedAmountOff
  */
 class OrderItemFixedAmountOff extends CommerceOrderItemFixedAmountOff {
 

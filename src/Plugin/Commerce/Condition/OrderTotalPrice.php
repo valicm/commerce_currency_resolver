@@ -10,14 +10,6 @@ use Drupal\commerce_price\Price;
 /**
  * Provides the total price condition for orders per currency.
  *
- * @CommerceCondition(
- *   id = "order_total_price",
- *   label = @Translation("Total price"),
- *   display_label = @Translation("Current order total"),
- *   category = @Translation("Order"),
- *   entity_type = "commerce_order",
- * )
- *
  * @see \Drupal\commerce_order\Plugin\Commerce\Condition\OrderTotalPrice
  */
 class OrderTotalPrice extends CommerceOrderTotalPrice {

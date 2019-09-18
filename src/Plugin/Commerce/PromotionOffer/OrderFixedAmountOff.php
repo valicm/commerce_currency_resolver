@@ -11,11 +11,7 @@ use Drupal\Core\Entity\EntityInterface;
 /**
  * Provides the fixed amount off offer for orders with multi-currency support.
  *
- * @CommercePromotionOffer(
- *   id = "order_fixed_amount_off",
- *   label = @Translation("Fixed amount off the order subtotal"),
- *   entity_type = "commerce_order",
- * )
+ * @see \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderFixedAmountOff
  */
 class OrderFixedAmountOff extends CommerceOrderFixedAmountOff {
 

@@ -1,14 +1,12 @@
 <?php
 
-/**
- * @file
- * Contains commerce_currency_resolver.module.
- */
-
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\commerce_currency_resolver\Event\CommerceCurrencyResolverEvents;
 use Drupal\commerce_currency_resolver\Event\ExchangeImport;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\commerce_currency_resolver\Plugin\Commerce\PromotionOffer\OrderItemFixedAmountOff;
+use Drupal\commerce_currency_resolver\Plugin\Commerce\PromotionOffer\OrderFixedAmountOff;
+use Drupal\commerce_currency_resolver\Plugin\Commerce\Condition\OrderTotalPrice;
 
 /**
  * Implements hook_help().
@@ -24,6 +22,21 @@ function commerce_currency_resolver_help($route_name, RouteMatchInterface $route
 
     default:
   }
+}
+
+/**
+ * Implements hook_commerce_promotion_offer_info_alter();
+ */
+function commerce_currency_resolver_commerce_promotion_offer_info_alter(array &$definitions) {
+  $definitions['order_item_fixed_amount_off']['class'] = OrderItemFixedAmountOff::class;
+  $definitions['order_fixed_amount_off']['class'] = OrderFixedAmountOff::class;
+}
+
+/**
+ * Implements hook_commerce_condition_info_alter();
+ */
+function commerce_currency_resolver_commerce_condition_info_alter(array &$definitions) {
+  $definitions['order_total_price']['class'] = OrderTotalPrice::class;
 }
 
 /**
