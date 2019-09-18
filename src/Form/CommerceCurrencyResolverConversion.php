@@ -70,9 +70,9 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
       '#title' => $this->t('Exchange rate cron'),
       '#description' => $this->t('Select how often exchange rates should be imported. Note about EBC, they update exchange rates once a day'),
       '#options' => [
-        60 * 60 * 6 => '6 hours',
-        60 * 60 * 12 => '12 hours',
-        60 * 60 * 24 => 'Once a day',
+        60 * 60 * 6 => $this->t('6 hours'),
+        60 * 60 * 12 => $this->t('12 hours'),
+        60 * 60 * 24 => $this->t('Once a day'),
       ],
       '#default_value' => (int) $config->get('cron'),
       '#required' => TRUE,
@@ -156,7 +156,7 @@ class CommerceCurrencyResolverConversion extends ConfigFormBase {
           $form['currency'][$key][$subkey]['sync'] = [
             '#type' => 'checkboxes',
             '#title' => '',
-            '#options' => [1 => 'Manually enter an exchange rate'],
+            '#options' => [1 => $this->t('Manually enter an exchange rate')],
             '#default_value' => $default_sync,
           ];
 
