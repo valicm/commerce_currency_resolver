@@ -30,7 +30,7 @@ class FlatRatePerItemCurrency extends FlatRateCurrency {
     // Rate IDs aren't used in a flat rate scenario because there's always a
     // single rate per plugin, and there's no support for purchasing rates.
     $rate_id = 0;
-    $amount = $this->configuration['amount'];
+    $amount = $this->configuration['rate_amount'];
     $amount = new Price($amount['number'], $amount['currency_code']);
 
     // Check if is enabled multicurrency.
