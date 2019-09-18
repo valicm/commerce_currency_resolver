@@ -127,6 +127,7 @@ trait CommerceCurrencyResolverAmountTrait {
     if (!$form_state->getErrors()) {
       $values = $form_state->getValue($form['#parents']);
       $this->configuration['fields'] = $values['fields'];
+      $this->configuration['multicurrency'] = $values['multicurrency'];
       $this->configuration['autocalculate'] = $values['autocalculate'];
     }
   }
