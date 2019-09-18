@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_currency_resolver;
 
+use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
@@ -99,8 +100,54 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
           }
         }
 
-        // Get new total price.
-        $order = $order->recalculateTotalPrice();
+        // Last part is handling adjustments. We could hit here to
+        // recalculateTotalPrice(), so it makes sense to run it last.
+        $new_adjustments = [];
+        $reset_adjustments = FALSE;
+
+        // Handle custom adjustments.
+        if ($adjustments = $order->getAdjustments()) {
+
+          foreach ($adjustments as $key => $adjustment) {
+
+            assert($adjustment instanceof Adjustment);
+
+            $adjustment_currency = $adjustment->getAmount()->getCurrencyCode();
+
+            // We should only dealt with locked adjustment.
+            // Any non locked have their order processor implementation
+            // probably.
+            if ($adjustment->isLocked() && $adjustment_currency !== $resolved_currency) {
+              $reset_adjustments = TRUE;
+              $adjustment_amount = $adjustment->getAmount();
+              $values = $adjustment->toArray();
+              // Auto calculate price.
+              $values['amount'] = CurrencyHelper::priceConversion($adjustment_amount, $resolved_currency);
+              $new_adjustment = new Adjustment($values);
+              $new_adjustments[] = $new_adjustment;
+            }
+          }
+
+          // We have custom adjustments which need to be recalculated.
+          if ($reset_adjustments) {
+            // We need clear adjustments like that while using
+            // $order->removeAdjustment() will trigger recalculateTotalPrice()
+            // which will break everything, while currencies are different.
+            $order->set('adjustments', []);
+
+            foreach ($new_adjustments as $new_adjustment) {
+              $order->addAdjustment($new_adjustment);
+            }
+          }
+        }
+
+        // Flag for recalculating order. If we had custom adjustments for
+        // conversion we already hit recalculateTotalPrice() with
+        //  $order->addAdjustment($new_adjustment), so no need again.
+        if (!$reset_adjustments) {
+          // Get new total price.
+          $order = $order->recalculateTotalPrice();
+        }
 
         // Refresh order on load. Shipping fix. Probably all other potential
         // unlocked adjustments which are not set correctly.
