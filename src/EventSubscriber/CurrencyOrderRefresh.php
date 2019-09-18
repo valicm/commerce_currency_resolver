@@ -83,9 +83,17 @@ class CurrencyOrderRefresh implements EventSubscriberInterface {
    *   The order event.
    */
   public function checkCurrency(OrderEvent $event) {
+    $orders = &drupal_static(__FUNCTION__, []);
 
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $event->getOrder();
+
+    if (!isset($orders[$order->id()])) {
+      $orders[$order->id()] = TRUE;
+    }
+    else {
+      return;
+    }
 
     // Get order total currency.
     if ($order_total = $order->getTotalPrice()) {
