@@ -67,37 +67,35 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
         return $price;
       }
 
-      // Different currencies, we need resolve to new price.
-      if ($resolved_currency !== $price->getCurrencyCode()) {
+      // Get how price should be calculated.
+      $currency_source = $this->getCurrencySource();
 
-        // Get how price should be calculated.
-        $currency_source = $this->getCurrencySource();
+      // Auto-calculate price by default. Fallback for all cases regardless
+      // of chosen currency source mode.
+      $resolved_price = CurrencyHelper::priceConversion($price, $resolved_currency);
 
-        // Auto-calculate price by default. Fallback for all cases regardless
-        // of chosen currency source mode.
-        $resolved_price = CurrencyHelper::priceConversion($price, $resolved_currency);
+      // Specific cases for field and combo. Even we had autocalculated
+      // price, in combo mode we could have field with price.
+      if ($currency_source === 'combo' || $currency_source === 'field') {
 
-        // Specific cases for field and combo. Even we had autocalculated
-        // price, in combo mode we could have field with price.
-        if ($currency_source === 'combo' || $currency_source === 'field') {
-
-          // Backward compatibility for older version, and inital setup
-          // that default price fields are mapped to field_price_currency_code
-          // instead to price_currency_code.
-          if ($field_name === 'price') {
-            $field_name = 'field_price';
-          }
-
-          $resolved_field = $field_name . '_' . strtolower($resolved_currency);
-
-          // Check if we have field.
-          if ($entity->hasField($resolved_field) && !$entity->get($resolved_field)->isEmpty()) {
-            $resolved_price = $entity->get($resolved_field)->first()->toPrice();
-          }
+        // Backward compatibility for older version, and inital setup
+        // that default price fields are mapped to field_price_currency_code
+        // instead to price_currency_code.
+        if ($field_name === 'price') {
+          $field_name = 'field_price';
         }
 
-        return $resolved_price;
+        $resolved_field = $field_name . '_' . strtolower($resolved_currency);
+
+        // Check if we have field.
+        if ($entity->hasField($resolved_field) && !$entity->get($resolved_field)
+            ->isEmpty()) {
+          $resolved_price = $entity->get($resolved_field)->first()->toPrice();
+        }
       }
+
+      return $resolved_price;
+
     }
 
   }
