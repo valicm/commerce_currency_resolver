@@ -7,6 +7,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\commerce_currency_resolver\Plugin\Commerce\PromotionOffer\OrderItemFixedAmountOff;
 use Drupal\commerce_currency_resolver\Plugin\Commerce\PromotionOffer\OrderFixedAmountOff;
 use Drupal\commerce_currency_resolver\Plugin\Commerce\Condition\OrderTotalPrice;
+use Drupal\commerce_currency_resolver\Plugin\Commerce\ShippingMethod\FlatRateCurrency;
+use Drupal\commerce_currency_resolver\Plugin\Commerce\ShippingMethod\FlatRatePerItemCurrency;
 
 /**
  * Implements hook_help().
@@ -37,6 +39,14 @@ function commerce_currency_resolver_commerce_promotion_offer_info_alter(array &$
  */
 function commerce_currency_resolver_commerce_condition_info_alter(array &$definitions) {
   $definitions['order_total_price']['class'] = OrderTotalPrice::class;
+}
+
+/**
+ * Implements hook_commerce_shipping_method_info_alter();
+ */
+function commerce_currency_resolver_commerce_shipping_method_info_alter(array &$definitions) {
+  $definitions['flat_rate_per_item']['class'] = FlatRatePerItemCurrency::class;
+  $definitions['flat_rate']['class'] = FlatRateCurrency::class;
 }
 
 /**
