@@ -50,3 +50,12 @@ function commerce_currency_resolver_update_8001() {
   // where this module should be after commerce_promotion.
   module_set_weight('commerce_currency_resolver', 10);
 }
+
+/**
+ * Set back weight of the module to 0.
+ *
+ * @see https://www.drupal.org/project/commerce_currency_resolver/issues/3082160
+ */
+function commerce_currency_resolver_update_8002() {
+  module_set_weight('commerce_currency_resolver', 0);
+}
