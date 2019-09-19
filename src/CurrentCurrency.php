@@ -48,9 +48,13 @@ class CurrentCurrency implements CurrentCurrencyInterface {
       // Go trough each of possible cases.
       switch ($this->getSourceType()) {
         case 'cookie':
+
+          // Cookie name can be configurable.
+          $cookie_name = $this->getCookieName();
+
           // Cookie solution check.
-          if ($request->cookies->has('commerce_currency')) {
-            $cookie = $request->cookies->get('commerce_currency');
+          if ($request->cookies->has($cookie_name)) {
+            $cookie = $request->cookies->get($cookie_name);
 
             // Check if cookie value match to any of enabled currencies.
             if (isset($this->getEnabledCurrencies()[$cookie])) {

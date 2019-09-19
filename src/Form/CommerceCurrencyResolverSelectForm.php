@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_currency_resolver\Form;
 
-use Drupal\commerce_currency_resolver\CurrencyHelper;
+use Drupal\commerce_currency_resolver\CommerceCurrencyResolverTrait;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @package Drupal\commerce_currency_resolver\Form
  */
 class CommerceCurrencyResolverSelectForm extends FormBase {
+
+  use CommerceCurrencyResolverTrait;
 
   /**
    * Current request object.
@@ -52,14 +54,15 @@ class CommerceCurrencyResolverSelectForm extends FormBase {
     $request = $this->requestStack->getCurrentRequest();
 
     // Get all active currencies.
-    $active_currencies = CurrencyHelper::getEnabledCurrency();
+    $active_currencies = $this->getEnabledCurrencies();
 
     // Get cookies.
     $cookies = $request->cookies;
+    $cookie_name = $this->getCookieName();
 
     // Get values from cookie.
-    if ($cookies->has('commerce_currency') && isset($active_currencies[$cookies->get('commerce_currency')])) {
-      $selected_currency = $cookies->get('commerce_currency');
+    if ($cookies->has($cookie_name) && isset($active_currencies[$cookies->get($cookie_name)])) {
+      $selected_currency = $cookies->get($cookie_name);
     }
 
     else {
@@ -94,7 +97,7 @@ class CommerceCurrencyResolverSelectForm extends FormBase {
     $selected_currency = $form_state->getValue('currency');
 
     // Set cookie for one day.
-    setrawcookie('commerce_currency', rawurlencode($selected_currency), REQUEST_TIME + 86400, '/');
+    setrawcookie($this->getCookieName(), rawurlencode($selected_currency), REQUEST_TIME + 86400, '/');
   }
 
 }

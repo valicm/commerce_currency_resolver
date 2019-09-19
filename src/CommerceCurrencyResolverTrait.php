@@ -3,6 +3,7 @@
 namespace Drupal\commerce_currency_resolver;
 
 use Drupal\commerce_store\Entity\StoreInterface;
+use Drupal\Core\Site\Settings;
 
 /**
  * Defaults for resolver.
@@ -10,6 +11,17 @@ use Drupal\commerce_store\Entity\StoreInterface;
  * @package Drupal\commerce_currency_resolver
  */
 trait CommerceCurrencyResolverTrait {
+
+  /**
+   * Get cookie name.
+   */
+  public function getCookieName() {
+    $cookieName = &drupal_static(__FUNCTION__);
+    if (!isset($cookieName)) {
+      $cookieName = Settings::get('commerce_currency_cookie') ?? 'commerce_currency';
+    }
+    return $cookieName;
+  }
 
   /**
    * Gets user country location.
