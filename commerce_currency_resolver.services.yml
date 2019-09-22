@@ -9,21 +9,6 @@ services:
     tags:
      - { name: commerce_price.price_resolver, priority: 1000 }
 
-  commerce_currency_resolver.exchange_rate_ecb:
-    class: Drupal\commerce_currency_resolver\EventSubscriber\ExchangeRateECB
-    tags:
-      - { name: event_subscriber }
-
-  commerce_currency_resolver.exchange_rate_fixer:
-    class: Drupal\commerce_currency_resolver\EventSubscriber\ExchangeRateFixer
-    tags:
-      - { name: event_subscriber }
-
-  commerce_currency_resolver.exchange_rate_fixer_paid:
-    class: Drupal\commerce_currency_resolver\EventSubscriber\ExchangeRateFixerPaid
-    tags:
-      - { name: event_subscriber }
-
   cache_context.currency_resolver:
     class: Drupal\commerce_currency_resolver\Cache\Context\CurrencyCacheContext
     arguments: ['@commerce_currency_resolver.current_currency']

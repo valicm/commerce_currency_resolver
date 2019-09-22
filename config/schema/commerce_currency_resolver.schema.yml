@@ -11,44 +11,12 @@ commerce_currency_resolver.settings:
     currency_source:
       type: string
       label: 'Currency source'
+    exchange_rates:
+      type: string
+      label: 'Exchange rates service'
     currency_default:
       type: string
       label: 'Currency default'
-
-commerce_currency_resolver.currency_conversion:
-  type: config_object
-  label: 'Currency conversion'
-  mapping:
-    source:
-      type: string
-      label: 'Currency exchange service'
-    api_key:
-      type: string
-      label: 'API key'
-    cron:
-      type: integer
-      label: 'Exchange rate cron'
-    use_cross_sync:
-      type: integer
-      label: 'Use cross conversion between non default currencies'
-    demo_amount:
-      type: string
-      label: 'Demo amount'
-    exchange:
-      type: sequence
-      label: 'Exchange rates'
-      sequence:
-        type: sequence
-        label: 'Currency upon exchanges is based'
-        sequence:
-          type: sequence
-          label: 'Other currencies exchange rates'
-          value:
-            type: string
-            label: 'Value'
-          sync:
-            type: string
-            label: 'Sync'
 
 commerce_currency_resolver.currency_mapping:
   type: config_object

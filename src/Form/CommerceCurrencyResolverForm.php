@@ -71,6 +71,15 @@ class CommerceCurrencyResolverForm extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
+    $form['exchange_rates'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Exchange rate API'),
+      '#description' => $this->t('Select which external service you want to use for calculating exchange rates between currencies'),
+      '#options' => CurrencyHelper::getExchangeServices(),
+      '#default_value' => $config->get('exchange_rates'),
+      '#required' => TRUE,
+    ];
+
     $form['currency_default'] = [
       '#type' => 'select',
       '#title' => $this->t('Default currency'),

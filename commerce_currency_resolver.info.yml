@@ -9,5 +9,6 @@ configure: commerce_currency_resolver.configuration
 dependencies:
   - commerce:commerce_price
   - commerce:commerce_order
+  - commerce_exchanger
 
 php: 7.0
