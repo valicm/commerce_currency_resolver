@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_currency_resolver;
 
+use Drupal\commerce_currency_resolver\Exception\CurrencyResolverMismatchException;
+use Drupal\commerce_exchanger\Entity\ExchangeRatesInterface;
 use Drupal\commerce_price\Price;
 
 /**
@@ -145,11 +147,14 @@ class CurrencyHelper {
    *   Return updated price object with new currency.
    */
   public static function priceConversion(Price $price, $currency) {
-    // Get currency conversion settings.
-    $config = \Drupal::config('commerce_currency_resolver.currency_conversion');
+    $exchange_rate_source = \Drupal::config('commerce_currency_resolver.settings')->get('currency_exchange_rates');
 
-    // Get specific settings.
-    $mapping = $config->get('exchange');
+    if (empty($exchange_rate_source)) {
+      throw new CurrencyResolverMismatchException('Missing exchange rate source');
+    }
+
+    // Get exchange rates based on commerce_exchanger name formatting.
+    $mapping = \Drupal::config(ExchangeRatesInterface::COMMERCE_EXCHANGER_IMPORT . '.' . $exchange_rate_source)->getRawData();
 
     // Current currency.
     $current_currency = $price->getCurrencyCode();
