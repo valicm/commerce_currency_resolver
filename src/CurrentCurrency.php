@@ -10,14 +10,17 @@ use CommerceGuys\Addressing\Country\CountryRepository;
  */
 class CurrentCurrency implements CurrentCurrencyInterface {
 
-  use CommerceCurrencyResolverTrait;
-
   /**
    * The request stack.
    *
    * @var \Symfony\Component\HttpFoundation\RequestStack
    */
   protected $requestStack;
+
+  /**
+   * @var \Drupal\commerce_currency_resolver\CurrencyHelperInterface
+   */
+  protected $currencyHelper;
 
   /**
    * Static cache of resolved currency. One per request.
@@ -29,8 +32,9 @@ class CurrentCurrency implements CurrentCurrencyInterface {
   /**
    * {@inheritdoc}
    */
-  public function __construct(RequestStack $request_stack) {
+  public function __construct(RequestStack $request_stack, CurrencyHelperInterface $currency_helper) {
     $this->requestStack = $request_stack;
+    $this->currencyHelper = $currency_helper;
     $this->currency = new \SplObjectStorage();
   }
 
@@ -43,21 +47,21 @@ class CurrentCurrency implements CurrentCurrencyInterface {
     if (!$this->currency->contains($request)) {
 
       // Get default currency from current store.
-      $resolved_currency = $this->defaultCurrencyCode();
+      $resolved_currency = $this->currencyHelper->defaultCurrencyCode();
 
       // Go trough each of possible cases.
-      switch ($this->getSourceType()) {
+      switch ($this->currencyHelper->getSourceType()) {
         case 'cookie':
 
           // Cookie name can be configurable.
-          $cookie_name = $this->getCookieName();
+          $cookie_name = $this->currencyHelper->getCookieName();
 
           // Cookie solution check.
           if ($request->cookies->has($cookie_name)) {
             $cookie = $request->cookies->get($cookie_name);
 
             // Check if cookie value match to any of enabled currencies.
-            if (isset($this->getEnabledCurrencies()[$cookie])) {
+            if (isset($this->currencyHelper->getCurrencies()[$cookie])) {
               $resolved_currency = $cookie;
             }
           }
@@ -66,10 +70,10 @@ class CurrentCurrency implements CurrentCurrencyInterface {
 
         case 'lang':
           // Get current user language.
-          $current_language = \Drupal::service('language_manager')->getCurrentLanguage()->getId();
+          $current_language = $this->currencyHelper->currentLanguage();
 
           // Get mapping language by currency.
-          $matrix = \Drupal::config('commerce_currency_resolver.currency_mapping')->get('matrix');
+          $matrix = $this->currencyHelper->getCurrencyMappingMatrix();
 
           if (isset($matrix[$current_language])) {
             $resolved_currency = $matrix[$current_language];
@@ -79,13 +83,11 @@ class CurrentCurrency implements CurrentCurrencyInterface {
 
         case 'geo':
           // Get user country.
-          $user_country = $this->getUserCountry();
-
-          $currency_mapping = \Drupal::config('commerce_currency_resolver.currency_mapping');
+          $user_country = $this->currencyHelper->getUserCountry();
 
           // Get currency matrix data. All mappings are inside.
           // Only if we use domicile currency, mapping is empty.
-          $matrix = $currency_mapping->get('matrix') ?? [];
+          $matrix = $this->currencyHelper->getCurrencyMappingMatrix();
 
           // We hit some mapping by language or geo and we don't use domicile
           // currency under geo settings.
@@ -96,12 +98,12 @@ class CurrentCurrency implements CurrentCurrencyInterface {
           // If we use, we need to pull currency per country, and
           // check if this currency is enabled. If not use default currency
           // defined in admin.
-          if (!empty($currency_mapping->get('domicile_currency'))) {
+          if (!empty($this->currencyHelper->getDomicileCurrency())) {
             $country_repository = new CountryRepository();
             $currency_code = $country_repository->get($user_country)->getCurrencyCode();
 
             // Check if domicile currency is among enabled currencies.
-            if (isset($this->getEnabledCurrencies()[$currency_code])) {
+            if (isset($this->currencyHelper->getCurrencies()[$currency_code])) {
               $resolved_currency = $currency_code;
             }
           }

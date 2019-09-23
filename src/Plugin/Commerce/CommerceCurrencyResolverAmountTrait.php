@@ -2,17 +2,13 @@
 
 namespace Drupal\commerce_currency_resolver\Plugin\Commerce;
 
-use Drupal\commerce_currency_resolver\CommerceCurrencyResolverTrait;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\commerce_currency_resolver\CurrencyHelper;
 use Drupal\commerce_price\Price;
 
 /**
  * Provides common configuration for fixed amount off offers.
  */
 trait CommerceCurrencyResolverAmountTrait {
-
-  use CommerceCurrencyResolverTrait;
 
   /**
    * Get resolved currency.
@@ -28,7 +24,7 @@ trait CommerceCurrencyResolverAmountTrait {
     $form = parent::buildConfigurationForm($form, $form_state);
 
     // Get default currency.
-    $defaultCurrency = $this->fallbackCurrencyCode();
+    $defaultCurrency = \Drupal::service('commerce_currency_resolver.currency_helper')->fallbackCurrencyCode();
 
     // If we handle shipping.
     if (isset($form['rate_amount']) && empty($form['rate_amount']['#default_value'])) {
@@ -55,7 +51,7 @@ trait CommerceCurrencyResolverAmountTrait {
     ];
 
     // Get all enabled currencies.
-    $enabledCurrencies = $this->getEnabledCurrencies();
+    $enabledCurrencies = \Drupal::service('commerce_currency_resolver.currency_helper')->getCurrencies();
 
     foreach ($enabledCurrencies as $key => $currency) {
 
@@ -115,7 +111,7 @@ trait CommerceCurrencyResolverAmountTrait {
     }
 
     // Auto-calculate if we don't have any price in currency field.
-    return CurrencyHelper::priceConversion($input_price, $target_currency);
+    return \Drupal::service('commerce_currency_resolver.calculator')->priceConversion($input_price, $target_currency);
 
   }
 

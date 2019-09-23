@@ -14,7 +14,7 @@ interface CurrencyHelperInterface {
    *
    * @return array
    */
-  public function getExchangeRates();
+  public function getExchangeRatesProviders();
 
   /**
    * Return formatted array of available currencies.

@@ -2,7 +2,7 @@
 
 namespace Drupal\commerce_currency_resolver\Form;
 
-use Drupal\commerce_currency_resolver\CommerceCurrencyResolverTrait;
+use Drupal\commerce_currency_resolver\CurrencyHelperInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -15,8 +15,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class CommerceCurrencyResolverSelectForm extends FormBase {
 
-  use CommerceCurrencyResolverTrait;
-
   /**
    * Current request object.
    *
@@ -25,10 +23,16 @@ class CommerceCurrencyResolverSelectForm extends FormBase {
   protected $requestStack;
 
   /**
+   * @var \Drupal\commerce_currency_resolver\CurrencyHelperInterface
+   */
+  protected $currencyHelper;
+
+  /**
    * {@inheritdoc}
    */
-  public function __construct(RequestStack $request_stack) {
+  public function __construct(RequestStack $request_stack, CurrencyHelperInterface $currency_helper) {
     $this->requestStack = $request_stack;
+    $this->currencyHelper = $currency_helper;
   }
 
   /**
@@ -36,7 +40,8 @@ class CommerceCurrencyResolverSelectForm extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('request_stack')
+      $container->get('request_stack'),
+      $container->get('commerce_currency_resolver.currency_helper')
     );
   }
 
@@ -54,11 +59,11 @@ class CommerceCurrencyResolverSelectForm extends FormBase {
     $request = $this->requestStack->getCurrentRequest();
 
     // Get all active currencies.
-    $active_currencies = $this->getEnabledCurrencies();
+    $active_currencies = $this->currencyHelper->getCurrencies();
 
     // Get cookies.
     $cookies = $request->cookies;
-    $cookie_name = $this->getCookieName();
+    $cookie_name = $this->currencyHelper->getCookieName();
 
     // Get values from cookie.
     if ($cookies->has($cookie_name) && isset($active_currencies[$cookies->get($cookie_name)])) {
@@ -97,7 +102,7 @@ class CommerceCurrencyResolverSelectForm extends FormBase {
     $selected_currency = $form_state->getValue('currency');
 
     // Set cookie for one day.
-    setrawcookie($this->getCookieName(), rawurlencode($selected_currency), REQUEST_TIME + 86400, '/');
+    setrawcookie($this->currencyHelper->getCookieName(), rawurlencode($selected_currency), REQUEST_TIME + 86400, '/');
   }
 
 }

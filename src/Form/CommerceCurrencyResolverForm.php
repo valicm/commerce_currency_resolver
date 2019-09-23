@@ -100,7 +100,7 @@ class CommerceCurrencyResolverForm extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
-    $exchange_rates = $this->currencyHelper->getExchangeRates();
+    $exchange_rates = $this->currencyHelper->getExchangeRatesProviders();
 
     $form['currency_exchange_rates'] = [
       '#type' => 'select',
