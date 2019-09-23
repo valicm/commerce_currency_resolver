@@ -36,11 +36,9 @@ trait CommerceCurrencyResolverTrait {
 
   /**
    * List all enabled currencies.
-   *
-   * @see \Drupal\commerce_currency_resolver\CurrencyHelper::getEnabledCurrency
    */
   public function getEnabledCurrencies() {
-    return CurrencyHelper::getEnabledCurrency();
+    return \Drupal::service('commerce_currency_resolver.currency_helper')->getCurrencies();
   }
 
   /**

@@ -2,9 +2,9 @@
 
 namespace Drupal\commerce_currency_resolver\Form;
 
+use Drupal\commerce_currency_resolver\CurrencyHelperInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\commerce_currency_resolver\CurrencyHelper;
 use Drupal\Core\Locale\CountryManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -24,16 +24,24 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
   protected $countryManager;
 
   /**
+   * @var \Drupal\commerce_currency_resolver\CurrencyHelperInterface
+   */
+  protected $currencyHelper;
+
+  /**
    * Constructs a CommerceCurrencyResolverMapping object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
    * @param \Drupal\Core\Locale\CountryManagerInterface $country_manager
    *   The country manager.
+   * @param \Drupal\commerce_currency_resolver\CurrencyHelperInterface $currencyHelper
+   *   Currency helper.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, CountryManagerInterface $country_manager) {
+  public function __construct(ConfigFactoryInterface $config_factory, CountryManagerInterface $country_manager, CurrencyHelperInterface $currencyHelper) {
     parent::__construct($config_factory);
     $this->countryManager = $country_manager;
+    $this->currencyHelper = $currencyHelper;
   }
 
   /**
@@ -42,7 +50,8 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
-      $container->get('country_manager')
+      $container->get('country_manager'),
+      $container->get('commerce_currency_resolver.currency_helper')
     );
   }
 
@@ -65,22 +74,24 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
 
+    // Get type of mapping for the resolver.
+    $currency_mapping = $this->config('commerce_currency_resolver.settings')->get('currency_mapping');
+
+    // Get default currency.
+    $currency_default = $this->config('commerce_currency_resolver.settings')->get('currency_default');
+
     // Get current settings.
     $config = $this->config('commerce_currency_resolver.currency_mapping');
-    $currency_mapping = \Drupal::config('commerce_currency_resolver.settings')
-      ->get('currency_mapping');
-    $currency_default = \Drupal::config('commerce_currency_resolver.settings')
-      ->get('currency_default');
 
     // Get active currencies.
-    $active_currencies = CurrencyHelper::getEnabledCurrency();
+    $active_currencies = $this->currencyHelper->getCurrencies();
 
     // Get mapped currency.
     $matrix = $config->get('matrix');
 
     switch ($currency_mapping) {
       case 'lang':
-        $languages = CurrencyHelper::getAvailableLanguages();
+        $languages = $this->currencyHelper->getLanguages();
 
         $form['matrix'] = [
           '#type' => 'details',
@@ -90,13 +101,13 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
           '#weight' => 50,
         ];
 
-        foreach ($languages as $key => $lang) {
+        foreach ($languages as $key => $language) {
           $form['matrix'][$key] = [
             '#type' => 'radios',
             '#options' => $active_currencies,
             '#default_value' => $matrix[$key],
-            '#title' => $lang,
-            '#description' => $this->t('Select currency which should be used with @lang language', ['@lang' => $lang]),
+            '#title' => $language,
+            '#description' => $this->t('Select currency which should be used with @lang language', ['@lang' => $language]),
           ];
         }
         break;
@@ -147,7 +158,7 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
                   '#options' => $active_currencies,
                   '#title' => $value->render(),
                   '#description' => $this->t('Select currency which should be used with @lang language', ['@lang' => $value->render()]),
-                  '#default_value' => isset($matrix[$key]) ? $matrix[$key] : $currency_default,
+                  '#default_value' => $matrix[$key] ?? $currency_default,
                 ];
               }
               break;
@@ -196,27 +207,25 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->config('commerce_currency_resolver.currency_mapping');
 
-    // Get magtrix logic value.
+    // Get matrix logic value.
     $logic = $form_state->getValue('logic');
 
     // Process results in some cases.
     // We want to have same array in any type of currency matrix.
-    switch ($logic) {
-      case 'currency':
-        $raw_data = $form_state->getValue('matrix');
-        $matrix = [];
-        foreach ($raw_data as $currency => $list) {
-          $countries = explode(',', $list);
+    if ($logic === 'currency') {
+      $raw_data = $form_state->getValue('matrix');
+      $matrix = [];
+      foreach ($raw_data as $currency => $list) {
+        $countries = explode(',', $list);
 
-          foreach ($countries as $country) {
-            $matrix[$country] = $currency;
-          }
+        foreach ($countries as $country) {
+          $matrix[$country] = $currency;
         }
-        break;
+      }
+    }
 
-      default:
-        $matrix = $form_state->getValue('matrix');
-        break;
+    else {
+      $matrix = $form_state->getValue('matrix');
     }
 
     // Set values.

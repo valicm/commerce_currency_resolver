@@ -2,11 +2,10 @@
 
 namespace Drupal\commerce_currency_resolver\Form;
 
+use Drupal\commerce_currency_resolver\CurrencyHelperInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\commerce_currency_resolver\CurrencyHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -17,19 +16,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class CommerceCurrencyResolverForm extends ConfigFormBase {
 
   /**
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var \Drupal\commerce_currency_resolver\CurrencyHelperInterface
    */
-  protected $entityTypeManager;
+  protected $currencyHelper;
 
   /**
-   * @var \Drupal\Core\Entity\EntityInterface[]
+   * CommerceCurrencyResolverForm constructor.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   Drupal config.
+   * @param \Drupal\commerce_currency_resolver\CurrencyHelperInterface $currency_helper
+   *   Generic helper.
    */
-  protected $providers;
-
-  public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManager $entityTypeManager) {
+  public function __construct(ConfigFactoryInterface $config_factory, CurrencyHelperInterface $currency_helper) {
     parent::__construct($config_factory);
-    $this->entityTypeManager = $entityTypeManager;
-    $this->providers = $this->entityTypeManager->getStorage('commerce_exchange_rates')->loadByProperties(['status' => TRUE]);
+    $this->currencyHelper = $currency_helper;
   }
 
   /**
@@ -38,7 +39,7 @@ class CommerceCurrencyResolverForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static (
       $container->get('config.factory'),
-      $container->get('entity_type.manager')
+      $container->get('commerce_currency_resolver.currency_helper')
     );
   }
 
@@ -64,24 +65,23 @@ class CommerceCurrencyResolverForm extends ConfigFormBase {
     // Get current settings.
     $config = $this->config('commerce_currency_resolver.settings');
 
-    // Get active currencies.
-    $active_currencies = CurrencyHelper::getEnabledCurrency();
-
     $form['currency_mapping'] = [
       '#type' => 'radios',
       '#title' => $this->t('Currency mapping'),
       '#description' => $this->t('Select how currency is mapped in the system. By country, language.'),
-      '#options' => CurrencyHelper::getAvailableMapping(),
+      '#options' => $this->getAvailableMapping(),
       '#default_value' => $config->get('currency_mapping'),
       '#required' => TRUE,
     ];
 
-    if (!empty(CurrencyHelper::getGeoModules()) && $config->get('currency_mapping') === 'geo') {
+    $geo_modules = $this->currencyHelper->getGeoModules();
+
+    if (!empty($geo_modules) && $config->get('currency_mapping') === 'geo') {
       $form['currency_geo'] = [
         '#type' => 'radios',
         '#title' => $this->t('Location module'),
         '#description' => $this->t('Select which module is used for geolocation services'),
-        '#options' => CurrencyHelper::getGeoModules(),
+        '#options' => $geo_modules,
         '#default_value' => $config->get('currency_geo'),
         '#required' => TRUE,
       ];
@@ -100,10 +100,7 @@ class CommerceCurrencyResolverForm extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
-    $exchange_rates = [];
-    foreach ($this->providers as $id => $provider) {
-      $exchange_rates[$provider->id()] = $provider->label();
-    }
+    $exchange_rates = $this->currencyHelper->getExchangeRates();
 
     $form['currency_exchange_rates'] = [
       '#type' => 'select',
@@ -122,7 +119,7 @@ class CommerceCurrencyResolverForm extends ConfigFormBase {
       '#type' => 'select',
       '#title' => $this->t('Default currency'),
       '#description' => $this->t('Select currency which you consider default - as fallback if all resolvers fails, and upon exchange rates should be calculated'),
-      '#options' => $active_currencies,
+      '#options' =>  $this->currencyHelper->getCurrencies(),
       '#default_value' => $config->get('currency_default'),
       '#required' => TRUE,
     ];
@@ -133,6 +130,33 @@ class CommerceCurrencyResolverForm extends ConfigFormBase {
     ];
 
     return $form;
+  }
+
+  /**
+   * Get all available option where currency could be mapped.
+   *
+   * @return array
+   *   Array of options available for currency mapping.
+   */
+  protected function getAvailableMapping() {
+    $mapping = [];
+
+    // Default store.
+    $mapping['store'] = t('Store (default Commerce 2 behavior)');
+    $mapping['cookie'] = t('Cookie (currency block selector)');
+
+    // Check if exist geo based modules.
+    // We support for now two of them.
+    if (!empty($this->currencyHelper->getGeoModules())) {
+      $mapping['geo'] = t('By Country');
+    }
+
+    // Check if the site is multilingual.
+    if (count($this->currencyHelper->getLanguages()) > 1) {
+      $mapping['lang'] = t('By Language');
+    }
+
+    return $mapping;
   }
 
   /**

@@ -4,17 +4,15 @@ namespace Drupal\commerce_currency_resolver\Resolver;
 
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
-use Drupal\commerce_currency_resolver\CommerceCurrencyResolverTrait;
+use Drupal\commerce_exchanger\ExchangerCalculatorInterface;
 use Drupal\commerce_price\Resolver\PriceResolverInterface;
-use Drupal\commerce_currency_resolver\CurrencyHelper;
 use Drupal\commerce_currency_resolver\CurrentCurrencyInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 
 /**
  * Returns a price and currency depending of language or country.
  */
 class CommerceCurrencyResolver implements PriceResolverInterface {
-
-  use CommerceCurrencyResolverTrait;
 
   /**
    * The current currency.
@@ -24,13 +22,29 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
   protected $currentCurrency;
 
   /**
+   * @var \Drupal\commerce_exchanger\ExchangerCalculatorInterface
+   */
+  protected $priceExchanger;
+
+  /**
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * Constructs a new CommerceCurrencyResolver object.
    *
    * @param \Drupal\commerce_currency_resolver\CurrentCurrencyInterface $current_currency
    *   The currency manager.
+   * @param \Drupal\commerce_exchanger\ExchangerCalculatorInterface $price_exchanger
+   *   Price exchanger calculator.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   Config factory.
    */
-  public function __construct(CurrentCurrencyInterface $current_currency) {
+  public function __construct(CurrentCurrencyInterface $current_currency, ExchangerCalculatorInterface $price_exchanger, ConfigFactoryInterface $config_factory) {
     $this->currentCurrency = $current_currency;
+    $this->priceExchanger = $price_exchanger;
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -68,13 +82,13 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
       }
 
       // Get how price should be calculated.
-      $currency_source = $this->getCurrencySource();
+      $currency_source = $this->configFactory->get('commerce_currency_resolver.settings')->get('currency_source');
 
       // Auto-calculate price by default. Fallback for all cases regardless
       // of chosen currency source mode.
-      $resolved_price = CurrencyHelper::priceConversion($price, $resolved_currency);
+      $resolved_price = $this->priceExchanger->priceConversion($price, $resolved_currency);
 
-      // Specific cases for field and combo. Even we had autocalculated
+      // Specific cases for field and combo. Even we had auto-calculated
       // price, in combo mode we could have field with price.
       if ($currency_source === 'combo' || $currency_source === 'field') {
 
