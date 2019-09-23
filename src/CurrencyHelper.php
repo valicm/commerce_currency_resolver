@@ -2,72 +2,100 @@
 
 namespace Drupal\commerce_currency_resolver;
 
-use Drupal\commerce_currency_resolver\Exception\CurrencyResolverMismatchException;
-use Drupal\commerce_exchanger\Entity\ExchangeRatesInterface;
-use Drupal\commerce_price\Price;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class CurrencyHelper.
- *
- * @package Drupal\commerce_currency_resolver
+ * Helper for various parts of the module.
  */
-class CurrencyHelper {
+class CurrencyHelper implements CurrencyHelperInterface {
 
   /**
-   * Get all available option where currency could be mapped.
-   *
-   * @return array
-   *   Array of options available for currency mapping.
+   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
-  public static function getAvailableMapping() {
-    $mapping = [];
+  protected $requestStack;
 
-    // Default store.
-    $mapping['store'] = t('Store (default Commerce 2 behavior)');
-    $mapping['cookie'] = t('Cookie (currency block selector)');
+  /**
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
 
-    // Check if exist geo based modules.
-    // We support for now two of them.
-    if (!empty(self::getGeoModules())) {
-      $mapping['geo'] = t('By Country');
-    }
+  /**
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
 
-    // Check if we site is multilingual.
-    if (\Drupal::languageManager()->isMultilingual()) {
-      $mapping['lang'] = t('By Language');
-    }
+  /**
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
 
-    return $mapping;
+  /**
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
+   * CurrencyHelper constructor.
+   *
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   */
+  public function __construct(RequestStack $request_stack, ConfigFactoryInterface $config_factory, EntityTypeManager $entityTypeManager, LanguageManagerInterface $languageManager, ModuleHandlerInterface $module_handler) {
+    $this->requestStack = $request_stack;
+    $this->configFactory = $config_factory;
+    $this->entityTypeManager = $entityTypeManager;
+    $this->languageManager = $languageManager;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
-   * Get list of supported and enabled location modules.
-   *
-   * @return array
-   *   Return list of enabled geo modules.
+   * {@inheritdoc}
    */
-  public static function getGeoModules() {
-    $geo = [];
+  public function getCurrencies() {
+    /** @var \Drupal\commerce_price\Entity\CurrencyInterface[] $currencies */
+    $currencies = $this->entityTypeManager->getStorage('commerce_currency')->loadMultiple();
 
-    if (\Drupal::ModuleHandler()->moduleExists('smart_ip')) {
-      $geo['smart_ip'] = t('Smart IP');
+    // Set defaults.
+    $active_currencies = [];
+
+    foreach ($currencies as $currency) {
+      if ($currency->status()) {
+        $active_currencies[$currency->getCurrencyCode()] = $currency->getName();
+      }
     }
 
-    if (\Drupal::ModuleHandler()->moduleExists('geoip')) {
-      $geo['geoip'] = t('GeoIP');
-    }
-
-    return $geo;
+    return $active_currencies;
   }
 
   /**
-   * Get list of all enabled languages.
-   *
-   * @return array
-   *   Array of languages.
+   * {@inheritdoc}
    */
-  public static function getAvailableLanguages() {
-    $languages = \Drupal::languageManager()->getLanguages();
+  public function getExchangeRates() {
+    /** @var \Drupal\commerce_exchanger\Entity\ExchangeRatesInterface[] $providers */
+    $providers =  $this->entityTypeManager->getStorage('commerce_exchange_rates')->loadMultiple();
+
+    $exchange_rates = [];
+    foreach ($providers as $id => $provider) {
+      if ($provider->status()) {
+        $exchange_rates[$provider->id()] = $provider->label();
+      }
+    }
+
+    return $exchange_rates;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLanguages() {
+    $languages = $this->languageManager->getLanguages();
 
     $data = [];
 
@@ -79,28 +107,23 @@ class CurrencyHelper {
   }
 
   /**
-   * Get list of all enabled currencies.
+   * Get list of supported and enabled location modules.
    *
    * @return array
-   *   Array of currencies.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   *   Return list of enabled geo modules.
    */
-  public static function getEnabledCurrency() {
-    $enabled_currencies = \Drupal::EntityTypeManager()
-      ->getStorage('commerce_currency')
-      ->loadByProperties([
-        'status' => TRUE,
-      ]);
+  public function getGeoModules() {
+    $geo = [];
 
-    $currencies = [];
-
-    foreach ($enabled_currencies as $key => $currency) {
-      $currencies[$key] = $currency->getName();
+    if ($this->moduleHandler->moduleExists('smart_ip')) {
+      $geo['smart_ip'] = t('Smart IP');
     }
 
-    return $currencies;
+    if ($this->moduleHandler->moduleExists('geoip')) {
+      $geo['geoip'] = t('GeoIP');
+    }
+
+    return $geo;
   }
 
   /**
@@ -112,69 +135,25 @@ class CurrencyHelper {
    * @return mixed
    *   Return 2 letter country code.
    */
-  public static function getUserCountry($service) {
+  public function getUserCountry($service) {
     switch ($service) {
       case 'smart_ip':
-        $location = \Drupal::service('smart_ip.smart_ip_location');
-        $country = $location->get('countryCode');
+        $country = \Drupal::service('smart_ip.smart_ip_location')->get('countryCode');
         break;
 
       case 'geoip':
-        $geo_locator = \Drupal::service('geoip.geolocation');
-        $ip_address = \Drupal::request()->getClientIp();
-        $country = $geo_locator->geolocate($ip_address);
+        $ip_address = $this->requestStack->getCurrentRequest()->getClientIp();
+        $country = \Drupal::service('geoip.geolocation')->geolocate($ip_address);
         break;
     }
 
     // If geolocation fails for any specific reason (most likely on local
     // environment, use default country from Drupal.
     if (empty($country)) {
-      $country = \Drupal::config('system.date')->get('country.default');
+      $country = $this->configFactory->get('system.date')->get('country.default');
     }
 
     return $country;
-  }
-
-  /**
-   * Currency conversion for prices.
-   *
-   * @param \Drupal\commerce_price\Price $price
-   *   Price object.
-   * @param string $currency
-   *   Target currency.
-   *
-   * @return \Drupal\commerce_price\Price|static
-   *   Return updated price object with new currency.
-   */
-  public static function priceConversion(Price $price, $currency) {
-    $exchange_rate_source = \Drupal::config('commerce_currency_resolver.settings')->get('currency_exchange_rates');
-
-    if (empty($exchange_rate_source)) {
-      throw new CurrencyResolverMismatchException('Missing exchange rate source');
-    }
-
-    // Get exchange rates based on commerce_exchanger name formatting.
-    $mapping = \Drupal::config(ExchangeRatesInterface::COMMERCE_EXCHANGER_IMPORT . '.' . $exchange_rate_source)->getRawData();
-
-    // Current currency.
-    $current_currency = $price->getCurrencyCode();
-
-    // Determine rate.
-    $rate = NULL;
-    if (isset($mapping[$current_currency][$currency])) {
-      $rate = $mapping[$current_currency][$currency]['value'];
-    }
-
-    // Fallback to use 1 as rate.
-    if (empty($rate)) {
-      $rate = '1';
-    }
-
-    // Convert. Convert rate to string.
-    $price = $price->convert($currency, (string) $rate);
-    $rounder = \Drupal::service('commerce_price.rounder');
-    $price = $rounder->round($price);
-    return $price;
   }
 
 }
