@@ -60,11 +60,11 @@ class PriceExchangerCalculator implements ExchangerCalculatorInterface {
 
     // If provider does not exist.
     if (!$this->provider) {
-      throw new CurrencyResolverMismatchException('There is not exchange rate plugin');
+      throw new CurrencyResolverMismatchException('There is no exchange rate plugin');
     }
 
     // Get configuration file.
-    $exchange_rates = $this->configFactory->get($this->provider->getExchangerConfigName());
+    $exchange_rates = $this->configFactory->get($this->provider->getExchangerConfigName())->get();
 
     // Current currency.
     $price_currency = $price->getCurrencyCode();
