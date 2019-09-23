@@ -129,13 +129,12 @@ class CurrencyHelper implements CurrencyHelperInterface {
   /**
    * Get user country location from contrib modules.
    *
-   * @param string $service
-   *   Type of geo service.
-   *
    * @return mixed
    *   Return 2 letter country code.
    */
-  public function getUserCountry($service) {
+  public function getUserCountry() {
+    $service = $this->configFactory->get('commerce_currency_resolver.settings')->get('currency_geo');
+
     switch ($service) {
       case 'smart_ip':
         $country = \Drupal::service('smart_ip.smart_ip_location')->get('countryCode');

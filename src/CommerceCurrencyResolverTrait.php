@@ -30,8 +30,7 @@ trait CommerceCurrencyResolverTrait {
    *   2-letter country code.
    */
   public function getUserCountry() {
-    $service = \Drupal::config('commerce_currency_resolver.settings')->get('currency_geo');
-    return CurrencyHelper::getUserCountry($service);
+    return \Drupal::service('commerce_currency_resolver.currency_helper')->getUserCountry();
   }
 
   /**
