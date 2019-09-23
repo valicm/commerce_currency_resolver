@@ -5,13 +5,6 @@ commerce_currency_resolver.configuration:
     _title: 'Commerce currency resolver'
   requirements:
     _permission: 'administer commerce currency resolver settings'
-commerce_currency_resolver.currency_conversion:
-  path: '/admin/commerce/config/commerce_currency_resolver/conversion'
-  defaults:
-    _form: 'Drupal\commerce_currency_resolver\Form\CommerceCurrencyResolverConversion'
-    _title: 'Currency conversion'
-  requirements:
-    _permission: 'administer commerce currency resolver settings'
 commerce_currency_resolver.currency_mapping:
   path: '/admin/commerce/config/commerce_currency_resolver/mapping'
   defaults:
@@ -19,7 +12,6 @@ commerce_currency_resolver.currency_mapping:
     _title: 'Currency mapping'
   requirements:
     _permission: 'administer commerce currency resolver settings'
-
 # Route to get autocomplete results for countries.
 commerce_currency_resolver.countries.autocomplete:
   path: '/admin/commerce/config/commerce_currency_resolver/autocomplete'

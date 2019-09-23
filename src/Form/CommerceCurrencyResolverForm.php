@@ -2,16 +2,45 @@
 
 namespace Drupal\commerce_currency_resolver\Form;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\commerce_currency_resolver\CurrencyHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class CommerceMulticurrencySettingsForm.
+ * Class CommerceCurrencyResolverForm.
  *
  * @package Drupal\commerce_currency_resolver\Form
  */
 class CommerceCurrencyResolverForm extends ConfigFormBase {
+
+  /**
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * @var \Drupal\Core\Entity\EntityInterface[]
+   */
+  protected $providers;
+
+  public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManager $entityTypeManager) {
+    parent::__construct($config_factory);
+    $this->entityTypeManager = $entityTypeManager;
+    $this->providers = $this->entityTypeManager->getStorage('commerce_exchange_rates')->loadByProperties(['status' => TRUE]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static (
+      $container->get('config.factory'),
+      $container->get('entity_type.manager')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -71,14 +100,23 @@ class CommerceCurrencyResolverForm extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
-    $form['exchange_rates'] = [
+    $exchange_rates = [];
+    foreach ($this->providers as $id => $provider) {
+      $exchange_rates[$provider->id()] = $provider->label();
+    }
+
+    $form['currency_exchange_rates'] = [
       '#type' => 'select',
       '#title' => $this->t('Exchange rate API'),
       '#description' => $this->t('Select which external service you want to use for calculating exchange rates between currencies'),
-      '#options' => CurrencyHelper::getExchangeServices(),
-      '#default_value' => $config->get('exchange_rates'),
+      '#options' => $exchange_rates,
+      '#default_value' => $config->get('currency_exchange_rates'),
       '#required' => TRUE,
     ];
+
+    if (empty($exchange_rates)) {
+      $form['currency_exchange_rates']['#field_suffix'] = $this->t('Please add at least one exchange rate provider under Exchange rates');
+    }
 
     $form['currency_default'] = [
       '#type' => 'select',
@@ -108,6 +146,7 @@ class CommerceCurrencyResolverForm extends ConfigFormBase {
       ->set('currency_geo', $form_state->getValue('currency_geo'))
       ->set('currency_source', $form_state->getValue('currency_source'))
       ->set('currency_default', $form_state->getValue('currency_default'))
+      ->set('currency_exchange_rates', $form_state->getValue('currency_exchange_rates'))
       ->save();
 
     parent::submitForm($form, $form_state);

@@ -6,15 +6,12 @@
  */
 
 use CommerceGuys\Addressing\Country\CountryRepository;
+use Drupal\commerce_exchanger\Entity\ExchangeRates;
 
 /**
  * Implements hook_install().
  */
 function commerce_currency_resolver_install() {
-
-  // Set module weight to 10. We are extending some commerce stuff,
-  // where this module should be after commerce_promotion.
-  module_set_weight('commerce_currency_resolver', 10);
 
   // @see commerce_price_install().
   if (!\Drupal::isConfigSyncing()) {
@@ -58,4 +55,100 @@ function commerce_currency_resolver_update_8001() {
  */
 function commerce_currency_resolver_update_8002() {
   module_set_weight('commerce_currency_resolver', 0);
+}
+
+/**
+ * Enable commerce_exchanger.
+ *
+ * @see https://www.drupal.org/project/commerce_currency_resolver/issues/3082160
+ */
+function commerce_currency_resolver_update_8003() {
+  \Drupal::service('module_installer')->install([
+    'commerce_exchanger',
+  ]);
+}
+
+/**
+ * Upgrade path for commerce_exchanger.
+ *
+ * @see https://www.drupal.org/project/commerce_currency_resolver/issues/3082267
+ */
+function commerce_currency_resolver_update_8004() {
+
+  // Default currency.
+  $default_currency = \Drupal::configFactory()->get('commerce_currency_resolver.settings')->get('currency_default');
+
+  // Get existing settings for exchange rates.
+  $config = \Drupal::configFactory()->get('commerce_currency_resolver.currency_conversion');
+
+  // Provide some defaults.
+  $plugin_id = 'manual';
+  $label = 'Manual';
+  $cron = 1;
+  $cross_sync = 1;
+  $api_key = '';
+  $auth = '';
+
+  if ($config) {
+    $source = $config->get('source');
+    $cron = $config->get('cron');
+    $cross_sync = $config->get('use_cross_sync');
+    $api_key = $config->get('api_key');
+    $auth = $config->get('auth');
+
+    switch ($source) {
+      case 'exchange_rate_ecb':
+        $plugin_id = 'ecb';
+        $label = 'European Central Bank';
+        $default_currency = 'EUR';
+      break;
+
+      case 'exchange_rate_fixer_paid';
+      case 'exchange_rate_fixer';
+        $plugin_id = 'fixer';
+        $label = 'Fixer.io';
+      break;
+
+      default:
+    }
+  }
+
+  $values = [
+    'id' => $plugin_id,
+    'label' => $label,
+    'plugin' => $plugin_id,
+  ];
+
+  $values['configuration'] = [
+    'cron' => $cron,
+    'use_cross_sync' => $cross_sync,
+    'demo_amount' => 100,
+    'base_currency' => $default_currency,
+    'mode' => 'live'
+  ];
+
+  if ($api_key) {
+    $values['configuration']['api_key'] = $api_key;
+  }
+
+  if ($auth) {
+    $values['configuration']['auth'] = $auth;
+  }
+
+  $values['configuration']['manual'] = $plugin_id === 'manual';
+
+  // Create new exchange rates.
+  $entity = ExchangeRates::create(
+    $values
+  );
+  $entity->save();
+
+  // Set new value to currency resolver.
+  $settings = \Drupal::configFactory()->getEditable('commerce_currency_resolver.settings');
+  $settings->set('currency_exchange_rates', $entity->id());
+  $settings->save();
+
+  // Delete now old configuration.
+  // commerce_currency_resolver.currency_conversion
+  \Drupal::configFactory()->getEditable('commerce_currency_resolver.currency_conversion')->delete();
 }
