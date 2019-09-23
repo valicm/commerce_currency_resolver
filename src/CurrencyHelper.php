@@ -102,36 +102,6 @@ class CurrencyHelper {
   }
 
   /**
-   * Get all Exchange rates services.
-   *
-   * @return array
-   *   Return array of available services.
-   */
-  public static function getExchangeServices() {
-    $container = \Drupal::getContainer();
-    $kernel = $container->get('kernel');
-
-    // Get all services.
-    $services = $kernel->getCachedContainerDefinition()['services'];
-
-    $options = [];
-    foreach ($services as $service_id => $value) {
-      // Split service id. Service could be in any module added, so we
-      // need to split service_id to rid of module name.
-      $name = explode('.', $service_id);
-
-      // Get second part of service name and check for specific string on
-      // the beginning.
-      if (isset($name[1]) && substr($name[1], 0, 13) === 'exchange_rate') {
-        $clean_name = str_replace('exchange_rate_', '', $name[1]);
-        $options[$name[1]] = str_replace('_', ' ', $clean_name);
-      }
-    }
-
-    return $options;
-  }
-
-  /**
    * Get user country location from contrib modules.
    *
    * @param string $service
@@ -200,43 +170,6 @@ class CurrencyHelper {
     $rounder = \Drupal::service('commerce_price.rounder');
     $price = $rounder->round($price);
     return $price;
-  }
-
-  /**
-   * Conversion for currencies when we use cross sync conversion.
-   *
-   * @param string $current
-   *   Current currency.
-   * @param string $target
-   *   Target currency.
-   *
-   * @return float|int
-   *   Return rate for conversion calculation.
-   *
-   * @todo Remove in never version. Deprecated.
-   */
-  public static function crossSyncConversion($current, $target) {
-    $currency_default = \Drupal::config('commerce_currency_resolver.settings')
-      ->get('currency_default');
-
-    $mapping = \Drupal::config('commerce_currency_resolver.currency_conversion')
-      ->get('exchange');
-
-    if ($current === $currency_default) {
-      $rate = $mapping[$currency_default][$target]['value'];
-    }
-
-    elseif ($target === $currency_default) {
-      $rate = 1 / $mapping[$currency_default][$current]['value'];
-    }
-
-    else {
-      $current_rate = $mapping[$currency_default][$current]['value'];
-      $target_rate = $mapping[$currency_default][$target]['value'];
-      $rate = $target_rate / $current_rate;
-    }
-
-    return $rate;
   }
 
 }
