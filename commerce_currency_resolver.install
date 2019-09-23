@@ -88,6 +88,7 @@ function commerce_currency_resolver_update_8004() {
   $cross_sync = 1;
   $api_key = '';
   $auth = '';
+  $mode = 'live';
 
   if ($config) {
     $source = $config->get('source');
@@ -97,6 +98,20 @@ function commerce_currency_resolver_update_8004() {
     $auth = $config->get('auth');
 
     switch ($source) {
+      case 'exchange_rate_bluesnap':
+        $plugin_id = 'bluesnap';
+        $label = 'BlueSnap';
+        $default_currency = 'USD';
+
+        if (!empty($config->get('bluesnap'))) {
+          $mode = $config->get('bluesnap')['mode'] === 'production' ? 'live' : 'test';
+          $auth = [
+            'username' => $config->get('bluesnap')['username'],
+            'password' => $config->get('bluesnap')['password'],
+          ];
+        }
+        break;
+
       case 'exchange_rate_ecb':
         $plugin_id = 'ecb';
         $label = 'European Central Bank';
@@ -124,7 +139,7 @@ function commerce_currency_resolver_update_8004() {
     'use_cross_sync' => $cross_sync,
     'demo_amount' => 100,
     'base_currency' => $default_currency,
-    'mode' => 'live'
+    'mode' => $mode
   ];
 
   if ($api_key) {
