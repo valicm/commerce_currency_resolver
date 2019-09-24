@@ -71,7 +71,7 @@ class CommerceCurrencyResolverSelectForm extends FormBase {
     }
 
     else {
-      $selected_currency = \Drupal::config('commerce_currency_resolver.settings')->get('currency_default');
+      $selected_currency = $this->currencyHelper->defaultCurrencyCode();
     }
 
     $form['currency'] = [
