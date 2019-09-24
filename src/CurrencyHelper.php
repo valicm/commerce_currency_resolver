@@ -115,17 +115,14 @@ class CurrencyHelper implements CurrencyHelperInterface {
   }
 
   /**
-   * @return string
+   * {@inheritdoc}
    */
   public function currentLanguage() {
     return $this->languageManager->getCurrentLanguage()->getId();
   }
 
   /**
-   * Get list of supported and enabled location modules.
-   *
-   * @return array
-   *   Return list of enabled geo modules.
+   * {@inheritdoc}
    */
   public function getGeoModules() {
     $geo = [];
@@ -142,10 +139,7 @@ class CurrencyHelper implements CurrencyHelperInterface {
   }
 
   /**
-   * Get user country location from contrib modules.
-   *
-   * @return mixed
-   *   Return 2 letter country code.
+   * {@inheritdoc}
    */
   public function getUserCountry() {
     $service = $this->configFactory->get('commerce_currency_resolver.settings')->get('currency_geo');
@@ -171,38 +165,28 @@ class CurrencyHelper implements CurrencyHelperInterface {
   }
 
   /**
-   * Get how currency is mapped in the system. By country, language, cookie.
-   *
-   * @return string
-   *   Return mapping type.
-   *
-   * @see commerce_currency_resolver.settings
+   * {@inheritdoc}
    */
   public function getSourceType() {
     return $this->configFactory->get('commerce_currency_resolver.settings')->get('currency_mapping');
   }
 
   /**
-   * Get how currency is mapped in the system. By country, language, cookie.
-   *
-   * @return string
-   *   Return mapping type.
-   *
-   * @see commerce_currency_resolver.settings
+   * {@inheritdoc}
    */
-  public function getCurrencyMappingMatrix() {
+  public function getMappingMatrix() {
     return $this->configFactory->get('commerce_currency_resolver.currency_mapping')->get('matrix');
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getDomicileCurrency() {
     return $this->configFactory->get('commerce_currency_resolver.currency_mapping')->get('domicile_currency');
   }
 
   /**
-   * Get default currency from current resolved store.
-   *
-   * @return string
-   *   Return currency code.
+   * {@inheritdoc}
    */
   public function defaultCurrencyCode() {
     if ($store = $this->currentStore->getStore()) {
@@ -213,17 +197,14 @@ class CurrencyHelper implements CurrencyHelperInterface {
   }
 
   /**
-   * Return default fallback currency from settings.
-   *
-   * @return string
-   *   Return currency code.
+   * {@inheritdoc}
    */
   public function fallbackCurrencyCode() {
     return $this->configFactory->get('commerce_currency_resolver.settings')->get('currency_default');
   }
 
   /**
-   * Get cookie name.
+   * {@inheritdoc}
    */
   public function getCookieName() {
     $cookieName = &drupal_static(__FUNCTION__);

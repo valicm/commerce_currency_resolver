@@ -73,7 +73,7 @@ class CurrentCurrency implements CurrentCurrencyInterface {
           $current_language = $this->currencyHelper->currentLanguage();
 
           // Get mapping language by currency.
-          $matrix = $this->currencyHelper->getCurrencyMappingMatrix();
+          $matrix = $this->currencyHelper->getMappingMatrix();
 
           if (isset($matrix[$current_language])) {
             $resolved_currency = $matrix[$current_language];
@@ -87,7 +87,7 @@ class CurrentCurrency implements CurrentCurrencyInterface {
 
           // Get currency matrix data. All mappings are inside.
           // Only if we use domicile currency, mapping is empty.
-          $matrix = $this->currencyHelper->getCurrencyMappingMatrix();
+          $matrix = $this->currencyHelper->getMappingMatrix();
 
           // We hit some mapping by language or geo and we don't use domicile
           // currency under geo settings.
