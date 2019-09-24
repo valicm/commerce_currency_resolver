@@ -106,8 +106,7 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
         $resolved_field = $field_name . '_' . strtolower($resolved_currency);
 
         // Check if we have field.
-        if ($entity->hasField($resolved_field) && !$entity->get($resolved_field)
-            ->isEmpty()) {
+        if ($entity->hasField($resolved_field) && !$entity->get($resolved_field)->isEmpty()) {
           $resolved_price = $entity->get($resolved_field)->first()->toPrice();
         }
       }

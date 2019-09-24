@@ -18,6 +18,8 @@ class CurrentCurrency implements CurrentCurrencyInterface {
   protected $requestStack;
 
   /**
+   * Helper service.
+   *
    * @var \Drupal\commerce_currency_resolver\CurrencyHelperInterface
    */
   protected $currencyHelper;

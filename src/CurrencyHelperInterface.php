@@ -3,7 +3,7 @@
 namespace Drupal\commerce_currency_resolver;
 
 /**
- * Interface CurrencyHelperInterface
+ * Interface CurrencyHelperInterface.
  *
  * @package Drupal\commerce_currency_resolver
  */
@@ -13,6 +13,7 @@ interface CurrencyHelperInterface {
    * Return formatted array of available exchange rates plugins.
    *
    * @return array
+   *   List of keyed providers ['provider_id' => 'Provider name'].
    */
   public function getExchangeRatesProviders();
 

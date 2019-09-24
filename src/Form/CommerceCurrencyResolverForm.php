@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class CommerceCurrencyResolverForm extends ConfigFormBase {
 
   /**
+   * Helper service.
+   *
    * @var \Drupal\commerce_currency_resolver\CurrencyHelperInterface
    */
   protected $currencyHelper;
@@ -119,7 +121,7 @@ class CommerceCurrencyResolverForm extends ConfigFormBase {
       '#type' => 'select',
       '#title' => $this->t('Default currency'),
       '#description' => $this->t('Select currency which you consider default - as fallback if all resolvers fails, and upon exchange rates should be calculated'),
-      '#options' =>  $this->currencyHelper->getCurrencies(),
+      '#options' => $this->currencyHelper->getCurrencies(),
       '#default_value' => $config->get('currency_default'),
       '#required' => TRUE,
     ];

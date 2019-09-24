@@ -17,6 +17,8 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 class PriceExchangerCalculator implements ExchangerCalculatorInterface {
 
   /**
+   * Entity type manager.
+   *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;

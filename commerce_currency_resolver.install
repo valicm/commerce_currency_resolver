@@ -168,7 +168,7 @@ function commerce_currency_resolver_update_8004() {
   $settings->save();
 
   // Delete now old configuration.
-  // commerce_currency_resolver.currency_conversion
+  // commerce_currency_resolver.currency_conversion.
   \Drupal::configFactory()
     ->getEditable('commerce_currency_resolver.currency_conversion')
     ->delete();

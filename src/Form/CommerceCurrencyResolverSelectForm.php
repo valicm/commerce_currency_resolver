@@ -23,6 +23,8 @@ class CommerceCurrencyResolverSelectForm extends FormBase {
   protected $requestStack;
 
   /**
+   * Helper service.
+   *
    * @var \Drupal\commerce_currency_resolver\CurrencyHelperInterface
    */
   protected $currencyHelper;

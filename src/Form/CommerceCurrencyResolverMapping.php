@@ -24,6 +24,8 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
   protected $countryManager;
 
   /**
+   * Helper service.
+   *
    * @var \Drupal\commerce_currency_resolver\CurrencyHelperInterface
    */
   protected $currencyHelper;

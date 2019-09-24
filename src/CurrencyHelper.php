@@ -19,31 +19,43 @@ class CurrencyHelper implements CurrencyHelperInterface {
   use StringTranslationTrait;
 
   /**
+   * Current request.
+   *
    * @var \Symfony\Component\HttpFoundation\RequestStack
    */
   protected $requestStack;
 
   /**
+   * Config factory.
+   *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
+   * Entity type manager.
+   *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
+   * Language manager.
+   *
    * @var \Drupal\Core\Language\LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
+   * Core module handler.
+   *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
+   * Current store.
+   *
    * @var \Drupal\commerce_store\CurrentStoreInterface
    */
   protected $currentStore;
@@ -52,10 +64,15 @@ class CurrencyHelper implements CurrencyHelperInterface {
    * CurrencyHelper constructor.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   *   Request.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   Config factory.
    * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   *   Entity type manager.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   Core language manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   Core module handler.
    */
   public function __construct(RequestStack $request_stack, ConfigFactoryInterface $config_factory, EntityTypeManager $entityTypeManager, LanguageManagerInterface $languageManager, ModuleHandlerInterface $module_handler, CurrentStoreInterface $current_store) {
     $this->requestStack = $request_stack;
@@ -90,7 +107,7 @@ class CurrencyHelper implements CurrencyHelperInterface {
    */
   public function getExchangeRatesProviders() {
     /** @var \Drupal\commerce_exchanger\Entity\ExchangeRatesInterface[] $providers */
-    $providers =  $this->entityTypeManager->getStorage('commerce_exchange_rates')->loadMultiple();
+    $providers = $this->entityTypeManager->getStorage('commerce_exchange_rates')->loadMultiple();
 
     $exchange_rates = [];
     foreach ($providers as $provider) {
