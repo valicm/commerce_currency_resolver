@@ -5,6 +5,7 @@ namespace Drupal\commerce_currency_resolver\Plugin\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\commerce_currency_resolver\Form\CommerceCurrencyResolverSelectForm;
 use Drupal\Core\Form\FormBuilderInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -16,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   category = @Translation("Blocks")
  * )
  */
-class CommerceCurrencyResolverSelectBlock extends BlockBase {
+class CommerceCurrencyResolverSelectBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
    * FormBuilderInterface.
