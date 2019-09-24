@@ -19,7 +19,7 @@ services:
     - { name: event_subscriber }
   commerce_currency_resolver.order_processor:
     class: Drupal\commerce_currency_resolver\CurrencyOrderProcessor
-    arguments: ['@entity_type.manager', '@commerce_currency_resolver.current_currency','@current_user', '@current_route_match', '@commerce_currency_resolver.calculator']
+    arguments: ['@entity_type.manager', '@commerce_currency_resolver.current_currency','@current_user', '@current_route_match', '@commerce_currency_resolver.calculator', '@module_handler']
     tags:
     - { name: commerce_order.order_processor, priority: 1000 }
   commerce_currency_resolver.currency_helper:

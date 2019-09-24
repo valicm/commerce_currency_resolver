@@ -8,6 +8,7 @@ use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 
@@ -54,14 +55,22 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
   protected $priceExchanger;
 
   /**
+   * Drupal module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * {@inheritdoc}
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, CurrentCurrency $currency, AccountInterface $account, RouteMatchInterface $route_match, ExchangerCalculatorInterface $price_exchanger) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, CurrentCurrency $currency, AccountInterface $account, RouteMatchInterface $route_match, ExchangerCalculatorInterface $price_exchanger, ModuleHandlerInterface $module_handler) {
     $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
     $this->routeMatch = $route_match;
     $this->account = $account;
     $this->currentCurrency = $currency;
     $this->priceExchanger = $price_exchanger;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
@@ -95,7 +104,7 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
         }
 
         // Handle shipping module.
-        if (\Drupal::service('module_handler')->moduleExists('commerce_shipping')) {
+        if ($this->moduleHandler->moduleExists('commerce_shipping')) {
           if ($order->hasField('shipments') && !$order->get('shipments')->isEmpty()) {
 
             // Get order shipments.

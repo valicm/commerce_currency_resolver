@@ -73,6 +73,8 @@ class CurrencyHelper implements CurrencyHelperInterface {
    *   Core language manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   Core module handler.
+   * @param \Drupal\commerce_store\CurrentStoreInterface $current_store
+   *   Current resolved Commerce store.
    */
   public function __construct(RequestStack $request_stack, ConfigFactoryInterface $config_factory, EntityTypeManager $entityTypeManager, LanguageManagerInterface $languageManager, ModuleHandlerInterface $module_handler, CurrentStoreInterface $current_store) {
     $this->requestStack = $request_stack;
