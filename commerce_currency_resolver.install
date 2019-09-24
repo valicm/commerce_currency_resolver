@@ -76,10 +76,13 @@ function commerce_currency_resolver_update_8003() {
 function commerce_currency_resolver_update_8004() {
 
   // Default currency.
-  $default_currency = \Drupal::configFactory()->get('commerce_currency_resolver.settings')->get('currency_default');
+  $default_currency = \Drupal::configFactory()
+    ->get('commerce_currency_resolver.settings')
+    ->get('currency_default');
 
   // Get existing settings for exchange rates.
-  $config = \Drupal::configFactory()->get('commerce_currency_resolver.currency_conversion');
+  $config = \Drupal::configFactory()
+    ->get('commerce_currency_resolver.currency_conversion');
 
   // Provide some defaults.
   $plugin_id = 'manual';
@@ -116,13 +119,13 @@ function commerce_currency_resolver_update_8004() {
         $plugin_id = 'ecb';
         $label = 'European Central Bank';
         $default_currency = 'EUR';
-      break;
+        break;
 
       case 'exchange_rate_fixer_paid';
       case 'exchange_rate_fixer';
         $plugin_id = 'fixer';
         $label = 'Fixer.io';
-      break;
+        break;
 
       default:
     }
@@ -139,7 +142,7 @@ function commerce_currency_resolver_update_8004() {
     'use_cross_sync' => $cross_sync,
     'demo_amount' => 100,
     'base_currency' => $default_currency,
-    'mode' => $mode
+    'mode' => $mode,
   ];
 
   if ($api_key) {
@@ -159,11 +162,14 @@ function commerce_currency_resolver_update_8004() {
   $entity->save();
 
   // Set new value to currency resolver.
-  $settings = \Drupal::configFactory()->getEditable('commerce_currency_resolver.settings');
+  $settings = \Drupal::configFactory()
+    ->getEditable('commerce_currency_resolver.settings');
   $settings->set('currency_exchange_rates', $entity->id());
   $settings->save();
 
   // Delete now old configuration.
   // commerce_currency_resolver.currency_conversion
-  \Drupal::configFactory()->getEditable('commerce_currency_resolver.currency_conversion')->delete();
+  \Drupal::configFactory()
+    ->getEditable('commerce_currency_resolver.currency_conversion')
+    ->delete();
 }

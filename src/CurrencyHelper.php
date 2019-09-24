@@ -8,12 +8,15 @@ use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Helper for various parts of the module.
  */
 class CurrencyHelper implements CurrencyHelperInterface {
+
+  use StringTranslationTrait;
 
   /**
    * @var \Symfony\Component\HttpFoundation\RequestStack
@@ -90,7 +93,7 @@ class CurrencyHelper implements CurrencyHelperInterface {
     $providers =  $this->entityTypeManager->getStorage('commerce_exchange_rates')->loadMultiple();
 
     $exchange_rates = [];
-    foreach ($providers as $id => $provider) {
+    foreach ($providers as $provider) {
       if ($provider->status()) {
         $exchange_rates[$provider->id()] = $provider->label();
       }
@@ -128,11 +131,11 @@ class CurrencyHelper implements CurrencyHelperInterface {
     $geo = [];
 
     if ($this->moduleHandler->moduleExists('smart_ip')) {
-      $geo['smart_ip'] = t('Smart IP');
+      $geo['smart_ip'] = $this->t('Smart IP');
     }
 
     if ($this->moduleHandler->moduleExists('geoip')) {
-      $geo['geoip'] = t('GeoIP');
+      $geo['geoip'] = $this->t('GeoIP');
     }
 
     return $geo;

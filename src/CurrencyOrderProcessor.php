@@ -47,6 +47,8 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
   protected $routeMatch;
 
   /**
+   * Price exchanger service.
+   *
    * @var \Drupal\commerce_exchanger\ExchangerCalculatorInterface
    */
   protected $priceExchanger;
@@ -150,7 +152,7 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
 
         // Flag for recalculating order. If we had custom adjustments for
         // conversion we already hit recalculateTotalPrice() with
-        //  $order->addAdjustment($new_adjustment), so no need again.
+        // $order->addAdjustment($new_adjustment), so no need again.
         if (!$reset_adjustments) {
           // Get new total price.
           $order = $order->recalculateTotalPrice();

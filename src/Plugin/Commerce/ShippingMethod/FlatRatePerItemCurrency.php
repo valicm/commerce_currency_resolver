@@ -28,7 +28,7 @@ class FlatRatePerItemCurrency extends FlatRateCurrency {
       return parent::calculateRates($shipment);
     }
 
-      $quantity = 0;
+    $quantity = 0;
     foreach ($shipment->getItems() as $shipment_item) {
       $quantity += $shipment_item->getQuantity();
     }

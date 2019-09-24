@@ -25,7 +25,7 @@ function commerce_currency_resolver_help($route_name, RouteMatchInterface $route
 }
 
 /**
- * Implements hook_commerce_promotion_offer_info_alter();
+ * Implements hook_commerce_promotion_offer_info_alter().
  */
 function commerce_currency_resolver_commerce_promotion_offer_info_alter(array &$definitions) {
   $definitions['order_item_fixed_amount_off']['class'] = OrderItemFixedAmountOff::class;
@@ -33,14 +33,14 @@ function commerce_currency_resolver_commerce_promotion_offer_info_alter(array &$
 }
 
 /**
- * Implements hook_commerce_condition_info_alter();
+ * Implements hook_commerce_condition_info_alter().
  */
 function commerce_currency_resolver_commerce_condition_info_alter(array &$definitions) {
   $definitions['order_total_price']['class'] = OrderTotalPrice::class;
 }
 
 /**
- * Implements hook_commerce_shipping_method_info_alter();
+ * Implements hook_commerce_shipping_method_info_alter().
  */
 function commerce_currency_resolver_commerce_shipping_method_info_alter(array &$definitions) {
   $definitions['flat_rate_per_item']['class'] = FlatRatePerItemCurrency::class;

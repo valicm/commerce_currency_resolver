@@ -142,18 +142,18 @@ class CommerceCurrencyResolverForm extends ConfigFormBase {
     $mapping = [];
 
     // Default store.
-    $mapping['store'] = t('Store (default Commerce 2 behavior)');
-    $mapping['cookie'] = t('Cookie (currency block selector)');
+    $mapping['store'] = $this->t('Store (default Commerce 2 behavior)');
+    $mapping['cookie'] = $this->t('Cookie (currency block selector)');
 
     // Check if exist geo based modules.
     // We support for now two of them.
     if (!empty($this->currencyHelper->getGeoModules())) {
-      $mapping['geo'] = t('By Country');
+      $mapping['geo'] = $this->t('By Country');
     }
 
     // Check if the site is multilingual.
     if (count($this->currencyHelper->getLanguages()) > 1) {
-      $mapping['lang'] = t('By Language');
+      $mapping['lang'] = $this->t('By Language');
     }
 
     return $mapping;

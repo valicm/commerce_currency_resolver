@@ -120,6 +120,7 @@ trait CommerceCurrencyResolverAmountTrait {
    *
    * @param string $currency_code
    *   Current currency on plugin.
+   *
    * @return bool
    *   Return TRUE if is allowed.
    */

@@ -10,7 +10,7 @@ use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
- * Class PriceExchangerCalculator
+ * Class PriceExchangerCalculator.
  *
  * @package Drupal\commerce_currency_resolver
  */
@@ -22,16 +22,22 @@ class PriceExchangerCalculator implements ExchangerCalculatorInterface {
   protected $entityTypeManager;
 
   /**
+   * Exchange rate provider.
+   *
    * @var \Drupal\commerce_exchanger\Entity\ExchangeRatesInterface
    */
   protected $provider;
 
   /**
+   * Config factory.
+   *
    * @var \Drupal\Core\Config\ConfigFactory
    */
   protected $configFactory;
 
   /**
+   * Commerce price rounder service.
+   *
    * @var \Drupal\commerce_price\RounderInterface
    */
   protected $rounder;

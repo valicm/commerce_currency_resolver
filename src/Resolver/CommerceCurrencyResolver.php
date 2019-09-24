@@ -22,11 +22,15 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
   protected $currentCurrency;
 
   /**
+   * Exchanger Calculator.
+   *
    * @var \Drupal\commerce_exchanger\ExchangerCalculatorInterface
    */
   protected $priceExchanger;
 
   /**
+   * Config factory.
+   *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $configFactory;

@@ -20,6 +20,7 @@ interface CurrencyHelperInterface {
    * Return formatted array of available currencies.
    *
    * @return array
+   *   List of keyed currencies ['HRK' => 'Croatian Kuna'].
    */
   public function getCurrencies();
 
@@ -27,6 +28,7 @@ interface CurrencyHelperInterface {
    * Return formatted array of languages.
    *
    * @return array
+   *   List of keyed languages ['HR' => 'Croatian'].
    */
   public function getLanguages();
 
@@ -34,7 +36,7 @@ interface CurrencyHelperInterface {
    * Return current user language.
    *
    * @return string
-   *  Two letter language code.
+   *   Two letter language code.
    */
   public function currentLanguage();
 
@@ -42,7 +44,7 @@ interface CurrencyHelperInterface {
    * Get list of enabled geo modules if any.
    *
    * @return array
-   *  List of geo modules.
+   *   List of geo modules.
    */
   public function getGeoModules();
 
@@ -78,6 +80,7 @@ interface CurrencyHelperInterface {
    * Return if domicile currency is used.
    *
    * @return mixed
+   *   Return if is active.
    */
   public function getDomicileCurrency();
 
