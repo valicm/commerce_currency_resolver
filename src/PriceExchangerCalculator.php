@@ -72,7 +72,7 @@ class PriceExchangerCalculator implements ExchangerCalculatorInterface {
     }
 
     // Get configuration file.
-    $exchange_rates = $this->configFactory->get($this->provider->getExchangerConfigName())->get();
+    $exchange_rates = $this->getExchangeRates();
 
     // Current currency.
     $price_currency = $price->getCurrencyCode();
@@ -87,12 +87,26 @@ class PriceExchangerCalculator implements ExchangerCalculatorInterface {
   }
 
   /**
+   * Get all exchange rates.
+   *
+   * @return array
+   *   Return exchange rates for currency resolver exchange plugin used.
+   *
+   * @todo Declare in ExchangerCalculatorInterface this function.
+   */
+  public function getExchangeRates() {
+    return $this->configFactory->get($this->provider->getExchangerConfigName())->get() ?? [];
+  }
+
+  /**
    * Return id of active provider.
    *
    * @return string
    *   Return provider.
+   *
+   * @todo Declare in ExchangerCalculatorInterface this function.
    */
-  protected function getExchangerId() {
+  public function getExchangerId() {
     return $this->configFactory->get('commerce_currency_resolver.settings')->get('currency_exchange_rates');
   }
 
