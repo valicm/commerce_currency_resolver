@@ -109,4 +109,12 @@ interface CurrencyHelperInterface {
    */
   public function getCookieName();
 
+  /**
+   * Used for specific cases on shipment edits.
+   *
+   * @return string|null
+   *   Return current order currency, or null.
+   */
+  public function isAdminOrder();
+
 }
