@@ -20,13 +20,6 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
   use CommerceCurrencyResolversRefreshTrait;
 
   /**
-   * The order storage.
-   *
-   * @var \Drupal\commerce_order\OrderStorage
-   */
-  protected $orderStorage;
-
-  /**
    * Current currency.
    *
    * @var \Drupal\commerce_currency_resolver\CurrentCurrencyInterface
@@ -64,8 +57,7 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
   /**
    * {@inheritdoc}
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, CurrentCurrency $currency, AccountInterface $account, RouteMatchInterface $route_match, ExchangerCalculatorInterface $price_exchanger, ModuleHandlerInterface $module_handler) {
-    $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
+  public function __construct(CurrentCurrency $currency, AccountInterface $account, RouteMatchInterface $route_match, ExchangerCalculatorInterface $price_exchanger, ModuleHandlerInterface $module_handler) {
     $this->routeMatch = $route_match;
     $this->account = $account;
     $this->currentCurrency = $currency;

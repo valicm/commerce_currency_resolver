@@ -3,7 +3,6 @@
 namespace Drupal\commerce_currency_resolver\EventSubscriber;
 
 use Drupal\commerce_currency_resolver\CommerceCurrencyResolversRefreshTrait;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\commerce_currency_resolver\CurrentCurrency;
@@ -26,13 +25,6 @@ class CurrencyOrderRefresh implements EventSubscriberInterface {
    * @var \Drupal\commerce_order\OrderRefreshInterface
    */
   protected $orderRefresh;
-
-  /**
-   * The order storage.
-   *
-   * @var \Drupal\commerce_order\OrderStorage
-   */
-  protected $orderStorage;
 
   /**
    * Current currency.
@@ -58,8 +50,7 @@ class CurrencyOrderRefresh implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, CurrentCurrency $currency, OrderRefreshInterface $order_refresh, AccountInterface $account, RouteMatchInterface $route_match) {
-    $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
+  public function __construct(CurrentCurrency $currency, OrderRefreshInterface $order_refresh, AccountInterface $account, RouteMatchInterface $route_match) {
     $this->account = $account;
     $this->routeMatch = $route_match;
     $this->currentCurrency = $currency;
