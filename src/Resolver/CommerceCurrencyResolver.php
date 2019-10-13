@@ -88,9 +88,7 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
       // Get how price should be calculated.
       $currency_source = $this->configFactory->get('commerce_currency_resolver.settings')->get('currency_source');
 
-      // Auto-calculate price by default. Fallback for all cases regardless
-      // of chosen currency source mode.
-      $resolved_price = $this->priceExchanger->priceConversion($price, $resolved_currency);
+      $resolved_price = NULL;
 
       // Specific cases for field and combo. Even we had auto-calculated
       // price, in combo mode we could have field with price.
@@ -109,6 +107,12 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
         if ($entity->hasField($resolved_field) && !$entity->get($resolved_field)->isEmpty()) {
           $resolved_price = $entity->get($resolved_field)->first()->toPrice();
         }
+      }
+
+      // If we haven't resolved yet anything, auto-calculate price by default.
+      // Fallback for all cases regardless of chosen currency source mode.
+      if ($resolved_price === NULL) {
+        $resolved_price = $this->priceExchanger->priceConversion($price, $resolved_currency);
       }
 
       return $resolved_price;
