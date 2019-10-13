@@ -73,9 +73,10 @@ class PriceExchangerCalculator implements ExchangerCalculatorInterface {
    *
    * @return array
    *   Return exchange rates for currency resolver exchange plugin used.
+   *
+   * @see \Drupal\commerce_exchanger\Entity\ExchangeRates::getExchangerConfigName
    */
   public function getExchangeRates() {
-    // Simulate \Drupal\commerce_exchanger\Entity\ExchangeRates::getExchangerConfigName
     return $this->configFactory->get(ExchangeRatesInterface::COMMERCE_EXCHANGER_IMPORT . '.' . $this->getExchangerId())->get() ?? [];
   }
 

@@ -118,7 +118,7 @@ class CurrentCurrency implements CurrentCurrencyInterface {
 
       // Where we are have commerce_order in route object on
       // administration pages, resolve to order currency.
-      // Most common case is tied with altering shipping
+      // Most common case is tied with altering shipping.
       // @see https://www.drupal.org/project/commerce_currency_resolver/issues/3083755
       if ($admin_order_currency = $this->currencyHelper->isAdminOrder()) {
         $resolved_currency = $admin_order_currency;

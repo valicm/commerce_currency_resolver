@@ -273,6 +273,7 @@ class CurrencyHelper implements CurrencyHelperInterface {
    * Determine if is order route.
    *
    * @return string|null
+   *   Return null or order currency.
    */
   protected function adminOrderRoutes() {
     if ($order_id = $this->routeMatch->getParameter('commerce_order')) {
@@ -288,6 +289,7 @@ class CurrencyHelper implements CurrencyHelperInterface {
    * Detect admin/* paths.
    *
    * @return bool
+   *   Return true if on admin/ path.
    */
   protected function isAdminPath() {
     $path = $this->requestStack->getCurrentRequest()->getPathInfo();
