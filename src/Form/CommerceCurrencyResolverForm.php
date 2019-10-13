@@ -113,8 +113,10 @@ class CommerceCurrencyResolverForm extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
+    // If there is no exchanger plugin.
     if (empty($exchange_rates)) {
       $form['currency_exchange_rates']['#field_suffix'] = $this->t('Please add at least one exchange rate provider under Exchange rates');
+      $form['submit']['#disabled'] = TRUE;
     }
 
     $form['currency_default'] = [

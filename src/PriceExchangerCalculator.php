@@ -3,11 +3,11 @@
 namespace Drupal\commerce_currency_resolver;
 
 use Drupal\commerce_currency_resolver\Exception\CurrencyResolverMismatchException;
+use Drupal\commerce_exchanger\Entity\ExchangeRatesInterface;
 use Drupal\commerce_exchanger\ExchangerCalculatorInterface;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_price\RounderInterface;
 use Drupal\Core\Config\ConfigFactory;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Class PriceExchangerCalculator.
@@ -15,20 +15,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
  * @package Drupal\commerce_currency_resolver
  */
 class PriceExchangerCalculator implements ExchangerCalculatorInterface {
-
-  /**
-   * Entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * Exchange rate provider.
-   *
-   * @var \Drupal\commerce_exchanger\Entity\ExchangeRatesInterface
-   */
-  protected $provider;
 
   /**
    * Config factory.
@@ -47,17 +33,13 @@ class PriceExchangerCalculator implements ExchangerCalculatorInterface {
   /**
    * PriceExchangerCalculator constructor.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   Entity type manager.
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
    *   Config factory.
    * @param \Drupal\commerce_price\RounderInterface $rounder
    *   Commerce price rounder.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, ConfigFactory $config_factory, RounderInterface $rounder) {
+  public function __construct(ConfigFactory $config_factory, RounderInterface $rounder) {
     $this->configFactory = $config_factory;
-    $this->entityTypeManager = $entity_type_manager;
-    $this->provider = $entity_type_manager->getStorage('commerce_exchange_rates')->load($this->getExchangerId());
     $this->rounder = $rounder;
   }
 
@@ -67,8 +49,8 @@ class PriceExchangerCalculator implements ExchangerCalculatorInterface {
   public function priceConversion(Price $price, $target_currency) {
 
     // If provider does not exist.
-    if (!$this->provider) {
-      throw new CurrencyResolverMismatchException('There is no exchange rate plugin');
+    if (!$this->getExchangerId()) {
+      throw new CurrencyResolverMismatchException('There is no active exchanger plugin selected');
     }
 
     // Get configuration file.
@@ -91,11 +73,10 @@ class PriceExchangerCalculator implements ExchangerCalculatorInterface {
    *
    * @return array
    *   Return exchange rates for currency resolver exchange plugin used.
-   *
-   * @todo Declare in ExchangerCalculatorInterface this function.
    */
   public function getExchangeRates() {
-    return $this->configFactory->get($this->provider->getExchangerConfigName())->get() ?? [];
+    // Simulate \Drupal\commerce_exchanger\Entity\ExchangeRates::getExchangerConfigName
+    return $this->configFactory->get(ExchangeRatesInterface::COMMERCE_EXCHANGER_IMPORT . '.' . $this->getExchangerId())->get() ?? [];
   }
 
   /**
@@ -103,8 +84,6 @@ class PriceExchangerCalculator implements ExchangerCalculatorInterface {
    *
    * @return string
    *   Return provider.
-   *
-   * @todo Declare in ExchangerCalculatorInterface this function.
    */
   public function getExchangerId() {
     return $this->configFactory->get('commerce_currency_resolver.settings')->get('currency_exchange_rates');
