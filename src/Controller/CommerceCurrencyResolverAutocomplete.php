@@ -57,12 +57,12 @@ class CommerceCurrencyResolverAutocomplete extends ControllerBase {
     $matches = [];
 
     foreach ($this->countryManager->getList() as $key => $value) {
-      if (stripos($value->render(), $query) === 0) {
-        $matches[$key] = $value->render();
+      if (stripos($value, $query) === 0) {
+        $matches[$key] = $value;
       }
 
       if (stripos($key, $query) === 0) {
-        $matches[$key] = $value->render();
+        $matches[$key] = $value;
       }
     }
 
