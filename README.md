@@ -12,7 +12,7 @@ CONTENTS OF THIS FILE
 INTRODUCTION
 ------------
 
-Enhancement for handling multicurrency in Drupal 8 for Drupal Commerce.
+Enhancement for handling multi-currency in Drupal 8 for Drupal Commerce.
 
 Drupal Commerce 2 supports multiple currencies out of the box.
 But only for adding prices, not resolving multiple currency prices/orders
@@ -25,7 +25,8 @@ calculating those prices and exchange rates between currencies.
 REQUIREMENTS
 ------------
 
-This module requires Drupal Commerce 2 and it's submodule price.
+This module requires Commerce Exchanger, Drupal Commerce 2 
+and it's submodule price.
 
 
 INSTALLATION

@@ -93,7 +93,9 @@ class CurrencyHelper implements CurrencyHelperInterface {
    * @param \Drupal\commerce_store\CurrentStoreInterface $current_store
    *   Current resolved Commerce store.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   Core route matcher service.
    * @param \Drupal\Core\Path\PathMatcherInterface $path_matcher
+   *   Core patch matcher service.
    */
   public function __construct(RequestStack $request_stack, ConfigFactoryInterface $config_factory, EntityTypeManager $entityTypeManager, LanguageManagerInterface $languageManager, ModuleHandlerInterface $module_handler, CurrentStoreInterface $current_store, RouteMatchInterface $route_match, PathMatcherInterface $path_matcher) {
     $this->requestStack = $request_stack;
@@ -115,7 +117,6 @@ class CurrencyHelper implements CurrencyHelperInterface {
 
     // Set defaults.
     $active_currencies = [];
-
     foreach ($currencies as $currency) {
       if ($currency->status()) {
         $active_currencies[$currency->getCurrencyCode()] = $currency->getName();
@@ -268,6 +269,11 @@ class CurrencyHelper implements CurrencyHelperInterface {
     return NULL;
   }
 
+  /**
+   * Determine if is order route.
+   *
+   * @return string|null
+   */
   protected function adminOrderRoutes() {
     if ($order_id = $this->routeMatch->getParameter('commerce_order')) {
       if ($order = Order::load($order_id)) {
@@ -279,6 +285,8 @@ class CurrencyHelper implements CurrencyHelperInterface {
   }
 
   /**
+   * Detect admin/* paths.
+   *
    * @return bool
    */
   protected function isAdminPath() {
