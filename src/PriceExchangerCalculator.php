@@ -46,7 +46,7 @@ class PriceExchangerCalculator implements ExchangerCalculatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function priceConversion(Price $price, $target_currency) {
+  public function priceConversion(Price $price, string $target_currency) {
 
     // If provider does not exist.
     if (!$this->getExchangerId()) {
