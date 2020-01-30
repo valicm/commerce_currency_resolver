@@ -5,6 +5,7 @@ namespace Drupal\commerce_currency_resolver\Plugin\Commerce\ShippingMethod;
 use Drupal\commerce_currency_resolver\Plugin\Commerce\CommerceCurrencyResolverAmountTrait;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_shipping\Entity\ShipmentInterface;
+use Drupal\commerce_shipping\Plugin\Commerce\ShippingMethod\FlatRatePerItem;
 use Drupal\commerce_shipping\ShippingRate;
 
 /**
@@ -15,7 +16,7 @@ use Drupal\commerce_shipping\ShippingRate;
  *   label = @Translation("Flat rate per item"),
  * )
  */
-class FlatRatePerItemCurrency extends FlatRateCurrency {
+class FlatRatePerItemCurrency extends FlatRatePerItem {
 
   use CommerceCurrencyResolverAmountTrait;
 
