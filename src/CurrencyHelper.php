@@ -276,9 +276,9 @@ class CurrencyHelper implements CurrencyHelperInterface {
    *   Return null or order currency.
    */
   protected function adminOrderRoutes() {
-    if ($order_id = $this->routeMatch->getParameter('commerce_order')) {
-      if ($order = Order::load($order_id)) {
-        return $order->getTotalPrice()->getCurrencyCode();
+    if ($order_id = $this->routeMatch->getRawParameter('commerce_order')) {
+      if (($order = Order::load($order_id)) && $total = $order->getTotalPrice()) {
+        return $total->getCurrencyCode();
       }
     }
 
