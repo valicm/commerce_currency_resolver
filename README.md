@@ -25,7 +25,7 @@ calculating those prices and exchange rates between currencies.
 REQUIREMENTS
 ------------
 
-This module requires Commerce Exchanger, Drupal Commerce 2 
+This module requires Commerce Exchanger, Drupal Commerce 2
 and it's submodule price.
 
 
@@ -58,19 +58,31 @@ EXCHANGE RATES
 Handled trough Commerce Exchanger module
 https://www.drupal.org/project/commerce_exchanger
 
+COMMERCE SHIPPING
+--------------
+
+If you are using commerce shipping there are two options how shipping methods
+can be set to work with currency resolver.
+
+* If you are using condition _Order currency_ and the selected currency matches to the price currency selected
+  under _Rate amount_ then you don't need to do anything.
+* If you need to auto-calculate price or have multiple prices per shipping method
+  you need enable submodule _commerce_currency_resolver_shipping_.
+
+
 EXAMPLES
 -----------
 
-### Adding order item programmatically  
+### Adding order item programmatically
 If you are adding order items programmatically in your code,
 you need take in account possible conflicts with prices. To avoid that
-is best that you using resolver to resolve prices for certain item to the cart. 
+is best that you using resolver to resolve prices for certain item to the cart.
 
 Example below shows entire process in custom add to cart process, where we add
 item to the cart.
 
 ```
-** 
+**
 @var \Drupal\commerce_cart\CartManagerInterface $cart_manager */
 $cart_manager = \Drupal::service('commerce_cart.cart_manager');
 

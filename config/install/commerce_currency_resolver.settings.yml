@@ -1,3 +1,4 @@
 currency_mapping: 'store'
 currency_source: 'combo'
 currency_default: ''
+currency_exchange_rates: ''

@@ -7,7 +7,6 @@ use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 
@@ -47,21 +46,13 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
   protected $priceExchanger;
 
   /**
-   * Drupal module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * {@inheritdoc}
    */
-  public function __construct(CurrentCurrency $currency, AccountInterface $account, RouteMatchInterface $route_match, ExchangerCalculatorInterface $price_exchanger, ModuleHandlerInterface $module_handler) {
+  public function __construct(CurrentCurrency $currency, AccountInterface $account, RouteMatchInterface $route_match, ExchangerCalculatorInterface $price_exchanger) {
     $this->routeMatch = $route_match;
     $this->account = $account;
     $this->currentCurrency = $currency;
     $this->priceExchanger = $price_exchanger;
-    $this->moduleHandler = $module_handler;
   }
 
   /**
@@ -91,21 +82,6 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
             $price = $item->getUnitPrice();
             // Auto calculate price.
             $item->setUnitPrice($this->priceExchanger->priceConversion($price, $resolved_currency));
-          }
-        }
-
-        // Handle shipping module.
-        if ($this->moduleHandler->moduleExists('commerce_shipping')) {
-          if ($order->hasField('shipments') && !$order->get('shipments')->isEmpty()) {
-
-            // Get order shipments.
-            $shipments = $order->shipments->referencedEntities();
-
-            $update_shipments = $this->processShipments($shipments, $resolved_currency);
-
-            if ($update_shipments) {
-              $order->set('shipments', $shipments);
-            }
           }
         }
 
@@ -167,59 +143,6 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
       }
     }
 
-  }
-
-  /**
-   * Handle shipments on currency change.
-   *
-   * @param \Drupal\commerce_shipping\Entity\Shipment[] $shipments
-   *   List of shipments attached to the order.
-   * @param string $resolved_currency
-   *   Currency code.
-   *
-   * @return bool|\Drupal\commerce_shipping\Entity\Shipment[]
-   *   FALSE if is auto-calculated, and shipments if they need to be updated.
-   */
-  protected function processShipments(array $shipments, $resolved_currency) {
-
-    $updateShipping = FALSE;
-
-    foreach ($shipments as $key => $shipment) {
-      if ($amount = $shipment->getAmount()) {
-        if ($amount->getCurrencyCode() !== $resolved_currency) {
-          // Recalculate rates.
-          if ($shipment->getShippingMethod()) {
-
-            // Get rates. User can have conditions based on Currency,
-            // or they can use multicurrency addon implementation on shipment.
-            $rates = $shipment->getShippingMethod()->getPlugin()->calculateRates($shipment);
-
-            // If we have found match, update with new rate.
-            if (!empty($rates)) {
-              $rate = reset($rates);
-              $shipment->getShippingMethod()->getPlugin()->selectRate($shipment, $rate);
-
-              // We have get new rate. But again duo to fact that we don't
-              // know if user is using multicurrency conditions or not,
-              // convert price just in case if is different currency.
-              if ($shipment->getAmount()->getCurrencyCode() !== $resolved_currency) {
-                $shipment->setAmount($this->priceExchanger->priceConversion($shipment->getAmount(), $resolved_currency));
-              }
-
-              $shipments[$key] = $shipment;
-              $updateShipping = $shipments;
-            }
-
-            // We haven't found anything, automatically convert price.
-            else {
-              $shipment->setAmount($this->priceExchanger->priceConversion($shipment->getAmount(), $resolved_currency));
-            }
-          }
-        }
-      }
-    }
-
-    return $updateShipping;
   }
 
 }

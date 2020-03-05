@@ -173,3 +173,16 @@ function commerce_currency_resolver_update_8004() {
     ->getEditable('commerce_currency_resolver.currency_conversion')
     ->delete();
 }
+
+/**
+ * Enable shipping submodule if needed.
+ *
+ * @see https://www.drupal.org/project/commerce_currency_resolver/issues/3111998
+ */
+function commerce_currency_resolver_update_8006() {
+  if (\Drupal::service('module_handler')->moduleExists('commerce_shipping')) {
+    \Drupal::service('module_installer')->install([
+      'commerce_currency_resolver_shipping',
+    ]);
+  }
+}

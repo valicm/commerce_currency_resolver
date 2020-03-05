@@ -26,14 +26,6 @@ trait CommerceCurrencyResolverAmountTrait {
     // Get default currency.
     $defaultCurrency = \Drupal::service('commerce_currency_resolver.currency_helper')->fallbackCurrencyCode();
 
-    // If we handle shipping.
-    if (isset($form['rate_amount']) && empty($form['rate_amount']['#default_value'])) {
-      $form['rate_amount']['#default_value'] = [
-        'number' => '',
-        'currency_code' => $defaultCurrency,
-      ];
-    }
-
     // If we handle commerce conditions and promotions.
     if (isset($form['amount']) && empty($form['amount']['#default_value'])) {
       $form['amount']['#default_value'] = [

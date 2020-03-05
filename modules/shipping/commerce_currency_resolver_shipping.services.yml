@@ -1,0 +1,6 @@
+services:
+  commerce_currency_resolver.shipping:
+    class: Drupal\commerce_currency_resolver_shipping\EventSubscriber\CommerceShippingCurrency
+    arguments: ['@commerce_currency_resolver.current_currency','@commerce_currency_resolver.calculator', '@current_route_match']
+    tags:
+      - { name: event_subscriber, priority: 200 }

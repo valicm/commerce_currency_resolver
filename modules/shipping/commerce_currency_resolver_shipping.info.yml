@@ -1,0 +1,12 @@
+name: 'Commerce Currency Resolver Shipping'
+type: module
+description: 'Commerce 2 currency enhancements for shipping'
+core: 8.x
+core_version_requirement: ^8 || ^9
+package: Commerce (Contrib)
+
+dependencies:
+  - commerce_currency_resolver:commerce_currency_resolver
+  - commerce_shipping:commerce_shipping  (> 2.0-beta8)
+
+php: 7.1
