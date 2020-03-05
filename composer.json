@@ -6,7 +6,7 @@
     "license": "GPL-2.0+",
     "require": {
         "drupal/commerce": "~2.10",
-        "drupal/commerce_exchanger": "~1.1"
+        "drupal/commerce_exchanger": "^1.12"
     },
     "minimum-stability": "dev"
 }

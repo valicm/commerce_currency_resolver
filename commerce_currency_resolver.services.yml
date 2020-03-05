@@ -27,4 +27,4 @@ services:
     arguments: ['@request_stack', '@config.factory', '@entity_type.manager', '@language_manager', '@module_handler', '@commerce_store.current_store', '@current_route_match', '@path.matcher']
   commerce_currency_resolver.calculator:
     class: Drupal\commerce_currency_resolver\PriceExchangerCalculator
-    arguments: ['@config.factory', '@commerce_price.rounder']
+    arguments: ['@entity_type.manager', '@config.factory', '@commerce_price.rounder']
