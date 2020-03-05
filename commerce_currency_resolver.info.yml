@@ -12,4 +12,7 @@ dependencies:
   - commerce:commerce_order
   - commerce_exchanger:commerce_exchanger (>=8.x-1.11)
 
-php: 7.0
+test_dependencies:
+  - commerce_shipping:commerce_shipping
+
+php: 7.1
