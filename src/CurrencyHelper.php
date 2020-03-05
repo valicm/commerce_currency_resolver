@@ -5,7 +5,7 @@ namespace Drupal\commerce_currency_resolver;
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_store\CurrentStoreInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Path\PathMatcherInterface;
@@ -84,7 +84,7 @@ class CurrencyHelper implements CurrencyHelperInterface {
    *   Request.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   Config factory.
-   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   Entity type manager.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   Core language manager.
@@ -97,7 +97,7 @@ class CurrencyHelper implements CurrencyHelperInterface {
    * @param \Drupal\Core\Path\PathMatcherInterface $path_matcher
    *   Core patch matcher service.
    */
-  public function __construct(RequestStack $request_stack, ConfigFactoryInterface $config_factory, EntityTypeManager $entityTypeManager, LanguageManagerInterface $languageManager, ModuleHandlerInterface $module_handler, CurrentStoreInterface $current_store, RouteMatchInterface $route_match, PathMatcherInterface $path_matcher) {
+  public function __construct(RequestStack $request_stack, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entityTypeManager, LanguageManagerInterface $languageManager, ModuleHandlerInterface $module_handler, CurrentStoreInterface $current_store, RouteMatchInterface $route_match, PathMatcherInterface $path_matcher) {
     $this->requestStack = $request_stack;
     $this->configFactory = $config_factory;
     $this->entityTypeManager = $entityTypeManager;
