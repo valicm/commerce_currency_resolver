@@ -7,6 +7,6 @@ package: Commerce (Contrib)
 
 dependencies:
   - commerce_currency_resolver:commerce_currency_resolver
-  - commerce_shipping:commerce_shipping  (> 2.0-beta8)
+  - commerce_shipping:commerce_shipping  (>=8.x-2.0-rc1)
 
 php: 7.1
