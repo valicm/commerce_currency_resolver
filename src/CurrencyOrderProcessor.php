@@ -4,14 +4,13 @@ namespace Drupal\commerce_currency_resolver;
 
 use Drupal\commerce_exchanger\ExchangerCalculatorInterface;
 use Drupal\commerce_order\Adjustment;
-use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Applies taxes to orders during the order refresh process.
+ * Apply currency changes during the order refresh process.
  */
 class CurrencyOrderProcessor implements OrderProcessorInterface {
 
@@ -134,9 +133,8 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
           $order = $order->recalculateTotalPrice();
         }
 
-        // Refresh order on load. Shipping fix. Probably all other potential
-        // unlocked adjustments which are not set correctly.
-        $order->setRefreshState(Order::REFRESH_ON_LOAD);
+        // Use as flag for our submodules order processors.
+        $order->setData(CurrencyHelper::CURRENCY_ORDER_REFRESH, TRUE);
 
         // Save order.
         $order->save();

@@ -79,10 +79,8 @@ class CurrencyOrderRefresh implements EventSubscriberInterface {
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $event->getOrder();
 
-    if (!isset($orders[$order->id()])) {
-      $orders[$order->id()] = TRUE;
-    }
-    else {
+    // We already have fired this event.
+    if (isset($orders[$order->id()])) {
       return;
     }
 
@@ -96,6 +94,9 @@ class CurrencyOrderRefresh implements EventSubscriberInterface {
       // This will trigger order processor which will handle
       // correction of total order price and currency.
       if ($order_currency !== $resolved_currency && $this->shouldCurrencyRefresh($order)) {
+
+        // Set as flag to trigger this even once.
+        $orders[$order->id()] = TRUE;
 
         // Check if we can refresh order.
         $this->orderRefresh->refresh($order);

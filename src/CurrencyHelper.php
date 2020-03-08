@@ -22,6 +22,11 @@ class CurrencyHelper implements CurrencyHelperInterface {
   use StringTranslationTrait;
 
   /**
+   * Use as flag for out other order processor.
+   */
+  const CURRENCY_ORDER_REFRESH = 'currency_order_refresh';
+
+  /**
    * Current request.
    *
    * @var \Symfony\Component\HttpFoundation\RequestStack

@@ -7,14 +7,20 @@ use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
+use Drupal\Tests\commerce_currency_resolver\Traits\CurrentCurrencyTrait;
 
 /**
  * Tests integration with the shipping module.
  *
  * @coversDefaultClass \Drupal\commerce_currency_resolver_shipping\EventSubscriber\CommerceShippingCurrency
+ * @covers \Drupal\commerce_currency_resolver_shipping\Plugin\Commerce\ShippingMethod\FlatRateCurrency
+ * @covers \Drupal\commerce_currency_resolver_shipping\Plugin\Commerce\ShippingMethod\FlatRatePerItemCurrency
+ * @covers \Drupal\commerce_currency_resolver_shipping\ShippingCurrencyOrderProcessor
  * @group commerce_currency_resolver
  */
 class ShippingIntegrationTest extends CommerceWebDriverTestBase {
+
+  use CurrentCurrencyTrait;
 
   /**
    * First sample product.
@@ -201,6 +207,7 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
    * Test for recalculating shipping trough cart/checkout steps.
    *
    * @covers ::shippingCurrency
+   * @covers \Drupal\commerce_currency_resolver_shipping\ShippingCurrencyOrderProcessor::process
    */
   public function testRecalculateShippingPricing() {
     // Create a flat rate.
@@ -291,8 +298,22 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     $this->assertSession()->pageTextContains('Shipping method');
     $this->assertSession()->pageTextContains('Shipping $1.00');
 
+    // Switch currency default to HRK.
+    $this->store->setDefaultCurrencyCode('HRK');
+    $this->store->save();
+    $this->reloadEntity($this->store);
+
     $this->getSession()->getPage()->findButton('Continue to review')->click();
-    $this->assertSession()->pageTextContains('Shipping $1.00');
+    $this->assertSession()->pageTextContains('Shipping HRK0.00');
+
+    $this->drupalGet('cart');
+    $this->assertSession()->pageTextContains('Shipping HRK0.00');
+    $this->getSession()->getPage()->fillField('edit_quantity[0]', 3);
+    $this->getSession()->getPage()->findButton('Update cart')->click();
+    $this->assertSession()->pageTextContains('Shipping HRK30.00');
+
+    $this->drupalGet('checkout/1');
+    $this->assertSession()->pageTextContains('Shipping HRK30.00');
 
   }
 
