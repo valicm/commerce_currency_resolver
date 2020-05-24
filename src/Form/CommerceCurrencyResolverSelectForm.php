@@ -3,6 +3,7 @@
 namespace Drupal\commerce_currency_resolver\Form;
 
 use Drupal\commerce_currency_resolver\CurrencyHelperInterface;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -30,11 +31,19 @@ class CommerceCurrencyResolverSelectForm extends FormBase {
   protected $currencyHelper;
 
   /**
+   * The time object.
+   *
+   * @var \Drupal\Component\Datetime\TimeInterface
+   */
+  protected $time;
+
+  /**
    * {@inheritdoc}
    */
-  public function __construct(RequestStack $request_stack, CurrencyHelperInterface $currency_helper) {
+  public function __construct(RequestStack $request_stack, CurrencyHelperInterface $currency_helper, TimeInterface $time) {
     $this->requestStack = $request_stack;
     $this->currencyHelper = $currency_helper;
+    $this->time = $time;
   }
 
   /**
@@ -43,7 +52,8 @@ class CommerceCurrencyResolverSelectForm extends FormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('request_stack'),
-      $container->get('commerce_currency_resolver.currency_helper')
+      $container->get('commerce_currency_resolver.currency_helper'),
+      $container->get('datetime.time')
     );
   }
 
@@ -104,7 +114,7 @@ class CommerceCurrencyResolverSelectForm extends FormBase {
     $selected_currency = $form_state->getValue('currency');
 
     // Set cookie for one day.
-    setrawcookie($this->currencyHelper->getCookieName(), rawurlencode($selected_currency), REQUEST_TIME + 86400, '/');
+    setrawcookie($this->currencyHelper->getCookieName(), rawurlencode($selected_currency), $this->time->getRequestTime() + 86400, '/');
   }
 
 }
