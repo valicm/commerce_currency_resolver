@@ -3,7 +3,7 @@
     "type": "drupal-module",
     "description": "Commerce 2 currency enhancements.",
     "homepage": "https://www.drupal.org/project/commerce_currency_resolver",
-    "license": "GPL-2.0+",
+    "license": "GPL-2.0-or-later",
     "require": {
         "drupal/commerce": "^2.20",
         "drupal/commerce_exchanger": "^1.20"
