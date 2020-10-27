@@ -16,11 +16,11 @@ class PriceExchangerCalculator extends AbstractExchangerCalculator {
    */
   public function getExchangerId() {
     $resolver_exchanger_id = $this->configFactory->get('commerce_currency_resolver.settings')->get('currency_exchange_rates');
-    if (isset($this->providers[$resolver_exchanger_id])) {
+    if (isset($this->providers[$resolver_exchanger_id]) && $this->providers[$resolver_exchanger_id]->status()) {
       return $this->providers[$resolver_exchanger_id]->getExchangerConfigName();
     }
 
-    return '';
+    return NULL;
   }
 
 }
