@@ -107,7 +107,6 @@ class CurrentCurrencyCartTest extends CartBrowserTestBase {
    * @covers ::checkCurrency
    * @covers ::shouldCurrencyRefresh
    * @covers ::checkOrderOwner
-   * @covers ::checkAdminRoute
    * @covers \Drupal\commerce_currency_resolver\CurrencyOrderProcessor::process
    * @covers \Drupal\commerce_currency_resolver\Resolver\CommerceCurrencyResolver::resolve
    */

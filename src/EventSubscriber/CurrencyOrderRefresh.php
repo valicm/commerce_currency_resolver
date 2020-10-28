@@ -41,18 +41,10 @@ class CurrencyOrderRefresh implements EventSubscriberInterface {
   protected $account;
 
   /**
-   * The current route match.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
-   */
-  protected $routeMatch;
-
-  /**
    * {@inheritdoc}
    */
-  public function __construct(CurrentCurrency $currency, OrderRefreshInterface $order_refresh, AccountInterface $account, RouteMatchInterface $route_match) {
+  public function __construct(CurrentCurrency $currency, OrderRefreshInterface $order_refresh, AccountInterface $account) {
     $this->account = $account;
-    $this->routeMatch = $route_match;
     $this->currentCurrency = $currency;
     $this->orderRefresh = $order_refresh;
   }
@@ -83,9 +75,8 @@ class CurrencyOrderRefresh implements EventSubscriberInterface {
     if (isset($orders[$order->id()])) {
       return;
     }
-
     // Get order total currency.
-    if ($order_total = $order->getTotalPrice()) {
+    if ($this->shouldCurrencyRefresh($order) && $order_total = $order->getTotalPrice()) {
       $order_currency = $order_total->getCurrencyCode();
       $resolved_currency = $this->currentCurrency->getCurrency();
 
@@ -93,7 +84,7 @@ class CurrencyOrderRefresh implements EventSubscriberInterface {
       // Refresh order if they are different. We need then alter total price.
       // This will trigger order processor which will handle
       // correction of total order price and currency.
-      if ($order_currency !== $resolved_currency && $this->shouldCurrencyRefresh($order)) {
+      if ($order_currency !== $resolved_currency) {
 
         // Set as flag to trigger this even once.
         $orders[$order->id()] = TRUE;

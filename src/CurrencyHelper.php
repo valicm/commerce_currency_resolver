@@ -2,14 +2,11 @@
 
 namespace Drupal\commerce_currency_resolver;
 
-use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_store\CurrentStoreInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Path\PathMatcherInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -69,20 +66,6 @@ class CurrencyHelper implements CurrencyHelperInterface {
   protected $currentStore;
 
   /**
-   * Route match definition.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
-   */
-  protected $routeMatch;
-
-  /**
-   * The path matcher.
-   *
-   * @var \Drupal\Core\Path\PathMatcherInterface
-   */
-  protected $pathMatcher;
-
-  /**
    * CurrencyHelper constructor.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
@@ -96,21 +79,14 @@ class CurrencyHelper implements CurrencyHelperInterface {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   Core module handler.
    * @param \Drupal\commerce_store\CurrentStoreInterface $current_store
-   *   Current resolved Commerce store.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   Core route matcher service.
-   * @param \Drupal\Core\Path\PathMatcherInterface $path_matcher
-   *   Core patch matcher service.
    */
-  public function __construct(RequestStack $request_stack, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entityTypeManager, LanguageManagerInterface $languageManager, ModuleHandlerInterface $module_handler, CurrentStoreInterface $current_store, RouteMatchInterface $route_match, PathMatcherInterface $path_matcher) {
+  public function __construct(RequestStack $request_stack, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entityTypeManager, LanguageManagerInterface $languageManager, ModuleHandlerInterface $module_handler, CurrentStoreInterface $current_store) {
     $this->requestStack = $request_stack;
     $this->configFactory = $config_factory;
     $this->entityTypeManager = $entityTypeManager;
     $this->languageManager = $languageManager;
     $this->moduleHandler = $module_handler;
     $this->currentStore = $current_store;
-    $this->routeMatch = $route_match;
-    $this->pathMatcher = $path_matcher;
   }
 
   /**
@@ -261,50 +237,6 @@ class CurrencyHelper implements CurrencyHelperInterface {
       $cookieName = Settings::get('commerce_currency_cookie') ?? 'commerce_currency';
     }
     return $cookieName;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isAdminOrder() {
-    if ($this->adminOrderRoutes() && $this->isAdminPath()) {
-      return $this->adminOrderRoutes();
-    }
-
-    return NULL;
-  }
-
-  /**
-   * Determine if is order route.
-   *
-   * @return string|null
-   *   Return null or order currency.
-   */
-  protected function adminOrderRoutes() {
-    if ($order_id = $this->routeMatch->getRawParameter('commerce_order')) {
-      if (($order = Order::load($order_id)) && $total = $order->getTotalPrice()) {
-        return $total->getCurrencyCode();
-      }
-    }
-
-    return NULL;
-  }
-
-  /**
-   * Detect admin/* paths.
-   *
-   * @return bool
-   *   Return true if on admin/ path.
-   */
-  protected function isAdminPath() {
-    $path = $this->requestStack->getCurrentRequest()->getPathInfo();
-    // Compare the lowercase path alias (if any) and internal path.
-    // Do not trim a trailing slash if that is the complete path.
-    $path = $path === '/' ? $path : rtrim($path, '/');
-
-    $patterns = '/admin/*';
-
-    return $this->pathMatcher->matchPath($path, $patterns);
   }
 
 }

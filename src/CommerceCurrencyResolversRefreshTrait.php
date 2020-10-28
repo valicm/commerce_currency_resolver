@@ -12,11 +12,34 @@ use Drupal\commerce_order\Entity\OrderInterface;
 trait CommerceCurrencyResolversRefreshTrait {
 
   /**
-   * Check admin route.
+   * Check shipping admin route.
    */
-  public function checkAdminRoute() {
+  public function isShippingAdminRoute() {
     // Get current route. Skip admin path.
-    return \Drupal::service('router.admin_context')->isAdminRoute($this->routeMatch->getRouteObject());
+    return \Drupal::routeMatch()->getRawParameter('commerce_shipment');
+  }
+
+  /**
+   * Detect admin/* paths.
+   *
+   * @return bool
+   *   Return true if on admin/ path.
+   */
+  public function isAdminPath() {
+    $paths = &drupal_static(__FUNCTION__, []);
+    $path = \Drupal::requestStack()->getCurrentRequest()->getPathInfo();
+    // Compare the lowercase path alias (if any) and internal path.
+    // Do not trim a trailing slash if that is the complete path.
+    $path = $path === '/' ? $path : rtrim($path, '/');
+
+    if (isset($paths[$path])) {
+      return $paths[$path];
+    }
+
+    $patterns = '/admin/*';
+
+    $paths[$path] = \Drupal::service('path.matcher')->matchPath($path, $patterns);
+    return $paths[$path];
   }
 
   /**
@@ -69,6 +92,10 @@ trait CommerceCurrencyResolversRefreshTrait {
       return FALSE;
     }
 
+    if ($this->isAdminPath()) {
+      return FALSE;
+    }
+
     // Not owner of order.
     if ($this->checkOrderOwner($order)) {
       return FALSE;
@@ -76,11 +103,6 @@ trait CommerceCurrencyResolversRefreshTrait {
 
     // Order is not in draft status.
     if ($this->checkOrderStatus($order)) {
-      return FALSE;
-    }
-
-    // Admin route.
-    if ($this->checkAdminRoute()) {
       return FALSE;
     }
 

@@ -4,6 +4,7 @@ namespace Drupal\commerce_currency_resolver\Resolver;
 
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
+use Drupal\commerce_currency_resolver\CommerceCurrencyResolversRefreshTrait;
 use Drupal\commerce_exchanger\ExchangerCalculatorInterface;
 use Drupal\commerce_price\Resolver\PriceResolverInterface;
 use Drupal\commerce_currency_resolver\CurrentCurrencyInterface;
@@ -13,6 +14,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
  * Returns a price and currency depending of language or country.
  */
 class CommerceCurrencyResolver implements PriceResolverInterface {
+
+  use CommerceCurrencyResolversRefreshTrait;
 
   /**
    * The current currency.
@@ -56,69 +59,71 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
    */
   public function resolve(PurchasableEntityInterface $entity, $quantity, Context $context) {
 
-    // Default price.
-    $price = NULL;
+    // Check if we need to skip resolving prices.
+    if (!$this->skipResolvingPrice()) {
+      // Default price.
+      $price = NULL;
 
-    // Get field from context.
-    $field_name = $context->getData('field_name', 'price');
+      // Get field from context.
+      $field_name = $context->getData('field_name', 'price');
 
-    // @see \Drupal\commerce_price\Resolver\DefaultPriceResolver
-    if ($field_name === 'price') {
-      $price = $entity->getPrice();
-    }
-    elseif ($entity->hasField($field_name) && !$entity->get($field_name)->isEmpty()) {
-      $price = $entity->get($field_name)->first()->toPrice();
-    }
-
-    // Get current resolved currency.
-    $resolved_currency = $this->currentCurrency->getCurrency();
-
-    // If we have price, and the resolved price currency is different than the
-    // current currency.
-    if ($price && $resolved_currency !== $price->getCurrencyCode()) {
-
-      // Loading orders trough drush, or any cli task
-      // will resolve price by current conditions in which cli is
-      // (country, language, current store) - this will result in
-      // currency exception. We need to return existing price.
-      if (PHP_SAPI === 'cli') {
-        return $price;
+      // @see \Drupal\commerce_price\Resolver\DefaultPriceResolver
+      if ($field_name === 'price') {
+        $price = $entity->getPrice();
+      }
+      elseif ($entity->hasField($field_name) && !$entity->get($field_name)->isEmpty()) {
+        $price = $entity->get($field_name)->first()->toPrice();
       }
 
-      // Get how price should be calculated.
-      $currency_source = $this->configFactory->get('commerce_currency_resolver.settings')->get('currency_source');
+      // Get current resolved currency.
+      $resolved_currency = $this->currentCurrency->getCurrency();
 
-      $resolved_price = NULL;
+      // If we have price, and the resolved price currency is different than the
+      // current currency.
+      if ($price && $resolved_currency !== $price->getCurrencyCode()) {
 
-      // Specific cases for field and combo. Even we had auto-calculated
-      // price, in combo mode we could have field with price.
-      if ($currency_source === 'combo' || $currency_source === 'field') {
+        // Get how price should be calculated.
+        $currency_source = $this->configFactory->get('commerce_currency_resolver.settings')->get('currency_source');
 
-        // Backward compatibility for older version, and inital setup
-        // that default price fields are mapped to field_price_currency_code
-        // instead to price_currency_code.
-        if ($field_name === 'price') {
-          $field_name = 'field_price';
+        $resolved_price = NULL;
+
+        // Specific cases for field and combo. Even we had auto-calculated
+        // price, in combo mode we could have field with price.
+        if ($currency_source === 'combo' || $currency_source === 'field') {
+
+          // Backward compatibility for older version, and inital setup
+          // that default price fields are mapped to field_price_currency_code
+          // instead to price_currency_code.
+          if ($field_name === 'price') {
+            $field_name = 'field_price';
+          }
+
+          $resolved_field = $field_name . '_' . strtolower($resolved_currency);
+
+          // Check if we have field.
+          if ($entity->hasField($resolved_field) && !$entity->get($resolved_field)->isEmpty()) {
+            $resolved_price = $entity->get($resolved_field)->first()->toPrice();
+          }
         }
 
-        $resolved_field = $field_name . '_' . strtolower($resolved_currency);
-
-        // Check if we have field.
-        if ($entity->hasField($resolved_field) && !$entity->get($resolved_field)->isEmpty()) {
-          $resolved_price = $entity->get($resolved_field)->first()->toPrice();
+        // If we haven't resolved yet anything, auto-calculate price by default.
+        // Fallback for all cases regardless of chosen currency source mode.
+        if ($resolved_price === NULL) {
+          $resolved_price = $this->priceExchanger->priceConversion($price, $resolved_currency);
         }
+
+        return $resolved_price;
       }
-
-      // If we haven't resolved yet anything, auto-calculate price by default.
-      // Fallback for all cases regardless of chosen currency source mode.
-      if ($resolved_price === NULL) {
-        $resolved_price = $this->priceExchanger->priceConversion($price, $resolved_currency);
-      }
-
-      return $resolved_price;
-
     }
+  }
 
+  /**
+   * Helper to determine when resolver is active.
+   *
+   * @return bool
+   */
+  protected function skipResolvingPrice() {
+    return ($this->isAdminPath() || (PHP_SAPI === 'cli' && !drupal_valid_test_ua()));
   }
 
 }
