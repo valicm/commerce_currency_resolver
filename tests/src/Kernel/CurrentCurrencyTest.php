@@ -55,7 +55,7 @@ class CurrentCurrencyTest extends OrderKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp() :void {
     parent::setUp();
 
     $this->installConfig('system');
@@ -103,10 +103,10 @@ class CurrentCurrencyTest extends OrderKernelTestBase {
    */
   public function testDefault() {
     $this->assertInstanceOf(StoreInterface::class, $this->store);
-    $this->assertEqual($this->store->getDefaultCurrencyCode(), $this->currentCurrency->getCurrency());
-    $this->assertEqual('USD', $this->store->getDefaultCurrencyCode());
-    $this->assertEqual('USD', $this->currentCurrency->getCurrency());
-    $this->assertEqual('HRK', $this->config('commerce_currency_resolver.settings')
+    $this->assertEquals($this->store->getDefaultCurrencyCode(), $this->currentCurrency->getCurrency());
+    $this->assertEquals('USD', $this->store->getDefaultCurrencyCode());
+    $this->assertEquals('USD', $this->currentCurrency->getCurrency());
+    $this->assertEquals('HRK', $this->config('commerce_currency_resolver.settings')
       ->get('currency_default'));
   }
 
@@ -116,16 +116,16 @@ class CurrentCurrencyTest extends OrderKernelTestBase {
    * @covers ::getCurrency
    */
   public function testNoStore() {
-    $this->assertEqual('HRK', $this->config('commerce_currency_resolver.settings')
+    $this->assertEquals('HRK', $this->config('commerce_currency_resolver.settings')
       ->get('currency_default'));
-    $this->assertEqual('USD', $this->store->getDefaultCurrencyCode());
-    $this->assertEqual('USD', $this->currentCurrency->getCurrency());
-    $this->assertEqual(1, $this->store->id());
+    $this->assertEquals('USD', $this->store->getDefaultCurrencyCode());
+    $this->assertEquals('USD', $this->currentCurrency->getCurrency());
+    $this->assertEquals(1, $this->store->id());
     $store = Store::load($this->store->id());
     $store->delete();
     $this->assertEmpty(Store::load(1));
     $this->resetCurrencyContainer();
-    $this->assertEqual('HRK', $this->currentCurrency->getCurrency());
+    $this->assertEquals('HRK', $this->currentCurrency->getCurrency());
   }
 
   /**
@@ -134,23 +134,23 @@ class CurrentCurrencyTest extends OrderKernelTestBase {
    * @covers ::getCurrency
    */
   public function testLanguage() {
-    $this->assertEqual('USD', $this->currentCurrency->getCurrency());
+    $this->assertEquals('USD', $this->currentCurrency->getCurrency());
 
     // Change mapping from store to language.
     $this->config('commerce_currency_resolver.settings')
       ->set('currency_mapping', 'lang')->save();
 
     // Validate default language.
-    $this->assertEqual('hr', $this->languageManager->getCurrentLanguage()->getId());
+    $this->assertEquals('hr', $this->languageManager->getCurrentLanguage()->getId());
 
     // Rebuild container and recheck currency.
     $this->resetCurrencyContainer();
-    $this->assertEqual('HRK', $this->currentCurrency->getCurrency());
+    $this->assertEquals('HRK', $this->currentCurrency->getCurrency());
 
     // Change language back to english.
     $this->config('system.site')->set('default_langcode', 'en')->save();
     $this->resetCurrencyContainer();
-    $this->assertEqual('USD', $this->currentCurrency->getCurrency());
+    $this->assertEquals('USD', $this->currentCurrency->getCurrency());
   }
 
 }

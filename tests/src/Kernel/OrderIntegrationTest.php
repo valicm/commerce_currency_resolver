@@ -44,7 +44,7 @@ class OrderIntegrationTest extends OrderKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp() :void {
     parent::setUp();
 
     // Add additional currency.
@@ -126,9 +126,9 @@ class OrderIntegrationTest extends OrderKernelTestBase {
 
     $order = Order::load(1);
     $this->assertInstanceOf(OrderInterface::class, $order);
-    $this->assertEqual('cli', PHP_SAPI);
-    $this->assertEqual('HRK', $this->order->getTotalPrice()->getCurrencyCode());
-    $this->assertEqual('USD', $this->currentCurrency->getCurrency());
+    $this->assertEquals('cli', PHP_SAPI);
+    $this->assertEquals('HRK', $this->order->getTotalPrice()->getCurrencyCode());
+    $this->assertEquals('USD', $this->currentCurrency->getCurrency());
   }
 
 }

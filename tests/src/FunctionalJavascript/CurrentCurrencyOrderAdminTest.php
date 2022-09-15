@@ -32,7 +32,7 @@ class CurrentCurrencyOrderAdminTest extends OrderAdminTest {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp() :void {
     parent::setUp();
 
     // Add additional currency.
@@ -102,9 +102,9 @@ class CurrentCurrencyOrderAdminTest extends OrderAdminTest {
 
     // Verify that we have different currencies on store and one
     // with current currency check.
-    $this->assertEqual($this->store->getDefaultCurrencyCode(), 'USD');
-    $this->assertEqual($this->currentCurrency->getCurrency(), 'VUV');
-    $this->assertEqual(\Drupal::service('commerce_currency_resolver.current_currency')->getCurrency(), 'VUV');
+    $this->assertEquals($this->store->getDefaultCurrencyCode(), 'USD');
+    $this->assertEquals($this->currentCurrency->getCurrency(), 'VUV');
+    $this->assertEquals(\Drupal::service('commerce_currency_resolver.current_currency')->getCurrency(), 'VUV');
     parent::testCreateOrder();
   }
 
