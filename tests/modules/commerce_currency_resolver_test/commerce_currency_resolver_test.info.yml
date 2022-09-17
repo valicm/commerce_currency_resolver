@@ -2,7 +2,7 @@ name: Current Currency Test
 type: module
 description: Contains various non-specific things needed in tests.
 package: Testing
-core_version_requirement: ^8.8 || ^9
+core_version_requirement: ^8.8 || ^9 || ^10
 
 dependencies:
   - commerce_currency_resolver:commerce_currency_resolver
