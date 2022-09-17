@@ -97,9 +97,9 @@ class ShippingAdminIntegrationTest extends ShipmentAdminTest {
     $this->drupalGet($this->order->toUrl());
     // Verify that we have different currencies on order and
     // currently resolved one.
-    $this->assertEqual($this->order->getTotalPrice()->getCurrencyCode(), 'USD');
-    $this->assertEqual($this->currentCurrency->getCurrency(), 'VUV');
-    $this->assertEqual(\Drupal::service('commerce_currency_resolver.current_currency')->getCurrency(), 'VUV');
+    $this->assertEquals($this->order->getTotalPrice()->getCurrencyCode(), 'USD');
+    $this->assertEquals($this->currentCurrency->getCurrency(), 'VUV');
+    $this->assertEquals(\Drupal::service('commerce_currency_resolver.current_currency')->getCurrency(), 'VUV');
     parent::testShipmentTabAndOperation();
   }
 
