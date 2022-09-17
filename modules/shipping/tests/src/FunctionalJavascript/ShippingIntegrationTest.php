@@ -5,6 +5,7 @@ namespace Drupal\Tests\commerce_currency_resolver_shipping\FunctionalJavascript;
 use Drupal\commerce_exchanger\Entity\ExchangeRates;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_payment\Entity\PaymentGateway;
+use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 use Drupal\Tests\commerce_currency_resolver\Traits\CurrentCurrencyTrait;
@@ -32,7 +33,7 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'commerce_checkout',
     'commerce_payment',
     'commerce_payment_example',
@@ -273,7 +274,6 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
         ->getPage()
         ->fillField($address_prefix . '[' . $property . ']', $value);
     }
-    $this->getSession()->getPage()->findButton('Recalculate shipping')->click();
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->submitForm([
       'payment_information[add_payment_method][payment_details][number]' => '4111111111111111',
@@ -293,7 +293,6 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     $this->drupalGet('checkout/1');
     $this->assertSession()->pageTextContains('Shipping $1.00');
 
-    $this->getSession()->getPage()->findButton('Recalculate shipping')->click();
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains('Shipping method');
     $this->assertSession()->pageTextContains('Shipping $1.00');
