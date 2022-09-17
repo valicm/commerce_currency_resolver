@@ -13,5 +13,5 @@ dependencies:
 
 test_dependencies:
   - commerce_shipping:commerce_shipping
-  - commerce_shipping:commerce_fee
+  - commerce_fee:commerce_fee
 php: 7.4
