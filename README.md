@@ -51,6 +51,17 @@ CONFIGURATION
     5. Navigate to the "Mapping" if available and selected which currency
        should be used per language or country.
 
+CACHING
+--------------
+Currency resolver module works with "**Internal Dynamic Page Cache**" only.
+
+**Page Cache** module needs to be disabled.
+
+The Drupal core Page Cache module does not work with personalized "content".
+Dynamic Page Cache is built for that purpose.
+
+Explanation - https://www.drupal.org/project/commerce_currency_resolver/issues/3042307#comment-13046326
+
 
 EXCHANGE RATES
 --------------
