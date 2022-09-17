@@ -5,6 +5,8 @@
  * Main module file.
  */
 
+use Drupal\commerce_currency_resolver\Plugin\Commerce\Fee\OrderFixedAmount;
+use Drupal\commerce_currency_resolver\Plugin\Commerce\Fee\OrderItemFixedAmount;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\commerce_currency_resolver\Plugin\Commerce\PromotionOffer\OrderItemFixedAmountOff;
@@ -33,6 +35,14 @@ function commerce_currency_resolver_help($route_name, RouteMatchInterface $route
 function commerce_currency_resolver_commerce_promotion_offer_info_alter(array &$definitions) {
   $definitions['order_item_fixed_amount_off']['class'] = OrderItemFixedAmountOff::class;
   $definitions['order_fixed_amount_off']['class'] = OrderFixedAmountOff::class;
+}
+
+/**
+ * Implements hook_commerce_fee_info_alter().
+ */
+function commerce_currency_resolver_commerce_fee_info_alter(array &$definitions) {
+  $definitions['order_item_fixed_amount']['class'] = OrderItemFixedAmount::class;
+  $definitions['order_fixed_amount']['class'] = OrderFixedAmount::class;
 }
 
 /**
