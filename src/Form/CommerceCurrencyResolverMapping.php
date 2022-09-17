@@ -107,7 +107,7 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
           $form['matrix'][$key] = [
             '#type' => 'radios',
             '#options' => $active_currencies,
-            '#default_value' => $matrix[$key],
+            '#default_value' => $matrix[$key] ?? $currency_default,
             '#title' => $language,
             '#description' => $this->t('Select currency which should be used with @lang language', ['@lang' => $language]),
           ];
@@ -172,7 +172,12 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
               // to currency -> countries list for autocomplete fields.
               if (!empty($matrix)) {
                 foreach ($matrix as $country => $currency) {
-                  $data[$currency] .= $country;
+                  if (!isset($data[$currency])) {
+                    $data[$currency] = $country;
+                  }
+                  else {
+                    $data[$currency] .= ', ' . $country;
+                  }
                 }
               }
 
@@ -183,7 +188,7 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
                   '#autocomplete_route_name' => 'commerce_currency_resolver.countries.autocomplete',
                   '#title' => $currency,
                   '#description' => $this->t('Select countires which should be used with @currency currency', ['@currency' => $currency]),
-                  '#default_value' => isset($data[$key]) ? str_replace(' ', ', ', $data[$key]) : '',
+                  '#default_value' => isset($data[$key]) ? $data[$key] : '',
                 ];
               }
 
@@ -221,7 +226,7 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
         $countries = explode(',', $list);
 
         foreach ($countries as $country) {
-          $matrix[$country] = $currency;
+          $matrix[trim($country)] = $currency;
         }
       }
     }
