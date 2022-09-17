@@ -47,7 +47,7 @@ class ShippingCurrencyOrderProcessor implements OrderProcessorInterface {
     $order->unsetData(CurrencyHelper::CURRENCY_ORDER_REFRESH);
 
     // If we don't have already this flag, trigger it.
-    // Otherwise amount on shipment is gonna be on old currency.
+    // Otherwise, amount on shipment is going to be on old currency.
     if (!$order->getData(ShippingOrderManagerInterface::FORCE_REFRESH)) {
       $order->setData(ShippingOrderManagerInterface::FORCE_REFRESH, TRUE);
     }

@@ -66,7 +66,7 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
       // Get order items.
       $items = $order->getItems();
 
-      // Loop trough all order items and find ones without PurchasableEntity
+      // Loop through all order items and find ones without PurchasableEntity
       // They need to automatically converted.
       foreach ($items as $item) {
         /** @var \Drupal\commerce_order\Entity\OrderItem $item */
@@ -84,15 +84,11 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
 
       // Handle custom adjustments.
       if ($adjustments = $order->getAdjustments()) {
-
         foreach ($adjustments as $adjustment) {
-
-          assert($adjustment instanceof Adjustment);
-
           $adjustment_currency = $adjustment->getAmount()->getCurrencyCode();
 
-          // We should only dealt with locked adjustment.
-          // Any non locked have their order processor implementation
+          // We should only deal with locked adjustment.
+          // Any non locked have their order processor implementation,
           // probably.
           if ($adjustment->isLocked() && $adjustment_currency !== $resolved_currency) {
             $reset_adjustments = TRUE;
@@ -128,6 +124,10 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
 
       // Use as flag for our submodules order processors.
       $order->setData(CurrencyHelper::CURRENCY_ORDER_REFRESH, TRUE);
+
+      // Skip refreshing order - it is going cause duplicate amounts for
+      // some adjustments.
+      $order->setRefreshState(OrderInterface::REFRESH_SKIP);
 
       // Save order.
       $order->save();
