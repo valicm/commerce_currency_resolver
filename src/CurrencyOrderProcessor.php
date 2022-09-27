@@ -128,9 +128,6 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
       // Skip refreshing order - it is going cause duplicate amounts for
       // some adjustments.
       $order->setRefreshState(OrderInterface::REFRESH_SKIP);
-
-      // Save order.
-      $order->save();
     }
 
   }

@@ -88,7 +88,7 @@ trait CommerceCurrencyResolversRefreshTrait {
     // Do not trigger currency refresh in cli - drush, cron, etc.
     // If we load order in cli, we don't want to manipulate order
     // with currency refresh.
-    if (PHP_SAPI === 'cli') {
+    if ($this->isPhpCli()) {
       return FALSE;
     }
 
@@ -107,6 +107,13 @@ trait CommerceCurrencyResolversRefreshTrait {
     }
 
     return TRUE;
+  }
+
+  /**
+   * Helper function to check if we are running as CLI.
+   */
+  protected function isPhpCli() {
+    return PHP_SAPI === 'cli';
   }
 
 }
