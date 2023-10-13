@@ -75,7 +75,7 @@ class CurrentCurrencyOrderAdminTest extends OrderAdminTest {
     ])->save();
 
     // Use cookie mapping for this tests, and set default value
-    // to HRK for currency.
+    // to EUR for currency.
     // Don't use store, while in core commerce there are some
     // price override trough UI done based on one currency.
     // Changing currency for store most certain will lead to

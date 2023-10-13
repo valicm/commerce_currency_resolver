@@ -21,7 +21,7 @@ interface CurrencyHelperInterface {
    * Return formatted array of available currencies.
    *
    * @return array
-   *   List of keyed currencies ['HRK' => 'Croatian Kuna'].
+   *   List of keyed currencies ['EUR' => 'Euro'].
    */
   public function getCurrencies();
 

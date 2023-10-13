@@ -61,7 +61,7 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     // Add additional currency.
     // The parent has already imported USD.
     $currency_importer = $this->container->get('commerce_price.currency_importer');
-    $currency_importer->import('HRK');
+    $currency_importer->import('EUR');
 
     // Create new exchange rates.
     $exchange_rates = ExchangeRates::create([
@@ -82,14 +82,14 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
 
     $this->config($exchange_rates->getExchangerConfigName())->setData([
       'rates' => [
-        'HRK' => [
+        'EUR' => [
           'USD' => [
             'value' => 0.15,
             'sync' => 0,
           ],
         ],
         'USD' => [
-          'HRK' => [
+          'EUR' => [
             'value' => 6.85,
             'sync' => 0,
           ],
@@ -140,7 +140,7 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
       'sku' => strtolower($this->randomMachineName()),
       'price' => [
         'number' => '10',
-        'currency_code' => 'HRK',
+        'currency_code' => 'EUR',
       ],
       'weight' => [
         'number' => '20',
@@ -185,7 +185,7 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
           'rate_label' => 'Flat Rate Per Item',
           'rate_amount' => [
             'number' => '10.00',
-            'currency_code' => 'HRK',
+            'currency_code' => 'EUR',
           ],
         ],
       ],
@@ -221,16 +221,16 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
           'rate_label' => 'Free Shipping',
           'rate_amount' => [
             'number' => '0.00',
-            'currency_code' => 'HRK',
+            'currency_code' => 'EUR',
           ],
           'fields' => [
             'USD' => [
               'number' => '1.00',
               'currency_code' => 'USD',
             ],
-            'HRK' => [
+            'EUR' => [
               'number' => '0.00',
-              'currency_code' => 'HRK',
+              'currency_code' => 'EUR',
             ],
           ],
         ],
@@ -252,7 +252,7 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     // Add product to order and calculate shipping.
     $this->drupalGet($this->firstProduct->toUrl()->toString());
     // We don't have calculated price formatter active.
-    $this->assertSession()->pageTextContains('HRK10.00');
+    $this->assertSession()->pageTextContains('EUR10.00');
     $this->assertSession()->pageTextContains('Conference hat');
     $this->submitForm([], 'Add to cart');
     $this->drupalGet('checkout/1');
@@ -297,22 +297,22 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     $this->assertSession()->pageTextContains('Shipping method');
     $this->assertSession()->pageTextContains('Shipping $1.00');
 
-    // Switch currency default to HRK.
-    $this->store->setDefaultCurrencyCode('HRK');
+    // Switch currency default to EUR.
+    $this->store->setDefaultCurrencyCode('EUR');
     $this->store->save();
     $this->reloadEntity($this->store);
 
     $this->getSession()->getPage()->findButton('Continue to review')->click();
-    $this->assertSession()->pageTextContains('Shipping HRK0.00');
+    $this->assertSession()->pageTextContains('Shipping EUR0.00');
 
     $this->drupalGet('cart');
-    $this->assertSession()->pageTextContains('Shipping HRK0.00');
+    $this->assertSession()->pageTextContains('Shipping EUR0.00');
     $this->getSession()->getPage()->fillField('edit_quantity[0]', 3);
     $this->getSession()->getPage()->findButton('Update cart')->click();
-    $this->assertSession()->pageTextContains('Shipping HRK30.00');
+    $this->assertSession()->pageTextContains('Shipping EUR30.00');
 
     $this->drupalGet('checkout/1');
-    $this->assertSession()->pageTextContains('Shipping HRK30.00');
+    $this->assertSession()->pageTextContains('Shipping EUR30.00');
 
   }
 

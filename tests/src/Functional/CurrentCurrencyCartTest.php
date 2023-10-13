@@ -46,7 +46,7 @@ class CurrentCurrencyCartTest extends CartBrowserTestBase {
     // Add additional currency.
     // The parent has already imported USD.
     $currency_importer = $this->container->get('commerce_price.currency_importer');
-    $currency_importer->import('HRK');
+    $currency_importer->import('EUR');
 
     // Create new exchange rates.
     $exchange_rates = ExchangeRates::create([
@@ -67,14 +67,14 @@ class CurrentCurrencyCartTest extends CartBrowserTestBase {
 
     $this->config($exchange_rates->getExchangerConfigName())->setData([
       'rates' => [
-        'HRK' => [
+        'EUR' => [
           'USD' => [
             'value' => 0.15,
             'sync' => 0,
           ],
         ],
         'USD' => [
-          'HRK' => [
+          'EUR' => [
             'value' => 6.85,
             'sync' => 0,
           ],
@@ -86,7 +86,7 @@ class CurrentCurrencyCartTest extends CartBrowserTestBase {
       ->set('currency_exchange_rates', 'testing')
       ->save();
 
-    $this->store->setDefaultCurrencyCode('HRK');
+    $this->store->setDefaultCurrencyCode('EUR');
     $this->store->save();
     $this->reloadEntity($this->store);
 
@@ -113,21 +113,21 @@ class CurrentCurrencyCartTest extends CartBrowserTestBase {
   public function testProductAddToCartForm() {
     $this->assertEquals('USD', $this->variation->getPrice()->getCurrencyCode());
     $this->assertEquals('999', $this->variation->getPrice()->getNumber());
-    $this->assertEquals('HRK', $this->currentCurrency->getCurrency());
+    $this->assertEquals('EUR', $this->currentCurrency->getCurrency());
 
     // Confirm that the initial add to cart submit works.
     $this->postAddToCart($this->variation->getProduct());
-    $this->assertSession()->pageTextContains('HRK6,843.15');
+    $this->assertSession()->pageTextContains('EUR6,843.15');
     $this->cart = Order::load($this->cart->id());
 
     $this->drupalGet('cart');
     $this->assertEquals(999 * 6.85, $this->cart->getTotalPrice()->getNumber());
-    $this->assertEquals('HRK', $this->cart->getTotalPrice()->getCurrencyCode());
+    $this->assertEquals('EUR', $this->cart->getTotalPrice()->getCurrencyCode());
 
     // Check product display. And check current currency.
     $this->drupalGet('product/1');
-    $this->assertSession()->pageTextContains('HRK6,843.15');
-    $this->assertEquals('HRK', $this->currentCurrency->getCurrency());
+    $this->assertSession()->pageTextContains('EUR6,843.15');
+    $this->assertEquals('EUR', $this->currentCurrency->getCurrency());
 
     // Switch currency back to USD.
     $this->store->setDefaultCurrencyCode('USD');

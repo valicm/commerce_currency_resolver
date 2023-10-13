@@ -50,7 +50,7 @@ class OrderIntegrationTest extends OrderKernelTestBase {
     // Add additional currency.
     // The parent has already imported USD.
     $currency_importer = $this->container->get('commerce_price.currency_importer');
-    $currency_importer->import('HRK');
+    $currency_importer->import('EUR');
 
     $this->installConfig(['commerce_currency_resolver']);
     $user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
@@ -74,14 +74,14 @@ class OrderIntegrationTest extends OrderKernelTestBase {
 
     $this->config($exchange_rates->getExchangerConfigName())->setData([
       'rates' => [
-        'HRK' => [
+        'EUR' => [
           'USD' => [
             'value' => 0.15,
             'sync' => 0,
           ],
         ],
         'USD' => [
-          'HRK' => [
+          'EUR' => [
             'value' => 6.85,
             'sync' => 0,
           ],
@@ -118,7 +118,7 @@ class OrderIntegrationTest extends OrderKernelTestBase {
     $order_item = OrderItem::create([
       'type' => 'test',
       'quantity' => '1',
-      'unit_price' => new Price('12.00', 'HRK'),
+      'unit_price' => new Price('12.00', 'EUR'),
     ]);
     $order_item->save();
     $this->order->addItem($order_item);
@@ -127,7 +127,7 @@ class OrderIntegrationTest extends OrderKernelTestBase {
     $order = Order::load(1);
     $this->assertInstanceOf(OrderInterface::class, $order);
     $this->assertEquals('cli', PHP_SAPI);
-    $this->assertEquals('HRK', $this->order->getTotalPrice()->getCurrencyCode());
+    $this->assertEquals('EUR', $this->order->getTotalPrice()->getCurrencyCode());
     $this->assertEquals('USD', $this->currentCurrency->getCurrency());
   }
 
