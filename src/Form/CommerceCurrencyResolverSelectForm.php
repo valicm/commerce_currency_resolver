@@ -10,9 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class CommerceCurrencyResolverSelectForm.
- *
- * @package Drupal\commerce_currency_resolver\Form
+ * Select form.
  */
 class CommerceCurrencyResolverSelectForm extends FormBase {
 

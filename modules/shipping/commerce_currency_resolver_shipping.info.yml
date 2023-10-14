@@ -8,4 +8,4 @@ dependencies:
   - commerce_currency_resolver:commerce_currency_resolver
   - commerce_shipping:commerce_shipping
 
-php: 7.4
+php: 8.0

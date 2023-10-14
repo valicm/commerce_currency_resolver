@@ -60,6 +60,7 @@ class CurrentCurrencyTest extends OrderKernelTestBase {
 
     $this->installConfig('system');
     $this->installConfig('language');
+    $this->installSchema('commerce_exchanger', ['commerce_exchanger_latest_rates']);
 
     // Add additional language.
     ConfigurableLanguage::create(['id' => 'hr'])->save();

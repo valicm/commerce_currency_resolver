@@ -5,13 +5,13 @@
  * Main module file.
  */
 
+use Drupal\commerce_currency_resolver\Plugin\Commerce\Condition\OrderTotalPrice;
 use Drupal\commerce_currency_resolver\Plugin\Commerce\Fee\OrderFixedAmount;
 use Drupal\commerce_currency_resolver\Plugin\Commerce\Fee\OrderItemFixedAmount;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\commerce_currency_resolver\Plugin\Commerce\PromotionOffer\OrderItemFixedAmountOff;
 use Drupal\commerce_currency_resolver\Plugin\Commerce\PromotionOffer\OrderFixedAmountOff;
-use Drupal\commerce_currency_resolver\Plugin\Commerce\Condition\OrderTotalPrice;
+use Drupal\commerce_currency_resolver\Plugin\Commerce\PromotionOffer\OrderItemFixedAmountOff;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
  * Implements hook_help().
@@ -53,7 +53,7 @@ function commerce_currency_resolver_commerce_condition_info_alter(array &$defini
 }
 
 /**
- * Implements hook_entity_build_defaults_alter().
+ * Implements hook_entity_view_alter().
  */
 function commerce_currency_resolver_entity_view_alter(array &$build, EntityInterface $entity, $view_mode) {
 

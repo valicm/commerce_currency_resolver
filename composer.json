@@ -5,12 +5,11 @@
     "homepage": "https://www.drupal.org/project/commerce_currency_resolver",
     "license": "GPL-2.0-or-later",
     "require": {
-        "drupal/commerce": "^2.20",
-        "drupal/commerce_exchanger": "^1.20"
+        "drupal/commerce": "^2.3",
+        "drupal/commerce_exchanger": "^2"
     },
     "require-dev": {
-        "drupal/commerce_shipping": "^2",
-        "drupal/commerce_fee":"^1"
+        "drupal/commerce_shipping": "^2"
     },
     "minimum-stability": "dev"
 }

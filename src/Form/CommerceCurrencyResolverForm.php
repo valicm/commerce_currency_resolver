@@ -9,9 +9,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class CommerceCurrencyResolverForm.
- *
- * @package Drupal\commerce_currency_resolver\Form
+ * Main form.
  */
 class CommerceCurrencyResolverForm extends ConfigFormBase {
 
@@ -39,7 +37,7 @@ class CommerceCurrencyResolverForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static (
+    return new static(
       $container->get('config.factory'),
       $container->get('commerce_currency_resolver.currency_helper')
     );

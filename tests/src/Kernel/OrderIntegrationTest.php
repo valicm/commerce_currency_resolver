@@ -53,6 +53,7 @@ class OrderIntegrationTest extends OrderKernelTestBase {
     $currency_importer->import('EUR');
 
     $this->installConfig(['commerce_currency_resolver']);
+    $this->installSchema('commerce_exchanger', ['commerce_exchanger_latest_rates']);
     $user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
 
     // Create new exchange rates.
@@ -67,27 +68,25 @@ class OrderIntegrationTest extends OrderKernelTestBase {
         'demo_amount' => 100,
         'base_currency' => 'USD',
         'mode' => 'live',
-        ],
-      ]
+      ],
+    ],
     );
     $exchange_rates->save();
 
-    $this->config($exchange_rates->getExchangerConfigName())->setData([
-      'rates' => [
-        'EUR' => [
-          'USD' => [
-            'value' => 0.15,
-            'sync' => 0,
-          ],
-        ],
+    $this->container->get('commerce_exchanger.manager')->setLatest($exchange_rates->id(), [
+      'EUR' => [
         'USD' => [
-          'EUR' => [
-            'value' => 6.85,
-            'sync' => 0,
-          ],
+          'value' => 0.15,
+          'manual' => 0,
         ],
       ],
-    ])->save();
+      'USD' => [
+        'EUR' => [
+          'value' => 6.85,
+          'manual' => 0,
+        ],
+      ],
+    ]);
 
     $this->config('commerce_currency_resolver.settings')
       ->set('currency_exchange_rates', 'testing')

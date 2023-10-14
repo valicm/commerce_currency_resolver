@@ -5,9 +5,9 @@ namespace Drupal\commerce_currency_resolver\Resolver;
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_currency_resolver\CommerceCurrencyResolversRefreshTrait;
+use Drupal\commerce_currency_resolver\CurrentCurrencyInterface;
 use Drupal\commerce_exchanger\ExchangerCalculatorInterface;
 use Drupal\commerce_price\Resolver\PriceResolverInterface;
-use Drupal\commerce_currency_resolver\CurrentCurrencyInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 
 /**
@@ -121,6 +121,7 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
    * Helper to determine when resolver is active.
    *
    * @return bool
+   *   Return true if resolving needs to be skipped.
    */
   protected function skipResolvingPrice() {
     return ($this->isAdminPath() || (PHP_SAPI === 'cli' && !drupal_valid_test_ua()));

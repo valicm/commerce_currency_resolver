@@ -50,37 +50,35 @@ class CurrentCurrencyCartTest extends CartBrowserTestBase {
 
     // Create new exchange rates.
     $exchange_rates = ExchangeRates::create([
-        'id' => 'testing',
-        'label' => 'Manual',
-        'plugin' => 'manual',
-        'status' => TRUE,
-        'configuration' => [
-          'cron' => FALSE,
-          'use_cross_sync' => FALSE,
-          'demo_amount' => 100,
-          'base_currency' => 'USD',
-          'mode' => 'live',
-        ],
-      ]
+      'id' => 'testing',
+      'label' => 'Manual',
+      'plugin' => 'manual',
+      'status' => TRUE,
+      'configuration' => [
+        'cron' => FALSE,
+        'use_cross_sync' => FALSE,
+        'demo_amount' => 100,
+        'base_currency' => 'USD',
+        'mode' => 'live',
+      ],
+    ]
     );
     $exchange_rates->save();
 
-    $this->config($exchange_rates->getExchangerConfigName())->setData([
-      'rates' => [
-        'EUR' => [
-          'USD' => [
-            'value' => 0.15,
-            'sync' => 0,
-          ],
-        ],
+    $this->container->get('commerce_exchanger.manager')->setLatest($exchange_rates->id(), [
+      'EUR' => [
         'USD' => [
-          'EUR' => [
-            'value' => 6.85,
-            'sync' => 0,
-          ],
+          'value' => 0.15,
+          'manual' => 0,
         ],
       ],
-    ])->save();
+      'USD' => [
+        'EUR' => [
+          'value' => 6.85,
+          'manual' => 0,
+        ],
+      ],
+    ]);
 
     $this->config('commerce_currency_resolver.settings')
       ->set('currency_exchange_rates', 'testing')
@@ -117,7 +115,7 @@ class CurrentCurrencyCartTest extends CartBrowserTestBase {
 
     // Confirm that the initial add to cart submit works.
     $this->postAddToCart($this->variation->getProduct());
-    $this->assertSession()->pageTextContains('EUR6,843.15');
+    $this->assertSession()->pageTextContains('€6,843.15');
     $this->cart = Order::load($this->cart->id());
 
     $this->drupalGet('cart');
@@ -126,7 +124,7 @@ class CurrentCurrencyCartTest extends CartBrowserTestBase {
 
     // Check product display. And check current currency.
     $this->drupalGet('product/1');
-    $this->assertSession()->pageTextContains('EUR6,843.15');
+    $this->assertSession()->pageTextContains('€6,843.15');
     $this->assertEquals('EUR', $this->currentCurrency->getCurrency());
 
     // Switch currency back to USD.

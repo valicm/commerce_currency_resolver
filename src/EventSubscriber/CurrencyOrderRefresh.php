@@ -3,12 +3,11 @@
 namespace Drupal\commerce_currency_resolver\EventSubscriber;
 
 use Drupal\commerce_currency_resolver\CommerceCurrencyResolversRefreshTrait;
-use Drupal\Core\Session\AccountInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\commerce_currency_resolver\CurrentCurrency;
 use Drupal\commerce_order\Event\OrderEvent;
 use Drupal\commerce_order\OrderRefreshInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Checking for mismatch in currencies on order.

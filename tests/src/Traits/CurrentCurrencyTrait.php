@@ -3,7 +3,7 @@
 namespace Drupal\Tests\commerce_currency_resolver\Traits;
 
 /**
- * Trait CurrentCurrencyTrait.
+ * Trait used by tests.
  */
 trait CurrentCurrencyTrait {
 

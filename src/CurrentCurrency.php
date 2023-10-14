@@ -2,8 +2,8 @@
 
 namespace Drupal\commerce_currency_resolver;
 
-use Symfony\Component\HttpFoundation\RequestStack;
 use CommerceGuys\Addressing\Country\CountryRepository;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Holds a reference to the currency, resolved on demand.

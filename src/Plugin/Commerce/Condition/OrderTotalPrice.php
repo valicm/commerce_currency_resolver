@@ -4,8 +4,8 @@ namespace Drupal\commerce_currency_resolver\Plugin\Commerce\Condition;
 
 use Drupal\commerce_currency_resolver\Plugin\Commerce\CommerceCurrencyResolverAmountTrait;
 use Drupal\commerce_order\Plugin\Commerce\Condition\OrderTotalPrice as CommerceOrderTotalPrice;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\commerce_price\Price;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Provides the total price condition for orders per currency.

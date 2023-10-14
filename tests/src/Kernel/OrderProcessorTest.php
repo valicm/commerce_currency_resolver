@@ -49,6 +49,8 @@ class OrderProcessorTest extends OrderKernelTestBase implements ServiceModifierI
   protected $product;
 
   /**
+   * The order.
+   *
    * @var \Drupal\commerce_order\Entity\OrderInterface
    */
   protected $order;
@@ -60,6 +62,7 @@ class OrderProcessorTest extends OrderKernelTestBase implements ServiceModifierI
     parent::setUp();
     $this->installConfig(['commerce_cart']);
     $this->installConfig(['commerce_currency_resolver']);
+    $this->installSchema('commerce_exchanger', ['commerce_exchanger_latest_rates']);
 
     $currency_importer = $this->container->get('commerce_price.currency_importer');
     $currency_importer->import('GBP');
@@ -87,22 +90,20 @@ class OrderProcessorTest extends OrderKernelTestBase implements ServiceModifierI
     );
     $exchange_rates->save();
 
-    $this->config($exchange_rates->getExchangerConfigName())->setData([
-      'rates' => [
-        'GBP' => [
-          'USD' => [
-            'value' => 1,
-            'sync' => 0,
-          ],
-        ],
+    $this->container->get('commerce_exchanger.manager')->setLatest($exchange_rates->id(), [
+      'GBP' => [
         'USD' => [
-          'GBP' => [
-            'value' => 1,
-            'sync' => 0,
-          ],
+          'value' => 1,
+          'manual' => 0,
         ],
       ],
-    ])->save();
+      'USD' => [
+        'GBP' => [
+          'value' => 1,
+          'manual' => 0,
+        ],
+      ],
+    ]);
 
     $this->config('commerce_currency_resolver.settings')
       ->set('currency_exchange_rates', 'testing')

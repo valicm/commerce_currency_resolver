@@ -13,6 +13,8 @@ use Drupal\Tests\commerce_order\FunctionalJavascript\OrderAdminTest;
 class CurrentCurrencyOrderAdminTest extends OrderAdminTest {
 
   /**
+   * The current currency.
+   *
    * @var \Drupal\commerce_currency_resolver\CurrentCurrencyInterface
    */
   protected $currentCurrency;
@@ -42,37 +44,35 @@ class CurrentCurrencyOrderAdminTest extends OrderAdminTest {
 
     // Create new exchange rates.
     $exchange_rates = ExchangeRates::create([
-        'id' => 'testing',
-        'label' => 'Manual',
-        'plugin' => 'manual',
-        'status' => TRUE,
-        'configuration' => [
-          'cron' => FALSE,
-          'use_cross_sync' => FALSE,
-          'demo_amount' => 100,
-          'base_currency' => 'USD',
-          'mode' => 'live',
-        ],
-      ]
+      'id' => 'testing',
+      'label' => 'Manual',
+      'plugin' => 'manual',
+      'status' => TRUE,
+      'configuration' => [
+        'cron' => FALSE,
+        'use_cross_sync' => FALSE,
+        'demo_amount' => 100,
+        'base_currency' => 'USD',
+        'mode' => 'live',
+      ],
+    ],
     );
     $exchange_rates->save();
 
-    $this->config($exchange_rates->getExchangerConfigName())->setData([
-      'rates' => [
-        'VUV' => [
-          'USD' => [
-            'value' => 0.00878642,
-            'sync' => 0,
-          ],
-        ],
+    $this->container->get('commerce_exchanger.manager')->setLatest($exchange_rates->id(), [
+      'VUV' => [
         'USD' => [
-          'VUV' => [
-            'value' => 113.812,
-            'sync' => 0,
-          ],
+          'value' => 0.00878642,
+          'manual' => 0,
         ],
       ],
-    ])->save();
+      'USD' => [
+        'VUV' => [
+          'value' => 113.812,
+          'manual' => 0,
+        ],
+      ],
+    ]);
 
     // Use cookie mapping for this tests, and set default value
     // to EUR for currency.

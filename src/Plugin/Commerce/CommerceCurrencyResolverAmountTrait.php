@@ -2,8 +2,8 @@
 
 namespace Drupal\commerce_currency_resolver\Plugin\Commerce;
 
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\commerce_price\Price;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides common configuration for fixed amount off offers.

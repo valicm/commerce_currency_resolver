@@ -5,7 +5,6 @@ namespace Drupal\Tests\commerce_currency_resolver_shipping\FunctionalJavascript;
 use Drupal\commerce_exchanger\Entity\ExchangeRates;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_payment\Entity\PaymentGateway;
-use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 use Drupal\Tests\commerce_currency_resolver\Traits\CurrentCurrencyTrait;
@@ -65,37 +64,35 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
 
     // Create new exchange rates.
     $exchange_rates = ExchangeRates::create([
-        'id' => 'testing',
-        'label' => 'Manual',
-        'plugin' => 'manual',
-        'status' => TRUE,
-        'configuration' => [
-          'cron' => FALSE,
-          'use_cross_sync' => FALSE,
-          'demo_amount' => 100,
-          'base_currency' => 'USD',
-          'mode' => 'live',
-        ],
-      ]
+      'id' => 'testing',
+      'label' => 'Manual',
+      'plugin' => 'manual',
+      'status' => TRUE,
+      'configuration' => [
+        'cron' => FALSE,
+        'use_cross_sync' => FALSE,
+        'demo_amount' => 100,
+        'base_currency' => 'USD',
+        'mode' => 'live',
+      ],
+    ]
     );
     $exchange_rates->save();
 
-    $this->config($exchange_rates->getExchangerConfigName())->setData([
-      'rates' => [
-        'EUR' => [
-          'USD' => [
-            'value' => 0.15,
-            'sync' => 0,
-          ],
-        ],
+    $this->container->get('commerce_exchanger.manager')->setLatest($exchange_rates->id(), [
+      'EUR' => [
         'USD' => [
-          'EUR' => [
-            'value' => 6.85,
-            'sync' => 0,
-          ],
+          'value' => 0.15,
+          'manual' => 0,
         ],
       ],
-    ])->save();
+      'USD' => [
+        'EUR' => [
+          'value' => 6.85,
+          'manual' => 0,
+        ],
+      ],
+    ]);
 
     $this->config('commerce_currency_resolver.settings')
       ->set('currency_exchange_rates', 'testing')
@@ -252,7 +249,7 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     // Add product to order and calculate shipping.
     $this->drupalGet($this->firstProduct->toUrl()->toString());
     // We don't have calculated price formatter active.
-    $this->assertSession()->pageTextContains('EUR10.00');
+    $this->assertSession()->pageTextContains('€10.00');
     $this->assertSession()->pageTextContains('Conference hat');
     $this->submitForm([], 'Add to cart');
     $this->drupalGet('checkout/1');
@@ -303,16 +300,16 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     $this->reloadEntity($this->store);
 
     $this->getSession()->getPage()->findButton('Continue to review')->click();
-    $this->assertSession()->pageTextContains('Shipping EUR0.00');
+    $this->assertSession()->pageTextContains('Shipping €0.00');
 
     $this->drupalGet('cart');
-    $this->assertSession()->pageTextContains('Shipping EUR0.00');
+    $this->assertSession()->pageTextContains('Shipping €0.00');
     $this->getSession()->getPage()->fillField('edit_quantity[0]', 3);
     $this->getSession()->getPage()->findButton('Update cart')->click();
-    $this->assertSession()->pageTextContains('Shipping EUR30.00');
+    $this->assertSession()->pageTextContains('Shipping €30.00');
 
     $this->drupalGet('checkout/1');
-    $this->assertSession()->pageTextContains('Shipping EUR30.00');
+    $this->assertSession()->pageTextContains('Shipping €30.00');
 
   }
 

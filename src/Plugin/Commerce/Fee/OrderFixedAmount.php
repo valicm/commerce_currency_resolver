@@ -3,11 +3,14 @@
 namespace Drupal\commerce_currency_resolver\Plugin\Commerce\Fee;
 
 use Drupal\commerce_currency_resolver\Plugin\Commerce\CommerceCurrencyResolverAmountTrait;
+use Drupal\commerce_fee\Entity\FeeInterface;
 use Drupal\commerce_fee\Plugin\Commerce\Fee\OrderFixedAmount as BaseOrderFixedAmount;
 use Drupal\commerce_order\Adjustment;
-use Drupal\commerce_fee\Entity\FeeInterface;
 use Drupal\Core\Entity\EntityInterface;
 
+/**
+ * {@inheritdoc}
+ */
 class OrderFixedAmount extends BaseOrderFixedAmount {
 
   use CommerceCurrencyResolverAmountTrait;

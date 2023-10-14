@@ -3,11 +3,11 @@
 namespace Drupal\commerce_currency_resolver_shipping\EventSubscriber;
 
 use Drupal\commerce_currency_resolver\CommerceCurrencyResolversRefreshTrait;
+use Drupal\commerce_currency_resolver\CurrentCurrency;
 use Drupal\commerce_exchanger\ExchangerCalculatorInterface;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_shipping\Event\ShippingRatesEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Drupal\commerce_currency_resolver\CurrentCurrency;
 
 /**
  * Handling shipments rates.
@@ -61,7 +61,8 @@ class CommerceShippingCurrency implements EventSubscriberInterface {
     if ($rates = $event->getRates()) {
       if ($this->isShippingAdminRoute()) {
         $resolved_currency = $event->getShipment()->getAmount()->getCurrencyCode();
-      } else {
+      }
+      else {
         $resolved_currency = $this->currentCurrency->getCurrency();
       }
       $shipping_conversion = [];

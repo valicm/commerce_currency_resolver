@@ -5,7 +5,7 @@ namespace Drupal\Tests\commerce_currency_resolver\Kernel;
 use Drupal\commerce_currency_resolver\CurrencyOrderProcessor;
 
 /**
- * TestProcessorOverridden class.
+ * Processor used by tests.
  */
 class TestProcessorOverridden extends CurrencyOrderProcessor {
 

@@ -4,15 +4,13 @@ namespace Drupal\commerce_currency_resolver\Controller;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Controller\ControllerBase;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Locale\CountryManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class CommerceCurrencyResolverAutocomplete.
- *
- * @package Drupal\commerce_currency_resolver\Controller
+ * Autocomplete for countries.
  */
 class CommerceCurrencyResolverAutocomplete extends ControllerBase {
 

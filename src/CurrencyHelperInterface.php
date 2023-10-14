@@ -3,9 +3,7 @@
 namespace Drupal\commerce_currency_resolver;
 
 /**
- * Interface CurrencyHelperInterface.
- *
- * @package Drupal\commerce_currency_resolver
+ * The interface for helper.
  */
 interface CurrencyHelperInterface {
 
