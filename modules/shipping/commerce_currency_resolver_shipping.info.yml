@@ -1,7 +1,7 @@
 name: 'Commerce Currency Resolver Shipping'
 type: module
 description: 'Commerce 2 currency enhancements for shipping'
-core_version_requirement: ^8.8 || ^9 || ^10
+core_version_requirement: ^10
 package: Commerce (Contrib)
 
 dependencies:

@@ -1,7 +1,7 @@
 name: 'Commerce Currency Resolver'
 type: module
 description: 'Commerce 2 currency enhancements'
-core_version_requirement: ^9 || ^10
+core_version_requirement: ^10
 package: Commerce (Contrib)
 
 configure: commerce_currency_resolver.configuration
