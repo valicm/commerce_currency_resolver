@@ -75,6 +75,11 @@ class CurrencyOrderProcessor implements OrderProcessorInterface {
           // Auto calculate price.
           $item->setUnitPrice($this->priceExchanger->priceConversion($price, $resolved_currency));
         }
+
+        // Compatibility with Commerce VADO.
+        if ($vado_discounted_price = $item->getData('commerce_vado_discount_price')) {
+          $item->setData('commerce_vado_discount_price', $this->priceExchanger->priceConversion($vado_discounted_price, $resolved_currency));
+        }
       }
 
       // Last part is handling adjustments. We could hit here to
