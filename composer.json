@@ -5,7 +5,7 @@
     "homepage": "https://www.drupal.org/project/commerce_currency_resolver",
     "license": "GPL-2.0-or-later",
     "require": {
-        "drupal/commerce": "^3.0",
+        "drupal/commerce": "^2 || ^3",
         "drupal/commerce_exchanger": "^2"
     },
     "require-dev": {
