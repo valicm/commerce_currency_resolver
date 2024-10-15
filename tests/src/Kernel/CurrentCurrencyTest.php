@@ -44,7 +44,7 @@ class CurrentCurrencyTest extends OrderKernelTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'language',
     'language_test',
     'system',

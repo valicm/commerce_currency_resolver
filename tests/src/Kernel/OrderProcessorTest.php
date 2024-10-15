@@ -22,7 +22,7 @@ class OrderProcessorTest extends OrderKernelTestBase implements ServiceModifierI
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'commerce_currency_resolver',
     'commerce_cart',
     'commerce_checkout',

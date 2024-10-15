@@ -36,7 +36,7 @@ class OrderIntegrationTest extends OrderKernelTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'commerce_exchanger',
     'commerce_currency_resolver',
   ];

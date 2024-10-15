@@ -31,7 +31,7 @@ class CurrentCurrencyCartTest extends CartBrowserTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'commerce_exchanger',
     'commerce_currency_resolver',
     'commerce_test',
