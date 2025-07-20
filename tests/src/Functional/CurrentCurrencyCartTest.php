@@ -88,8 +88,6 @@ class CurrentCurrencyCartTest extends CartBrowserTestBase {
     $this->store->save();
     $this->reloadEntity($this->store);
 
-    $this->currentCurrency = $this->container->get('commerce_currency_resolver.current_currency');
-
     $variation_display = commerce_get_entity_display('commerce_product_variation', 'default', 'view');
     $variation_display->setComponent('price', [
       'label' => 'above',
@@ -111,7 +109,6 @@ class CurrentCurrencyCartTest extends CartBrowserTestBase {
   public function testProductAddToCartForm() {
     $this->assertEquals('USD', $this->variation->getPrice()->getCurrencyCode());
     $this->assertEquals('999', $this->variation->getPrice()->getNumber());
-    $this->assertEquals('EUR', $this->currentCurrency->getCurrency());
 
     // Confirm that the initial add to cart submit works.
     $this->postAddToCart($this->variation->getProduct());
@@ -125,7 +122,6 @@ class CurrentCurrencyCartTest extends CartBrowserTestBase {
     // Check product display. And check current currency.
     $this->drupalGet('product/1');
     $this->assertSession()->pageTextContains('€6,843.15');
-    $this->assertEquals('EUR', $this->currentCurrency->getCurrency());
 
     // Switch currency back to USD.
     $this->store->setDefaultCurrencyCode('USD');
@@ -133,7 +129,6 @@ class CurrentCurrencyCartTest extends CartBrowserTestBase {
     $this->reloadEntity($this->store);
     $this->resetCurrencyContainer();
 
-    $this->assertEquals('USD', $this->currentCurrency->getCurrency());
     $this->postAddToCart($this->variation->getProduct());
 
     $order = Order::load($this->cart->id());

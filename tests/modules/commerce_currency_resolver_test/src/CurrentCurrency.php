@@ -2,12 +2,12 @@
 
 namespace Drupal\commerce_currency_resolver_test;
 
-use Drupal\commerce_currency_resolver\CurrentCurrency;
+use Drupal\commerce_currency_resolver\CurrentCurrency as CoreCurrentCurrency;
 
 /**
  * Holds a reference to the currency, resolved on demand.
  */
-class CurrentCurrencyTest extends CurrentCurrency {
+class CurrentCurrency extends CoreCurrentCurrency {
 
   /**
    * {@inheritdoc}

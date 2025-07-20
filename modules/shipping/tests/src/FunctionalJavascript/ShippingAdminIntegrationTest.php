@@ -85,6 +85,7 @@ class ShippingAdminIntegrationTest extends CommerceWebDriverTestBase {
     'commerce_exchanger',
     'commerce_currency_resolver',
     'commerce_test',
+    'commerce_product',
     'commerce_currency_resolver_test',
   ];
 

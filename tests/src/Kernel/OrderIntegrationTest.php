@@ -54,7 +54,7 @@ class OrderIntegrationTest extends OrderKernelTestBase {
 
     $this->installConfig(['commerce_currency_resolver']);
     $this->installSchema('commerce_exchanger', ['commerce_exchanger_latest_rates']);
-    $user = $this->createUser(['mail' => $this->randomString() . '@example.com']);
+    $user = $this->createUser([], NULL, FALSE, ['mail' => 'valentino@example.com']);
 
     // Create new exchange rates.
     $exchange_rates = ExchangeRates::create([

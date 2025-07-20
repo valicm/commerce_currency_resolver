@@ -9,8 +9,6 @@ trait CurrentCurrencyTrait {
 
   /**
    * Current currency.
-   *
-   * @var currentCurrency
    */
   protected $currentCurrency;
 

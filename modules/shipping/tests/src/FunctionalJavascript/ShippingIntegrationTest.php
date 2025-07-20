@@ -34,6 +34,7 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
    */
   protected static $modules = [
     'commerce_checkout',
+    'commerce_product',
     'commerce_payment',
     'commerce_payment_example',
     'commerce_shipping',
@@ -254,17 +255,16 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     $this->submitForm([], 'Add to cart');
     $this->drupalGet('checkout/1');
     $address = [
-      'given_name' => 'John',
-      'family_name' => 'Smith',
-      'address_line1' => '1098 Alta Ave',
-      'locality' => 'Mountain View',
-      'administrative_area' => 'CA',
-      'postal_code' => '94043',
+      'given_name' => 'Ivan',
+      'family_name' => 'Horvat',
+      'address_line1' => 'Moja ulica 22',
+      'locality' => 'Osijek',
+      'postal_code' => '31000',
     ];
     $address_prefix = 'shipping_information[shipping_profile][address][0][address]';
     $this->getSession()
       ->getPage()
-      ->fillField($address_prefix . '[country_code]', 'US');
+      ->fillField($address_prefix . '[country_code]', 'HR');
     $this->assertSession()->assertWaitOnAjaxRequest();
     foreach ($address as $property => $value) {
       $this->getSession()
@@ -275,7 +275,7 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     $this->submitForm([
       'payment_information[add_payment_method][payment_details][number]' => '4111111111111111',
       'payment_information[add_payment_method][payment_details][expiration][month]' => '02',
-      'payment_information[add_payment_method][payment_details][expiration][year]' => '2023',
+      'payment_information[add_payment_method][payment_details][expiration][year]' => '2032',
       'payment_information[add_payment_method][payment_details][security_code]' => '123',
     ], 'Continue to review');
 
@@ -290,7 +290,6 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     $this->drupalGet('checkout/1');
     $this->assertSession()->pageTextContains('Shipping $1.00');
 
-    $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->pageTextContains('Shipping method');
     $this->assertSession()->pageTextContains('Shipping $1.00');
 

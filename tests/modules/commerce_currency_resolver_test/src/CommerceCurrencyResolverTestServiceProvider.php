@@ -15,7 +15,7 @@ class CommerceCurrencyResolverTestServiceProvider extends ServiceProviderBase {
    */
   public function alter(ContainerBuilder $container) {
     $definition = $container->getDefinition('commerce_currency_resolver.current_currency');
-    $definition->setClass(CurrentCurrencyTest::class);
+    $definition->setClass(CurrentCurrency::class);
   }
 
 }
