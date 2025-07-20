@@ -2,13 +2,13 @@
 
 namespace Drupal\commerce_currency_resolver;
 
-use Drupal\commerce_store\CurrentStoreInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\commerce_store\CurrentStoreInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**

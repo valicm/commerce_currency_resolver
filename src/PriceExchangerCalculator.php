@@ -2,11 +2,11 @@
 
 namespace Drupal\commerce_currency_resolver;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\commerce_exchanger\AbstractExchangerCalculator;
 use Drupal\commerce_exchanger\ExchangerManagerInterface;
 use Drupal\commerce_price\RounderInterface;
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Default exchange calculator for resolver.

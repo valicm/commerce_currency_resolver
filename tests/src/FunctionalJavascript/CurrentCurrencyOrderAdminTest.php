@@ -2,8 +2,8 @@
 
 namespace Drupal\Tests\commerce_currency_resolver\FunctionalJavascript;
 
-use Drupal\commerce_exchanger\Entity\ExchangeRates;
 use Drupal\Tests\commerce_order\FunctionalJavascript\OrderAdminTest;
+use Drupal\commerce_exchanger\Entity\ExchangeRates;
 
 /**
  * Tests the order admin UI.

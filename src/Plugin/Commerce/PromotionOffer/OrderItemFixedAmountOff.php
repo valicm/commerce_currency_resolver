@@ -2,14 +2,14 @@
 
 namespace Drupal\commerce_currency_resolver\Plugin\Commerce\PromotionOffer;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\commerce_currency_resolver\Plugin\Commerce\CommerceCurrencyResolverAmountTrait;
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_promotion\Entity\PromotionInterface;
 use Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderItemFixedAmountOff as CommerceOrderItemFixedAmountOff;
-use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Provides the percentage off offer for order items with multicurrency support.
+ * Provides percentage off offer for order items with multi-currency support.
  *
  * @see \Drupal\commerce_promotion\Plugin\Commerce\PromotionOffer\OrderItemFixedAmountOff
  */

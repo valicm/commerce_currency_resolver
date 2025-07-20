@@ -2,11 +2,11 @@
 
 namespace Drupal\commerce_currency_resolver;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\commerce_exchanger\ExchangerCalculatorInterface;
 use Drupal\commerce_order\Adjustment;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_order\OrderProcessorInterface;
-use Drupal\Core\Session\AccountInterface;
 
 /**
  * Apply currency changes during the order refresh process.

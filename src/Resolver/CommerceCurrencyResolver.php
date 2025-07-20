@@ -2,13 +2,13 @@
 
 namespace Drupal\commerce_currency_resolver\Resolver;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\commerce\Context;
 use Drupal\commerce\PurchasableEntityInterface;
 use Drupal\commerce_currency_resolver\CommerceCurrencyResolversRefreshTrait;
 use Drupal\commerce_currency_resolver\CurrentCurrencyInterface;
 use Drupal\commerce_exchanger\ExchangerCalculatorInterface;
 use Drupal\commerce_price\Resolver\PriceResolverInterface;
-use Drupal\Core\Config\ConfigFactoryInterface;
 
 /**
  * Returns a price and currency depending of language or country.
@@ -91,7 +91,7 @@ class CommerceCurrencyResolver implements PriceResolverInterface {
         // price, in combo mode we could have field with price.
         if ($currency_source === 'combo' || $currency_source === 'field') {
 
-          // Backward compatibility for older version, and inital setup
+          // Backward compatibility for older version, and initial setup
           // that default price fields are mapped to field_price_currency_code
           // instead to price_currency_code.
           if ($field_name === 'price') {

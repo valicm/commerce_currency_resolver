@@ -2,11 +2,11 @@
 
 namespace Drupal\commerce_currency_resolver\EventSubscriber;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\commerce_currency_resolver\CommerceCurrencyResolversRefreshTrait;
 use Drupal\commerce_currency_resolver\CurrentCurrency;
 use Drupal\commerce_order\Event\OrderEvent;
 use Drupal\commerce_order\OrderRefreshInterface;
-use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**

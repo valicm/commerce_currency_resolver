@@ -9,7 +9,8 @@
         "drupal/commerce_exchanger": "^2"
     },
     "require-dev": {
-        "drupal/commerce_shipping": "^2"
+        "drupal/commerce_shipping": "^2",
+        "drupal/commerce_fee": "^1"
     },
     "minimum-stability": "dev"
 }

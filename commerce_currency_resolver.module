@@ -5,13 +5,13 @@
  * Main module file.
  */
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\commerce_currency_resolver\Plugin\Commerce\Condition\OrderTotalPrice;
 use Drupal\commerce_currency_resolver\Plugin\Commerce\Fee\OrderFixedAmount;
 use Drupal\commerce_currency_resolver\Plugin\Commerce\Fee\OrderItemFixedAmount;
 use Drupal\commerce_currency_resolver\Plugin\Commerce\PromotionOffer\OrderFixedAmountOff;
 use Drupal\commerce_currency_resolver\Plugin\Commerce\PromotionOffer\OrderItemFixedAmountOff;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
  * Implements hook_help().

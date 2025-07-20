@@ -8,6 +8,13 @@ namespace Drupal\Tests\commerce_currency_resolver\Traits;
 trait CurrentCurrencyTrait {
 
   /**
+   * Current currency.
+   *
+   * @var currentCurrency
+   */
+  protected $currentCurrency;
+
+  /**
    * Reset current currency container.
    */
   protected function resetCurrencyContainer() {

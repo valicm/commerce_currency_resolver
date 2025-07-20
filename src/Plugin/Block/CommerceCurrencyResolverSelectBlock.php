@@ -2,10 +2,10 @@
 
 namespace Drupal\commerce_currency_resolver\Plugin\Block;
 
-use Drupal\commerce_currency_resolver\Form\CommerceCurrencyResolverSelectForm;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\commerce_currency_resolver\Form\CommerceCurrencyResolverSelectForm;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

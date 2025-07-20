@@ -2,10 +2,10 @@
 
 namespace Drupal\Tests\commerce_currency_resolver\Functional;
 
-use Drupal\commerce_exchanger\Entity\ExchangeRates;
-use Drupal\commerce_order\Entity\Order;
 use Drupal\Tests\commerce_cart\Functional\CartBrowserTestBase;
 use Drupal\Tests\commerce_currency_resolver\Traits\CurrentCurrencyTrait;
+use Drupal\commerce_exchanger\Entity\ExchangeRates;
+use Drupal\commerce_order\Entity\Order;
 
 /**
  * Tests the add to cart form with mixed currencies.

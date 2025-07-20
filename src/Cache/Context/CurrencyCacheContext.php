@@ -2,9 +2,9 @@
 
 namespace Drupal\commerce_currency_resolver\Cache\Context;
 
-use Drupal\commerce_currency_resolver\CurrentCurrency;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextInterface;
+use Drupal\commerce_currency_resolver\CurrentCurrency;
 
 /**
  * Defines the CurrencyCacheContext service, for "per currency" caching.

@@ -2,11 +2,11 @@
 
 namespace Drupal\Tests\commerce_currency_resolver\Kernel;
 
+use Drupal\Tests\commerce_currency_resolver\Traits\CurrentCurrencyTrait;
+use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 use Drupal\commerce_store\Entity\Store;
 use Drupal\commerce_store\Entity\StoreInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\Tests\commerce_currency_resolver\Traits\CurrentCurrencyTrait;
-use Drupal\Tests\commerce_order\Kernel\OrderKernelTestBase;
 
 /**
  * Tests current currency class.

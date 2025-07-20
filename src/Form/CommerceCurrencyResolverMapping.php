@@ -2,11 +2,11 @@
 
 namespace Drupal\commerce_currency_resolver\Form;
 
-use Drupal\commerce_currency_resolver\CurrencyHelperInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Locale\CountryManagerInterface;
+use Drupal\commerce_currency_resolver\CurrencyHelperInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -185,7 +185,7 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
                   '#type' => 'textfield',
                   '#autocomplete_route_name' => 'commerce_currency_resolver.countries.autocomplete',
                   '#title' => $currency,
-                  '#description' => $this->t('Select countires which should be used with @currency currency', ['@currency' => $currency]),
+                  '#description' => $this->t('Select countries which should be used with @currency currency', ['@currency' => $currency]),
                   '#default_value' => $data[$key] ?? '',
                 ];
               }

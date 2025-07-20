@@ -2,12 +2,12 @@
 
 namespace Drupal\Tests\commerce_currency_resolver_shipping\FunctionalJavascript;
 
+use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
+use Drupal\Tests\commerce_currency_resolver\Traits\CurrentCurrencyTrait;
 use Drupal\commerce_exchanger\Entity\ExchangeRates;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\commerce_product\Entity\ProductVariationType;
-use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
-use Drupal\Tests\commerce_currency_resolver\Traits\CurrentCurrencyTrait;
 
 /**
  * Tests integration with the shipping module.

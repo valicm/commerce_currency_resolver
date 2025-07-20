@@ -2,19 +2,19 @@
 
 namespace Drupal\Tests\commerce_currency_resolver_shipping\FunctionalJavascript;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Test\AssertMailTrait;
+use Drupal\Core\Url;
+use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 use Drupal\commerce_exchanger\Entity\ExchangeRates;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_price\Price;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\commerce_shipping\Entity\ShipmentType;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\Test\AssertMailTrait;
-use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\profile\Entity\Profile;
 use Drupal\profile\Entity\ProfileType;
-use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 
 /**
  * Tests the shipment admin UI.

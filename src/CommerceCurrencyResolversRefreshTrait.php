@@ -43,6 +43,13 @@ trait CommerceCurrencyResolversRefreshTrait {
   }
 
   /**
+   * Customer accounts.
+   *
+   * @var account
+   */
+  protected $account;
+
+  /**
    * Check if order belongs to current user.
    *
    * @param \Drupal\commerce_order\Entity\OrderInterface $order
