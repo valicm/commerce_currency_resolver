@@ -3,6 +3,8 @@
 namespace Drupal\commerce_currency_resolver\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManager;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Locale\CountryManagerInterface;
@@ -38,8 +40,8 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
    * @param \Drupal\commerce_currency_resolver\CurrencyHelperInterface $currencyHelper
    *   Currency helper.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, CountryManagerInterface $country_manager, CurrencyHelperInterface $currencyHelper) {
-    parent::__construct($config_factory);
+  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, CountryManagerInterface $country_manager, CurrencyHelperInterface $currencyHelper) {
+    parent::__construct($config_factory, $typedConfigManager);
     $this->countryManager = $country_manager;
     $this->currencyHelper = $currencyHelper;
   }
@@ -50,6 +52,7 @@ class CommerceCurrencyResolverMapping extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
+      $container->get('config.typed'),
       $container->get('country_manager'),
       $container->get('commerce_currency_resolver.currency_helper')
     );
