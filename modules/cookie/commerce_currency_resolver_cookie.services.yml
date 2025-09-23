@@ -1,0 +1,6 @@
+services:
+  commerce_currency_resolver_cookie.currency:
+    class: Drupal\commerce_currency_resolver_cookie\Resolver\CurrencyResolverCookie
+    arguments: ['@request_stack', '@commerce_currency_resolver.manager']
+    tags:
+      - { name: commerce_price.currency_resolver, priority: 1000 }

@@ -1,0 +1,35 @@
+<?php
+
+namespace Drupal\commerce_currency_resolver_exchanger;
+
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\commerce_exchanger\AbstractExchangerCalculator;
+use Drupal\commerce_exchanger\ExchangerManagerInterface;
+use Drupal\commerce_price\RounderInterface;
+
+/**
+ * Default exchange calculator for resolver.
+ */
+class PriceExchangerCalculator extends AbstractExchangerCalculator {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, ExchangerManagerInterface $exchanger_manager, RounderInterface $rounder, protected ConfigFactoryInterface $configFactory) {
+    parent::__construct($entity_type_manager, $exchanger_manager, $rounder);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getExchangerId() {
+    $resolver_exchanger_id = $this->configFactory->get('commerce_currency_resolver.settings')->get('currency_exchange_rates');
+    if (isset($this->providers[$resolver_exchanger_id]) && $this->providers[$resolver_exchanger_id]->status()) {
+      return $this->providers[$resolver_exchanger_id]->id();
+    }
+
+    return NULL;
+  }
+
+}

@@ -11,7 +11,7 @@ use Drupal\commerce_currency_resolver_shipping\Plugin\Commerce\ShippingMethod\Fl
 /**
  * Implements hook_commerce_shipping_method_info_alter().
  */
-function commerce_currency_resolver_shipping_commerce_shipping_method_info_alter(array &$definitions) {
+function commerce_currency_resolver_shipping_commerce_shipping_method_info_alter(array &$definitions): void {
   $definitions['flat_rate_per_item']['class'] = FlatRatePerItemCurrency::class;
   $definitions['flat_rate']['class'] = FlatRateCurrency::class;
 }

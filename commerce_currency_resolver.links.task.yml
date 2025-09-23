@@ -2,8 +2,3 @@ commerce_currency_resolver.configuration:
   route_name: commerce_currency_resolver.configuration
   base_route: commerce_currency_resolver.configuration
   title: 'Configuration'
-commerce_currency_resolver.currency_mapping:
-  route_name: commerce_currency_resolver.currency_mapping
-  base_route: commerce_currency_resolver.configuration
-  title: 'Mapping'
-  weight: 20

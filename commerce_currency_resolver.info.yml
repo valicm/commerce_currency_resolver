@@ -1,16 +1,17 @@
 name: 'Commerce Currency Resolver'
 type: module
-description: 'Commerce 2/3 currency enhancements'
-core_version_requirement: ^10.1 || ^11
-package: Commerce (Contrib)
+description: 'Commerce 3 currency enhancements'
+core_version_requirement: ^11
+package: Commerce (contrib)
 
 configure: commerce_currency_resolver.configuration
 
 dependencies:
   - commerce:commerce_price
   - commerce:commerce_order
-  - commerce_exchanger:commerce_exchanger
 
 test_dependencies:
   - commerce_shipping:commerce_shipping
   - commerce_fee:commerce_fee
+  - commerce_exchanger:commerce_exchanger
+  - geoip:geoip

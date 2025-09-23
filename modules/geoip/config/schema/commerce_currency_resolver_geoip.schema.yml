@@ -1,0 +1,12 @@
+commerce_currency_resolver_geoip.currency_mapping:
+  type: config_object
+  label: 'Currency geoip mapping'
+  mapping:
+    logic:
+      type: string
+      label: 'Matrix logic'
+    matrix:
+      type: sequence
+      label: 'Matrix'
+      sequence:
+        type: string

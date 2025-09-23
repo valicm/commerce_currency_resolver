@@ -1,35 +1,13 @@
 commerce_currency_resolver.settings:
   type: config_object
-  label: 'Commerce currency resolvers settings'
+  label: 'Commerce currency resolver settings'
   mapping:
-    currency_mapping:
-      type: string
-      label: 'Currency mapping'
-    currency_geo:
-      type: string
-      label: 'Location modules'
     currency_source:
       type: string
       label: 'Currency source'
+    currency_field_prefix:
+      type: string
+      label: 'Currency field prefix'
     currency_exchange_rates:
       type: string
       label: 'Exchange rates service'
-    currency_default:
-      type: string
-      label: 'Currency default'
-
-commerce_currency_resolver.currency_mapping:
-  type: config_object
-  label: 'Currency mapping'
-  mapping:
-    domicile_currency:
-      type: string
-      label: 'Use domicile currency per country'
-    logic:
-      type: string
-      label: 'Matrix logic'
-    matrix:
-      type: sequence
-      label: 'Matrix'
-      sequence:
-        type: string

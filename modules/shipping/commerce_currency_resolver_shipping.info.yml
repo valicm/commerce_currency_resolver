@@ -1,11 +1,11 @@
 name: 'Commerce Currency Resolver Shipping'
 type: module
-description: 'Commerce 2 currency enhancements for shipping'
-core_version_requirement: ^10.1 || ^11
-package: Commerce (Contrib)
+description: 'Commerce 3 currency enhancements for shipping'
+core_version_requirement: ^10 | ^11
+package: Commerce (contrib)
 
 dependencies:
   - commerce_currency_resolver:commerce_currency_resolver
   - commerce_shipping:commerce_shipping
+  - commerce_exchanger:commerce_exchanger
 
-php: 8.0

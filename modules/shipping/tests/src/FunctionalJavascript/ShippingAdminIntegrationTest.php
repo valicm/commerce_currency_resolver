@@ -2,9 +2,12 @@
 
 namespace Drupal\Tests\commerce_currency_resolver_shipping\FunctionalJavascript;
 
+use Drupal\commerce_order\Entity\OrderInterface;
+use Drupal\commerce_shipping\Entity\PackageTypeInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Core\Url;
+use Drupal\profile\Entity\ProfileInterface;
 use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
 use Drupal\commerce_exchanger\Entity\ExchangeRates;
 use Drupal\commerce_order\Entity\OrderType;
@@ -15,6 +18,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\profile\Entity\Profile;
 use Drupal\profile\Entity\ProfileType;
+use Drupal\Tests\commerce_currency_resolver\Traits\CurrentCurrencyTrait;
 
 /**
  * Tests the shipment admin UI.
@@ -23,12 +27,7 @@ use Drupal\profile\Entity\ProfileType;
  */
 class ShippingAdminIntegrationTest extends CommerceWebDriverTestBase {
 
-  /**
-   * The current currency.
-   *
-   * @var \Drupal\commerce_currency_resolver\CurrentCurrencyInterface
-   */
-  protected $currentCurrency;
+  use CurrentCurrencyTrait;
 
   use AssertMailTrait;
   use StringTranslationTrait;
@@ -38,7 +37,7 @@ class ShippingAdminIntegrationTest extends CommerceWebDriverTestBase {
    *
    * @var array
    */
-  protected $defaultAddress = [
+  protected array $defaultAddress = [
     'country_code' => 'US',
     'administrative_area' => 'SC',
     'locality' => 'Greenville',
@@ -50,31 +49,23 @@ class ShippingAdminIntegrationTest extends CommerceWebDriverTestBase {
 
   /**
    * The default profile.
-   *
-   * @var \Drupal\profile\Entity\ProfileInterface
    */
-  protected $defaultProfile;
+  protected ProfileInterface $defaultProfile;
 
   /**
    * A sample order.
-   *
-   * @var \Drupal\commerce_order\Entity\OrderInterface
    */
-  protected $order;
+  protected OrderInterface $order;
 
   /**
    * The base admin shipment uri.
-   *
-   * @var string
    */
-  protected $shipmentUri;
+  protected string $shipmentUri;
 
   /**
    * A test package type.
-   *
-   * @var \Drupal\commerce_shipping\Entity\PackageTypeInterface
    */
-  protected $packageType;
+  protected PackageTypeInterface $packageType;
 
   /**
    * {@inheritdoc}
@@ -86,7 +77,7 @@ class ShippingAdminIntegrationTest extends CommerceWebDriverTestBase {
     'commerce_currency_resolver',
     'commerce_test',
     'commerce_product',
-    'commerce_currency_resolver_test',
+    'commerce_currency_resolver_shipping',
   ];
 
   /**
@@ -108,6 +99,7 @@ class ShippingAdminIntegrationTest extends CommerceWebDriverTestBase {
    */
   protected function setUp() :void {
     parent::setUp();
+
     $product_variation_type = ProductVariationType::load('default');
     $product_variation_type->setTraits(['purchasable_entity_shippable']);
     $product_variation_type->setGenerateTitle(FALSE);
@@ -255,8 +247,7 @@ class ShippingAdminIntegrationTest extends CommerceWebDriverTestBase {
     ]);
     $this->defaultProfile->save();
 
-    /** @var \Drupal\commerce_payment\Entity\PaymentGatewayInterface $payment_gateway */
-    $payment_gateway = $this->createEntity('commerce_payment_gateway', [
+    $this->createEntity('commerce_payment_gateway', [
       'id' => 'example',
       'label' => 'Example',
       'plugin' => 'manual',
@@ -266,6 +257,9 @@ class ShippingAdminIntegrationTest extends CommerceWebDriverTestBase {
     // The parent has already imported USD.
     $currency_importer = $this->container->get('commerce_price.currency_importer');
     $currency_importer->import('VUV');
+
+    $this->store->setDefaultCurrencyCode('VUV');
+    $this->store->save();
 
     // Create new exchange rates.
     $exchange_rates = ExchangeRates::create([
@@ -298,32 +292,22 @@ class ShippingAdminIntegrationTest extends CommerceWebDriverTestBase {
         ],
       ],
     ]);
-
-    // Use cookie mapping for this tests, and set default value
-    // to EUR for currency.
-    // Don't use store, while in core commerce there are some
-    // price override trough UI done based on one currency.
-    // Changing currency for store most certain will lead to
-    // order tried to be saved with multiple different currencies.
     $this->config('commerce_currency_resolver.settings')
       ->set('currency_exchange_rates', 'testing')
-      ->set('currency_default', 'VUV')
-      ->set('currency_mapping', 'cookie')
       ->save();
 
-    $this->currentCurrency = $this->container->get('commerce_currency_resolver.current_currency');
+    $this->resetCurrencyContainer();
   }
 
   /**
    * Tests that Shipments tab and operation visibility.
    */
-  public function testShipmentTabAndOperation() {
+  public function testShipmentTabAndOperation(): void {
     $this->drupalGet($this->order->toUrl());
     // Verify that we have different currencies on order and
     // currently resolved one.
-    $this->assertEquals($this->order->getTotalPrice()->getCurrencyCode(), 'USD');
-    $this->assertEquals($this->currentCurrency->getCurrency(), 'VUV');
-    $this->assertEquals(\Drupal::service('commerce_currency_resolver.current_currency')->getCurrency(), 'VUV');
+    $this->assertEquals('USD', $this->order->getTotalPrice()->getCurrencyCode());
+    $this->assertEquals('VUV', $this->currentCurrency->getCurrency()->getCurrencyCode());
   }
 
 }

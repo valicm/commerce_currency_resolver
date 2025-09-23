@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Install file for commerce_currency_resolver_exchanger.
+ */
+
+use Drupal\commerce_currency_resolver\CurrencyResolverManagerInterface;
+
+/**
+ * Implements hook_install().
+ */
+function commerce_currency_resolver_exchanger_install(): void {
+  $config_factory = Drupal::configFactory();
+  $config_factory->getEditable('commerce_currency_resolver.settings')->set('currency_source', CurrencyResolverManagerInterface::CURRENCY_RESOLVER_PRICE_COMBO)->save();
+}

@@ -2,17 +2,19 @@
 
 namespace Drupal\Tests\commerce_currency_resolver_shipping\FunctionalJavascript;
 
+use Drupal\commerce_product\Entity\ProductInterface;
 use Drupal\Tests\commerce\FunctionalJavascript\CommerceWebDriverTestBase;
-use Drupal\Tests\commerce_currency_resolver\Traits\CurrentCurrencyTrait;
 use Drupal\commerce_exchanger\Entity\ExchangeRates;
 use Drupal\commerce_order\Entity\OrderType;
 use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\commerce_product\Entity\ProductVariationType;
+use Drupal\Tests\commerce_currency_resolver\Traits\CurrentCurrencyTrait;
+use Drupal\Tests\commerce_shipping\Traits\ShippingTestHelperTrait;
 
 /**
  * Tests integration with the shipping module.
  *
- * @coversDefaultClass \Drupal\commerce_currency_resolver_shipping\EventSubscriber\CommerceShippingCurrency
+ * @coversDefaultClass \Drupal\commerce_currency_resolver_shipping\ShippingCurrencyOrderProcessor
  * @covers \Drupal\commerce_currency_resolver_shipping\Plugin\Commerce\ShippingMethod\FlatRateCurrency
  * @covers \Drupal\commerce_currency_resolver_shipping\Plugin\Commerce\ShippingMethod\FlatRatePerItemCurrency
  * @covers \Drupal\commerce_currency_resolver_shipping\ShippingCurrencyOrderProcessor
@@ -21,13 +23,12 @@ use Drupal\commerce_product\Entity\ProductVariationType;
 class ShippingIntegrationTest extends CommerceWebDriverTestBase {
 
   use CurrentCurrencyTrait;
+  use ShippingTestHelperTrait;
 
   /**
    * First sample product.
-   *
-   * @var \Drupal\commerce_product\Entity\ProductInterface
    */
-  protected $firstProduct;
+  protected ProductInterface $firstProduct;
 
   /**
    * {@inheritdoc}
@@ -38,9 +39,11 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     'commerce_payment',
     'commerce_payment_example',
     'commerce_shipping',
+    'commerce_shipping_test',
     'commerce_exchanger',
     'commerce_currency_resolver',
     'commerce_currency_resolver_shipping',
+    'commerce_currency_resolver_exchanger',
   ];
 
   /**
@@ -97,6 +100,7 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
 
     $this->config('commerce_currency_resolver.settings')
       ->set('currency_exchange_rates', 'testing')
+      ->set('currency_source', 'combo')
       ->save();
 
     $this->store->setDefaultCurrencyCode('USD');
@@ -145,7 +149,6 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
         'unit' => 'g',
       ],
     ]);
-    /** @var \Drupal\commerce_product\Entity\ProductInterface $product */
     $this->firstProduct = $this->createEntity('commerce_product', [
       'type' => 'default',
       'title' => 'Conference hat',
@@ -153,8 +156,7 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
       'stores' => [$this->store],
     ]);
 
-    /** @var \Drupal\commerce_shipping\Entity\PackageType $package_type */
-    $package_type = $this->createEntity('commerce_package_type', [
+    $this->createEntity('commerce_package_type', [
       'id' => 'package_type_a',
       'label' => 'Package Type A',
       'dimensions' => [
@@ -200,15 +202,18 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
         ],
       ],
     ]);
+
+    $this->resetCurrencyContainer();
   }
 
   /**
    * Test for recalculating shipping trough cart/checkout steps.
    *
-   * @covers ::shippingCurrency
+   * @covers \Drupal\commerce_currency_resolver_shipping\Plugin\Commerce\ShippingMethod\FlatRateCurrency::calculateRates
+   * @covers \Drupal\commerce_currency_resolver_shipping\Plugin\Commerce\ShippingMethod\FlatRatePerItemCurrency::calculateRates
    * @covers \Drupal\commerce_currency_resolver_shipping\ShippingCurrencyOrderProcessor::process
    */
-  public function testRecalculateShippingPricing() {
+  public function testRecalculateShippingPricing(): void {
     // Create a flat rate.
     $this->createEntity('commerce_shipping_method', [
       'name' => 'Flat Rate',
@@ -285,6 +290,7 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     $this->drupalGet('/cart');
     $this->getSession()->getPage()->fillField('edit_quantity[0]', 10);
     $this->getSession()->getPage()->findButton('Update cart')->click();
+    $this->createScreenshot(\Drupal::root() . '/screen1.png');
     $this->assertSession()->pageTextContains('Shipping $1.00');
 
     $this->drupalGet('checkout/1');

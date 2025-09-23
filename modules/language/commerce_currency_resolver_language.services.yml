@@ -1,0 +1,6 @@
+services:
+  commerce_currency_resolver_language.currency:
+    class: Drupal\commerce_currency_resolver_language\Resolver\CurrencyResolverLanguage
+    arguments: ['@language_manager', '@config.factory', '@commerce_currency_resolver.manager']
+    tags:
+      - { name: commerce_price.currency_resolver, priority: 800 }

@@ -1,0 +1,9 @@
+name: 'Commerce Currency Resolver Cookie'
+type: module
+description: 'Resolve currency in Commerce 3 via cookie'
+core_version_requirement: ^10 | ^11
+package: Commerce (contrib)
+
+dependencies:
+  - commerce_currency_resolver:commerce_currency_resolver
+

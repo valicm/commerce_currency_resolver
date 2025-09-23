@@ -1,16 +1,17 @@
 {
     "name": "drupal/commerce_currency_resolver",
     "type": "drupal-module",
-    "description": "Commerce 2 currency enhancements.",
+    "description": "Commerce 3 currency enhancements.",
     "homepage": "https://www.drupal.org/project/commerce_currency_resolver",
     "license": "GPL-2.0-or-later",
     "require": {
-        "drupal/commerce": "^2 || ^3",
+        "drupal/commerce": "^3.2",
         "drupal/commerce_exchanger": "^2"
     },
     "require-dev": {
         "drupal/commerce_shipping": "^2",
-        "drupal/commerce_fee": "^1"
+        "drupal/commerce_fee": "^1",
+        "drupal/geoip": "3.0.x-dev@dev"
     },
     "minimum-stability": "dev"
 }

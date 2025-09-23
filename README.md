@@ -14,18 +14,16 @@ INTRODUCTION
 
 Enhancement for handling multi-currency in Drupal 8 for Drupal Commerce.
 
-Drupal Commerce 2 supports multiple currencies out of the box.
-But only for adding prices, not resolving multiple currency prices/orders
-based on some criteria.
+Drupal Commerce 3 supports multiple currencies out of the box.
 
 Commerce currency resolver tries to solve resolving prices per currency,
-calculating those prices and exchange rates between currencies.
+calculating those prices and exchange rates between different currencies.
 
 
 REQUIREMENTS
 ------------
 
-This module requires Commerce Exchanger, Drupal Commerce 2
+This module requires Commerce Exchanger 2, Drupal Commerce 3
 and it's submodule price.
 
 
@@ -37,6 +35,19 @@ any Drupal contrib module.
 Visit https://www.drupal.org/node/1897420 for further information.
 
 
+SUBMODULES
+------------
+
+The module comes with five different submodules.
+
+  | Name      | Description                                                                                           |
+  |-----------|-------------------------------------------------------------------------------------------------------|
+  | language  | Resolving currency per user language, and UI to map languages to specify currency.                    |
+  | geoip     | Resolving currency per use geo country via GeoIP module, and UI to map language to specify currency.  |
+  | cookie    | Resolving currency via cookie, providing a block for selecting desired currency.                      |
+  | exchanger | Integration with Commerce Exchanger, adds feature to auto-calculate all prices based of exchange rate |
+  | shipping  | Integration with Commerce Shipping module.                                                            |
+
 CONFIGURATION
 --------------
 
@@ -44,12 +55,16 @@ CONFIGURATION
        Resolver module.
     2. Navigate to Home > Administration > Commerce > Configuration
                    > Currency resolver.
-    3. Choose from available options settings to configure how currency should
-       be resolved, how prices are calculated and default currency.
-    4. Navigate to the "Conversion" tab for configuration related
-       to Exchange rates.
-    5. Navigate to the "Mapping" if available and selected which currency
-       should be used per language or country.
+    3. Enable one of the provided submodules if needed.
+
+The main module by default follows Commerce Core 3 logic where currency is resolved via
+current resolved Store.
+
+The submodules listed above provide different options to resolve price and calculate or convert prices
+more dynamically for products, orders, promotions, fees, taxes, custom adjustments.
+
+CONFIGURATION EXAMPLES
+--------------
 
 CACHING
 --------------
@@ -66,19 +81,19 @@ Explanation - https://www.drupal.org/project/commerce_currency_resolver/issues/3
 EXCHANGE RATES
 --------------
 
-Handled trough Commerce Exchanger module
+Handle through Commerce Exchanger module
 https://www.drupal.org/project/commerce_exchanger
 
 COMMERCE SHIPPING
 --------------
 
-If you are using commerce shipping there are two options how shipping methods
+If you are using commerce shipping, there are two options for how shipping methods
 can be set to work with currency resolver.
 
 * If you are using condition _Order currency_ and the selected currency matches to the price currency selected
   under _Rate amount_ then you don't need to do anything.
-* If you need to auto-calculate price or have multiple prices per shipping method
-  you need enable submodule _commerce_currency_resolver_shipping_.
+* If you need to auto-calculate price or have multiple prices per shipping method,
+* you need to enable submodule _commerce_currency_resolver_shipping_.
 
 
 EXAMPLES
@@ -86,10 +101,10 @@ EXAMPLES
 
 ### Adding order item programmatically
 If you are adding order items programmatically in your code,
-you need take in account possible conflicts with prices. To avoid that
-is best that you using resolver to resolve prices for certain item to the cart.
+you need to take in an account possible conflicts with prices. To avoid that
+is best that you're using resolver to resolve prices for certain items in the cart.
 
-Example below shows entire process in custom add to cart process, where we add
+The example below shows an entire process custom "add to cart" process, where we add
 item to the cart.
 
 ```
@@ -132,6 +147,6 @@ The 8.x-1.x branch was created by:
  * Valentino Medimorec (valic) - https://www.drupal.org/u/valic
 
 This module was created and sponsored by Foreo,
-Swedish multi-national beauty brand.
+Swedish multinational beauty brand.
 
  * Foreo - https://www.foreo.com/

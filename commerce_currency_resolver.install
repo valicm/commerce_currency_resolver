@@ -5,184 +5,46 @@
  * Install file for commerce_currency_resolver.
  */
 
-use CommerceGuys\Addressing\Country\CountryRepository;
-use Drupal\commerce_exchanger\Entity\ExchangeRates;
-
 /**
- * Implements hook_install().
+ * Upgrade 1.x to 2.x version of the module.
  */
-function commerce_currency_resolver_install() {
+function commerce_currency_resolver_update_10001(): void {
+  $config_factory = Drupal::configFactory();
+  $configuration = $config_factory->get('commerce_currency_resolver.settings');
+  $currency_mapping = $configuration->get('currency_mapping');
+  $mapping = $config_factory->get('commerce_currency_resolver.currency_mapping')->getRawData();
+  /** @var \Drupal\Core\Extension\ModuleInstallerInterface $module_installer */
+  $module_installer = \Drupal::service('module_installer');
 
-  // @see commerce_price_install().
-  if (!\Drupal::isConfigSyncing()) {
-    // Get default country and their currency.
-    $default_country = \Drupal::config('system.date')->get('country.default');
-    $default_country = $default_country ?: 'US';
-    $country_repository = new CountryRepository();
-    $country = $country_repository->get($default_country);
-    $currency_code = $country->getCurrencyCode();
-
-    // Set initial default currency by default country.
-    // User can change it later.
-    \Drupal::service('config.factory')->getEditable('commerce_currency_resolver.settings')->set('currency_default', $currency_code)->save();
-
-  }
-}
-
-/**
- * Implements hook_uninstall().
- */
-function commerce_currency_resolver_uninstall() {
-  // Remove all stored states.
-  \Drupal::state()->deleteMultiple([
-    'commerce_currency_resolver.last_update_time',
+  // It was required in version 1.x, so we need to install it.
+  $module_installer->install([
+    'commerce_currency_resolver_exchanger',
   ]);
-}
 
-/**
- * Fix issues with plugin discovery and using same plugin ID.
- */
-function commerce_currency_resolver_update_8001() {
-  // Set module weight to 10. We are extending some commerce stuff,
-  // where this module should be after commerce_promotion.
-  module_set_weight('commerce_currency_resolver', 10);
-}
-
-/**
- * Set back weight of the module to 0.
- *
- * @see https://www.drupal.org/project/commerce_currency_resolver/issues/3082160
- */
-function commerce_currency_resolver_update_8002() {
-  module_set_weight('commerce_currency_resolver', 0);
-}
-
-/**
- * Enable commerce_exchanger.
- *
- * @see https://www.drupal.org/project/commerce_currency_resolver/issues/3082160
- */
-function commerce_currency_resolver_update_8003() {
-  \Drupal::service('module_installer')->install([
-    'commerce_exchanger',
-  ]);
-}
-
-/**
- * Upgrade path for commerce_exchanger.
- *
- * @see https://www.drupal.org/project/commerce_currency_resolver/issues/3082267
- */
-function commerce_currency_resolver_update_8004() {
-
-  // Default currency.
-  $default_currency = \Drupal::configFactory()
-    ->get('commerce_currency_resolver.settings')
-    ->get('currency_default');
-
-  // Get existing settings for exchange rates.
-  $config = \Drupal::configFactory()
-    ->get('commerce_currency_resolver.currency_conversion');
-
-  // Provide some defaults.
-  $plugin_id = 'manual';
-  $label = 'Manual';
-  $cron = 1;
-  $cross_sync = 1;
-  $api_key = '';
-  $auth = '';
-  $mode = 'live';
-
-  if ($config) {
-    $source = $config->get('source');
-    $cron = $config->get('cron');
-    $cross_sync = $config->get('use_cross_sync');
-    $api_key = $config->get('api_key');
-    $auth = $config->get('auth');
-
-    switch ($source) {
-      case 'exchange_rate_bluesnap':
-        $plugin_id = 'bluesnap';
-        $label = 'BlueSnap';
-        $default_currency = 'USD';
-
-        if (!empty($config->get('bluesnap'))) {
-          $mode = $config->get('bluesnap')['mode'] === 'production' ? 'live' : 'test';
-          $auth = [
-            'username' => $config->get('bluesnap')['username'],
-            'password' => $config->get('bluesnap')['password'],
-          ];
-        }
+  if (!empty($mapping)) {
+    switch ($currency_mapping) {
+      case  'cookie':
+        $module_installer->install([
+          'commerce_currency_resolver_cookie',
+        ]);
         break;
 
-      case 'exchange_rate_ecb':
-        $plugin_id = 'ecb';
-        $label = 'European Central Bank';
-        $default_currency = 'EUR';
+      case 'geo':
+        $module_installer->install([
+          'commerce_currency_resolver_geoip',
+        ]);
+        $config_factory->getEditable('commerce_currency_resolver_geoip.currency_mapping')->set('matrix', $mapping['matrix'])
+          ->set('logic', $mapping['logic'])
+          ->save();
         break;
 
-      case 'exchange_rate_fixer_paid';
-      case 'exchange_rate_fixer';
-        $plugin_id = 'fixer';
-        $label = 'Fixer.io';
+      case 'lang':
+        $module_installer->install([
+          'commerce_currency_resolver_language',
+        ]);
+        $config_factory->getEditable('commerce_currency_resolver_language.currency_mapping')->set('matrix', $mapping['matrix'])->save();
         break;
-
-      default:
     }
   }
 
-  $values = [
-    'id' => $plugin_id,
-    'label' => $label,
-    'plugin' => $plugin_id,
-  ];
-
-  $values['configuration'] = [
-    'cron' => $cron,
-    'use_cross_sync' => $cross_sync,
-    'demo_amount' => 100,
-    'base_currency' => $default_currency,
-    'mode' => $mode,
-  ];
-
-  if ($api_key) {
-    $values['configuration']['api_key'] = $api_key;
-  }
-
-  if ($auth) {
-    $values['configuration']['auth'] = $auth;
-  }
-
-  $values['configuration']['manual'] = $plugin_id === 'manual';
-
-  // Create new exchange rates.
-  $entity = ExchangeRates::create(
-    $values
-  );
-  $entity->save();
-
-  // Set new value to currency resolver.
-  $settings = \Drupal::configFactory()
-    ->getEditable('commerce_currency_resolver.settings');
-  $settings->set('currency_exchange_rates', $entity->id());
-  $settings->save();
-
-  // Delete now old configuration.
-  // commerce_currency_resolver.currency_conversion.
-  \Drupal::configFactory()
-    ->getEditable('commerce_currency_resolver.currency_conversion')
-    ->delete();
-}
-
-/**
- * Enable shipping submodule if needed.
- *
- * @see https://www.drupal.org/project/commerce_currency_resolver/issues/3111998
- */
-function commerce_currency_resolver_update_8006() {
-  if (\Drupal::service('module_handler')->moduleExists('commerce_shipping')) {
-    \Drupal::service('module_installer')->install([
-      'commerce_currency_resolver_shipping',
-    ]);
-  }
 }

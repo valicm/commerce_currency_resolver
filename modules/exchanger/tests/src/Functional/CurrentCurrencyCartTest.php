@@ -1,0 +1,138 @@
+<?php
+
+namespace Drupal\Tests\commerce_currency_resolver_exchanger\Functional;
+
+use Drupal\Tests\commerce_cart\Functional\CartBrowserTestBase;
+use Drupal\commerce_exchanger\Entity\ExchangeRates;
+use Drupal\commerce_order\Entity\Order;
+use Drupal\Tests\commerce_currency_resolver\Traits\CurrentCurrencyTrait;
+
+/**
+ * Tests the adding to cart form with mixed currencies.
+ *
+ * @coversDefaultClass \Drupal\commerce_currency_resolver_exchanger\ExchangerOrderProcessor
+ * @covers \Drupal\commerce_currency_resolver_exchanger\Resolver\ExchangerResolverPrice
+ * @covers \Drupal\commerce_currency_resolver\CurrencyResolverManager
+ * @group commerce_currency_resolver
+ */
+class CurrentCurrencyCartTest extends CartBrowserTestBase {
+
+  use CurrentCurrencyTrait;
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  protected static $modules = [
+    'commerce_exchanger',
+    'commerce_currency_resolver',
+    'commerce_test',
+    'commerce_currency_resolver_exchanger',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() :void {
+    parent::setUp();
+
+    // Add additional currency.
+    // The parent has already imported USD.
+    $currency_importer = $this->container->get('commerce_price.currency_importer');
+    $currency_importer->import('EUR');
+
+    // Create new exchange rates.
+    $exchange_rates = ExchangeRates::create([
+      'id' => 'testing',
+      'label' => 'Manual',
+      'plugin' => 'manual',
+      'status' => TRUE,
+      'configuration' => [
+        'cron' => FALSE,
+        'use_cross_sync' => FALSE,
+        'demo_amount' => 100,
+        'base_currency' => 'USD',
+        'mode' => 'live',
+      ],
+    ]
+    );
+    $exchange_rates->save();
+
+    $this->container->get('commerce_exchanger.manager')->setLatest($exchange_rates->id(), [
+      'EUR' => [
+        'USD' => [
+          'value' => 0.15,
+          'manual' => 0,
+        ],
+      ],
+      'USD' => [
+        'EUR' => [
+          'value' => 6.85,
+          'manual' => 0,
+        ],
+      ],
+    ]);
+
+    $this->config('commerce_currency_resolver.settings')
+      ->set('currency_exchange_rates', 'testing')
+      ->save();
+
+    $this->store->setDefaultCurrencyCode('EUR');
+    $this->store->save();
+    $this->reloadEntity($this->store);
+
+    $variation_display = commerce_get_entity_display('commerce_product_variation', 'default', 'view');
+    $variation_display->setComponent('price', [
+      'label' => 'above',
+      'type' => 'commerce_price_calculated',
+      'settings' => [],
+    ]);
+    $variation_display->save();
+    $this->resetCurrencyContainer();
+  }
+
+  /**
+   * Test adding a product to the cart.
+   *
+   * @covers \Drupal\commerce_currency_resolver\CurrencyResolverManager::shouldCurrencyRefresh
+   * @covers \Drupal\commerce_currency_resolver_exchanger\ExchangerOrderProcessor::process
+   * @covers \Drupal\commerce_currency_resolver_exchanger\Resolver\ExchangerResolverPrice::resolve
+   */
+  public function testProductAddToCartForm(): void {
+    $this->assertEquals('USD', $this->variation->getPrice()->getCurrencyCode());
+    $this->assertEquals('999', $this->variation->getPrice()->getNumber());
+    $this->assertEquals('EUR', $this->store->getDefaultCurrency()->getCurrencyCode());
+    $this->assertEquals('EUR', $this->currentCurrency->getCurrency()->getCurrencyCode());
+
+    // Confirm that the initial add to cart submit works.
+    $this->postAddToCart($this->variation->getProduct());
+    $this->assertSession()->pageTextContains('€6,843.15');
+    $this->cart = Order::load($this->cart->id());
+    $this->assertEquals('EUR', $this->currentCurrency->getCurrency()->getCurrencyCode());
+
+    $this->drupalGet('cart');
+    $this->assertEquals(999 * 6.85, $this->cart->getTotalPrice()->getNumber());
+    $this->assertEquals('EUR', $this->cart->getTotalPrice()->getCurrencyCode());
+
+    // Check product display. And check current currency.
+    $this->drupalGet('product/1');
+    $this->assertSession()->pageTextContains('€6,843.15');
+
+    // Switch currency back to USD.
+    $this->store->setDefaultCurrencyCode('USD');
+    $this->store->save();
+    $this->reloadEntity($this->store);
+    $this->resetCurrencyContainer();
+
+    $this->assertEquals('USD', $this->currentCurrency->getCurrency()->getCurrencyCode());
+    $this->postAddToCart($this->variation->getProduct());
+
+    $order = Order::load($this->cart->id());
+    $this->drupalGet('cart');
+    $this->assertEquals(2 * 999, $order->getTotalPrice()->getNumber());
+    $this->assertEquals('USD', $order->getTotalPrice()->getCurrencyCode());
+
+  }
+
+}

@@ -1,0 +1,5 @@
+commerce_currency_resolver_geoip.currency_mapping:
+  route_name: commerce_currency_resolver_geoip.currency_mapping
+  base_route: commerce_currency_resolver.configuration
+  title: 'GeoIP mapping'
+  weight: 20

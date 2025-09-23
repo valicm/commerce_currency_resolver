@@ -1,0 +1,6 @@
+services:
+  commerce_currency_resolver_geoip.currency:
+    class: Drupal\commerce_currency_resolver_geoip\Resolver\CurrencyResolverGeoip
+    arguments: ['@request_stack', '@geoip.geolocation', '@config.factory', '@commerce_currency_resolver.manager']
+    tags:
+      - { name: commerce_price.currency_resolver, priority: 900 }

@@ -1,0 +1,7 @@
+commerce_currency_resolver_language.currency_mapping:
+  path: '/admin/commerce/config/commerce_currency_resolver/language'
+  defaults:
+    _form: 'Drupal\commerce_currency_resolver_language\Form\CurrencyResolverLanguageMapping'
+    _title: 'Language mapping'
+  requirements:
+    _permission: 'administer commerce currency resolver settings'

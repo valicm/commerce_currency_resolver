@@ -1,0 +1,68 @@
+<?php
+
+namespace Drupal\commerce_currency_resolver_geoip\Controller;
+
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Locale\CountryManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+
+/**
+ * Autocomplete for countries.
+ */
+class CountryCurrencyResolverAutocomplete extends ControllerBase {
+
+  /**
+   * Constructs a CommerceCurrencyResolverAutocomplete object.
+   */
+  public function __construct(protected CountryManagerInterface $countryManager) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('country_manager')
+    );
+  }
+
+  /**
+   * Retrieves group suggestions for a context.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The current request.
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   A JSON response with groups matching the query.
+   */
+  public function countriesAutocomplete(Request $request): JsonResponse {
+    $query = $request->query->get('q');
+
+    $matches = [];
+
+    foreach ($this->countryManager->getList() as $key => $value) {
+      if (stripos($value, $query) === 0) {
+        $matches[$key] = $value;
+      }
+
+      if (stripos($key, $query) === 0) {
+        $matches[$key] = $value;
+      }
+    }
+
+    $response = [];
+
+    // Format the unique matches to be used with the autocomplete field.
+    foreach (array_unique($matches) as $key => $match) {
+      $response[] = [
+        'value' => $key,
+        'label' => Html::escape($match),
+      ];
+    }
+
+    return new JsonResponse($response);
+  }
+
+}

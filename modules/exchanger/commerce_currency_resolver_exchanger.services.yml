@@ -1,0 +1,14 @@
+services:
+  commerce_currency_resolver_exchanger.calculator:
+    class: Drupal\commerce_currency_resolver_exchanger\PriceExchangerCalculator
+    arguments: [ '@entity_type.manager', '@commerce_exchanger.manager', '@commerce_price.rounder', '@config.factory' ]
+  commerce_currency_resolver_exchanger.order_processor:
+    class: Drupal\commerce_currency_resolver_exchanger\ExchangerOrderProcessor
+    arguments: [ '@commerce_currency_resolver.manager', '@commerce_price.current_currency', '@commerce_currency_resolver_exchanger.calculator' ]
+    tags:
+      - { name: commerce_order.order_processor, priority: 1000 }
+  commerce_currency_resolver_exchanger.price_resolver:
+    class: Drupal\commerce_currency_resolver_exchanger\Resolver\ExchangerResolverPrice
+    arguments: [ '@commerce_price.current_currency', '@config.factory','@commerce_currency_resolver_exchanger.calculator'  ]
+    tags:
+      - { name: commerce_price.price_resolver, priority: 999 }

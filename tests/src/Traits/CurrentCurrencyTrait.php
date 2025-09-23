@@ -12,12 +12,14 @@ trait CurrentCurrencyTrait {
    */
   protected $currentCurrency;
 
+  protected $container;
+
   /**
    * Reset current currency container.
    */
-  protected function resetCurrencyContainer() {
+  protected function resetCurrencyContainer(): void {
     $this->container = $this->container->get('kernel')->rebuildContainer();
-    $this->currentCurrency = $this->container->get('commerce_currency_resolver.current_currency');
+    $this->currentCurrency = $this->container->get('commerce_price.current_currency');
   }
 
 }

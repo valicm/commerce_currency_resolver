@@ -1,4 +1,3 @@
-currency_mapping: 'store'
-currency_source: 'combo'
-currency_default: ''
+currency_source: 'field'
+currency_field_prefix: 'field_price_'
 currency_exchange_rates: ''
