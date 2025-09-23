@@ -21,30 +21,29 @@ function commerce_currency_resolver_update_10001(): void {
     'commerce_currency_resolver_exchanger',
   ]);
 
-  if (!empty($mapping)) {
-    switch ($currency_mapping) {
-      case  'cookie':
-        $module_installer->install([
-          'commerce_currency_resolver_cookie',
-        ]);
-        break;
+  switch ($currency_mapping) {
+    case  'cookie':
+      $module_installer->install([
+        'commerce_currency_resolver_cookie',
+      ]);
+      break;
 
-      case 'geo':
-        $module_installer->install([
-          'commerce_currency_resolver_geoip',
-        ]);
-        $config_factory->getEditable('commerce_currency_resolver_geoip.currency_mapping')->set('matrix', $mapping['matrix'])
-          ->set('logic', $mapping['logic'])
-          ->save();
-        break;
+    case 'geo':
+      $module_installer->install([
+        'commerce_currency_resolver_geoip',
+      ]);
+      $config_factory->getEditable('commerce_currency_resolver_geoip.currency_mapping')->set('matrix', $mapping['matrix'] ?? [])
+        ->set('logic', $mapping['logic'])
+        ->save();
+      break;
 
-      case 'lang':
-        $module_installer->install([
-          'commerce_currency_resolver_language',
-        ]);
-        $config_factory->getEditable('commerce_currency_resolver_language.currency_mapping')->set('matrix', $mapping['matrix'])->save();
-        break;
-    }
+    case 'lang':
+      $module_installer->install([
+        'commerce_currency_resolver_language',
+      ]);
+      $config_factory->getEditable('commerce_currency_resolver_language.currency_mapping')->set('matrix', $mapping['matrix'] ?? [])->save();
+      break;
   }
+
 
 }
