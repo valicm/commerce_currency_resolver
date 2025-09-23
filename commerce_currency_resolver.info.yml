@@ -15,3 +15,4 @@ test_dependencies:
   - commerce_fee:commerce_fee
   - commerce_exchanger:commerce_exchanger
   - geoip:geoip
+  - smart_ip:smart_ip
