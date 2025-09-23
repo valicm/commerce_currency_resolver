@@ -1,0 +1,6 @@
+services:
+  commerce_currency_resolver_smart_ip.currency:
+    class: Drupal\commerce_currency_resolver_smart_ip\Resolver\CurrencyResolverSmartIp
+    arguments: ['@request_stack', '@smart_ip.smart_ip_location', '@config.factory', '@commerce_currency_resolver.manager']
+    tags:
+      - { name: commerce_price.currency_resolver, priority: 900 }

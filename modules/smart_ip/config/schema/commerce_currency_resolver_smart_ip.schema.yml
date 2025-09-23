@@ -1,0 +1,12 @@
+commerce_currency_resolver_smart_ip.currency_mapping:
+  type: config_object
+  label: 'Currency Smart IP mapping'
+  mapping:
+    logic:
+      type: string
+      label: 'Matrix logic'
+    matrix:
+      type: sequence
+      label: 'Matrix'
+      sequence:
+        type: string

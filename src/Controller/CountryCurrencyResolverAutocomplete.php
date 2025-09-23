@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\commerce_currency_resolver_geoip\Controller;
+namespace Drupal\commerce_currency_resolver\Controller;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Controller\ControllerBase;

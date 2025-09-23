@@ -29,10 +29,11 @@ function commerce_currency_resolver_update_10001(): void {
       break;
 
     case 'geo':
+      $currency_geo = $configuration->get('currency_geo');
       $module_installer->install([
-        'commerce_currency_resolver_geoip',
+        sprintf('commerce_currency_resolver_%s', $currency_geo),
       ]);
-      $config_factory->getEditable('commerce_currency_resolver_geoip.currency_mapping')->set('matrix', $mapping['matrix'] ?? [])
+      $config_factory->getEditable(sprintf('commerce_currency_resolver_%s.currency_mapping', $currency_geo))->set('matrix', $mapping['matrix'] ?? [])
         ->set('logic', $mapping['logic'])
         ->save();
       break;

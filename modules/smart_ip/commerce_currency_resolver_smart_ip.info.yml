@@ -1,0 +1,10 @@
+name: 'Commerce Currency Resolver Smart IP'
+type: module
+description: 'Resolve currency in Commerce 3 via geolocation and smart_ip module'
+core_version_requirement: ^11
+package: Commerce (contrib)
+
+dependencies:
+  - commerce_currency_resolver:commerce_currency_resolver
+  - smart_ip:smart_ip
+

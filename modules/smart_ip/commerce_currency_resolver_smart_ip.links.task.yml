@@ -1,0 +1,5 @@
+commerce_currency_resolver_smart_ip.currency_mapping:
+  route_name: commerce_currency_resolver_smart_ip.currency_mapping
+  base_route: commerce_currency_resolver.configuration
+  title: 'Smart IP mapping'
+  weight: 20
