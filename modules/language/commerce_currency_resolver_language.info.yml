@@ -1,7 +1,7 @@
 name: 'Commerce Currency Resolver Language'
 type: module
 description: 'Resolve currency in Commerce 3 via current user language'
-core_version_requirement: ^10 | ^11
+core_version_requirement: ^11
 package: Commerce (contrib)
 
 dependencies:
