@@ -23,8 +23,8 @@ calculating those prices and exchange rates between different currencies.
 REQUIREMENTS
 ------------
 
-This module requires Commerce Exchanger 2, Drupal Commerce 3
-and it's submodule price.
+This module requires Drupal Commerce 3, and it's submodule price.
+The additionally submodules have different requirements.
 
 
 INSTALLATION
@@ -38,15 +38,16 @@ Visit https://www.drupal.org/node/1897420 for further information.
 SUBMODULES
 ------------
 
-The module comes with five different submodules.
+The module comes with six different submodules.
 
-  | Name      | Description                                                                                           |
-  |-----------|-------------------------------------------------------------------------------------------------------|
-  | language  | Resolving currency per user language, and UI to map languages to specify currency.                    |
-  | geoip     | Resolving currency per use geo country via GeoIP module, and UI to map language to specify currency.  |
-  | cookie    | Resolving currency via cookie, providing a block for selecting desired currency.                      |
-  | exchanger | Integration with Commerce Exchanger, adds feature to auto-calculate all prices based of exchange rate |
-  | shipping  | Integration with Commerce Shipping module.                                                            |
+  | Name      | Description                                                                                            |
+  |-----------|--------------------------------------------------------------------------------------------------------|
+  | language  | Resolving currency per user language, and UI to map languages to specify currency.                     |
+  | geoip     | Resolving currency per use geo country via GeoIP module, and UI to map language to specify currency.   |
+  | smart_ip  | Resolving currency per use geo country via Smart IP module, and UI to map language to specify currency. |
+  | cookie    | Resolving currency via cookie, providing a block for selecting desired currency.                       |
+  | exchanger | Integration with Commerce Exchanger, adds feature to auto-calculate all prices based of exchange rate  |
+  | shipping  | Integration with Commerce Shipping module for use with Commerce exchanger                              |
 
 CONFIGURATION
 --------------
@@ -65,6 +66,18 @@ more dynamically for products, orders, promotions, fees, taxes, custom adjustmen
 
 CONFIGURATION EXAMPLES
 --------------
+Here are few examples of possible configuration and examples.
+If you are resolving currencies per current store, and you did set up everything per currency,
+you really don't need than this module.
+
+| Resolve type | Handling currency                                                           | Do I need this module?            |
+|--------------|-----------------------------------------------------------------------------|-----------------------------------|
+| store        | Products have specific prices. Promotion and shipments are set per currency | NO                                |
+| language     | Same as previous example.                                                   | Language submodule                |
+| language     | Same as previous example plus custom adjustments                            | Language and exchanger submodule  |
+| any          | Want to not care about specific setup of promotions, fees, shipping methods | Exchanger submodule for auto mode |
+| any          | Using commerce shipping and run automatic conversion                        | Shipping and exchanger submodule  |
+
 
 CACHING
 --------------
