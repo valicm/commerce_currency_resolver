@@ -24,9 +24,18 @@ class CurrencyResolverCookie implements CurrencyResolverInterface {
     // Cookie name can be configurable.
     $cookie_name = $this->currencyResolverManager->getCookieName();
     $request = $this->requestStack->getCurrentRequest();
+    // Cookie is visible via request as x-commerce-currency,
+    // where with $_SERVER is visible as http-x-commerce-currency.
+    $header_name = sprintf('X_%s', strtoupper($cookie_name));
+    // Reverse proxy case where we have a header based of cookie.
+    // Check the header first, and then cookie itself.
+    if ($request?->headers->has($header_name)) {
+      $currency_code = $request->headers->get($header_name);
+      return $this->currencyResolverManager->getCurrencyByCode($currency_code);
+    }
     if ($request?->cookies->has($cookie_name)) {
-      $cookie = $request->cookies->get($cookie_name);
-      return $this->currencyResolverManager->getCurrencyByCode($cookie);
+      $currency_code = $request->cookies->get($cookie_name);
+      return $this->currencyResolverManager->getCurrencyByCode($currency_code);
     }
 
     return NULL;
