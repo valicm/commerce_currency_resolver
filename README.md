@@ -4,7 +4,10 @@ CONTENTS OF THIS FILE
 * Introduction
 * Requirements
 * Installation
+* Submodules
 * Configuration
+* Price setup
+* Setup examples
 * Exchange rates
 * Maintainers
 
@@ -40,14 +43,14 @@ SUBMODULES
 
 The module comes with six different submodules.
 
-  | Name      | Description                                                                                            |
-  |-----------|--------------------------------------------------------------------------------------------------------|
-  | language  | Resolving currency per user language, and UI to map languages to specify currency.                     |
-  | geoip     | Resolving currency per use geo country via GeoIP module, and UI to map language to specify currency.   |
+  | Name      | Description                                                                                             |
+  |-----------|---------------------------------------------------------------------------------------------------------|
+  | language  | Resolving currency per user language, and UI to map languages to specify currency.                      |
+  | geoip     | Resolving currency per use geo country via GeoIP module, and UI to map language to specify currency.    |
   | smart_ip  | Resolving currency per use geo country via Smart IP module, and UI to map language to specify currency. |
-  | cookie    | Resolving currency via cookie, providing a block for selecting desired currency.                       |
-  | exchanger | Integration with Commerce Exchanger, adds feature to auto-calculate all prices based of exchange rate  |
-  | shipping  | Integration with Commerce Shipping module for use with Commerce exchanger                              |
+  | cookie    | Resolving currency via cookie, providing a block for selecting desired currency.                        |
+  | exchanger | Integration with Commerce Exchanger, adds feature to auto-calculate all prices based of exchange rate   |
+  | shipping  | Integration with Commerce Shipping module for use with Commerce exchanger                               |
 
 CONFIGURATION
 --------------
@@ -64,7 +67,15 @@ current resolved Store.
 The submodules listed above provide different options to resolve price and calculate or convert prices
 more dynamically for products, orders, promotions, fees, taxes, custom adjustments.
 
-CONFIGURATION EXAMPLES
+PRICE SETUP
+--------------
+    1. Price per currency - you can specify now in module settings field prefixes for each currency field
+    2. Combo mode - once the exchanger module is enable, this is default way of working.
+    3. Automatic - once the exchanger module is enabled you can do everything automatic.
+
+Currently, the module does not support price list module.
+
+SETUP EXAMPLES
 --------------
 Here are few examples of possible configuration and examples.
 If you are resolving currencies per current store, and you did set up everything per currency,
