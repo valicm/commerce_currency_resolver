@@ -13,32 +13,32 @@ interface CurrencyResolverManagerInterface {
   /**
    * Using fields to store and resolve prices per different currencies.
    */
-  public const string CURRENCY_RESOLVER_PRICE_FIELD = 'field';
+  public const CURRENCY_RESOLVER_PRICE_FIELD = 'field';
 
   /**
    * Using everything automatically calculated.
    */
-  public const string CURRENCY_RESOLVER_PRICE_AUTO = 'auto';
+  public const CURRENCY_RESOLVER_PRICE_AUTO = 'auto';
 
   /**
    * Combination of fields and auto-calculation when needed.
    */
-  public const string CURRENCY_RESOLVER_PRICE_COMBO = 'combo';
+  public const CURRENCY_RESOLVER_PRICE_COMBO = 'combo';
 
   /**
    * Use as a flag to signal skipping resolver logic.
    */
-  public const string CURRENCY_RESOLVER_SKIP_REFRESH = 'currency_resolver_skip_refresh';
+  public const CURRENCY_RESOLVER_SKIP_REFRESH = 'currency_resolver_skip_refresh';
 
   /**
    * Use as a flag to signal skipping resolver logic.
    */
-  public const string CURRENCY_RESOLVER_FORCE_REFRESH = 'currency_resolver_force_refresh';
+  public const CURRENCY_RESOLVER_FORCE_REFRESH = 'currency_resolver_force_refresh';
 
   /**
    * Use as a flag for other code to signal if refresh is needed.
    */
-  public const string CURRENCY_ORDER_REFRESH = 'currency_order_refresh';
+  public const CURRENCY_ORDER_REFRESH = 'currency_order_refresh';
 
   /**
    * Determine if order currency needs to be refreshed.

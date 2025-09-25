@@ -49,7 +49,9 @@ include:
 # Docs at https://git.drupalcode.org/project/gitlab_templates/-/blob/1.0.x/includes/include.drupalci.variables.yml
 ################
 variables:
-#  OPT_IN_TEST_PREVIOUS_MAJOR: 1
+  _SHOW_ENVIRONMENT_VARIABLES: 1
+  OPT_IN_TEST_CURRENT: 1
+  OPT_IN_TEST_PREVIOUS_MAJOR: 1
   _CSPELL_WORDS: 'Medimorec,valic,bluesnap,Centarro,Foreo,geolocate,vado,fewfsfs,Horvat,Moja,ulica,Osijek'
 #   SKIP_ESLINT: '1'
 

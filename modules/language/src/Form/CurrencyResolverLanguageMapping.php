@@ -19,8 +19,8 @@ class CurrencyResolverLanguageMapping extends ConfigFormBase {
   /**
    * Constructs a CurrencyResolverLanguageMapping object.
    */
-  public function __construct(ConfigFactoryInterface $configFactory, protected TypedConfigManagerInterface $typedConfigManager, protected CountryManagerInterface $countryManager, protected CurrencyResolverManagerInterface $currencyResolverManager, protected LanguageManagerInterface $languageManager) {
-    parent::__construct($configFactory, $this->typedConfigManager);
+  public function __construct(ConfigFactoryInterface $configFactory, TypedConfigManagerInterface $typed_config_manager, protected CountryManagerInterface $countryManager, protected CurrencyResolverManagerInterface $currencyResolverManager, protected LanguageManagerInterface $languageManager) {
+    parent::__construct($configFactory, $typed_config_manager);
   }
 
   /**

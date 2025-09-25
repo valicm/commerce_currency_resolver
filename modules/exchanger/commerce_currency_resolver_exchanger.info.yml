@@ -1,7 +1,7 @@
 name: 'Commerce Currency Resolver Exchanger'
 type: module
 description: 'Automatic currency conversion via Commerce Exchanger'
-core_version_requirement: ^11
+core_version_requirement: ^10.3 || ^11
 package: Commerce (contrib)
 
 dependencies:

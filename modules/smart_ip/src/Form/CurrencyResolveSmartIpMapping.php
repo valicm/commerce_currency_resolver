@@ -18,8 +18,8 @@ class CurrencyResolveSmartIpMapping extends ConfigFormBase {
   /**
    * Constructs a CurrencyResolveSmartIpMapping object.
    */
-  public function __construct(ConfigFactoryInterface $configFactory, protected TypedConfigManagerInterface $typedConfigManager, protected CountryManagerInterface $countryManager, protected CurrencyResolverManagerInterface $currencyResolverManager) {
-    parent::__construct($configFactory, $typedConfigManager);
+  public function __construct(ConfigFactoryInterface $configFactory, TypedConfigManagerInterface $typed_config_manager, protected CountryManagerInterface $countryManager, protected CurrencyResolverManagerInterface $currencyResolverManager) {
+    parent::__construct($configFactory, $typed_config_manager);
   }
 
   /**

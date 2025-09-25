@@ -17,8 +17,8 @@ class CurrencyResolverSettingsForm extends ConfigFormBase {
   /**
    * CurrencyResolverForm constructor.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, protected TypedConfigManagerInterface $typedConfigManager, protected CurrencyResolverManagerInterface $currencyResolverManager) {
-    parent::__construct($config_factory, $typedConfigManager);
+  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typed_config_manager, protected CurrencyResolverManagerInterface $currencyResolverManager) {
+    parent::__construct($config_factory, $typed_config_manager);
   }
 
   /**
