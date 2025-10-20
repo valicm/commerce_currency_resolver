@@ -62,7 +62,7 @@ class CurrencyResolveSmartIpMapping extends ConfigFormBase {
     // Get mapped currency.
     $matrix = $config->get('matrix');
 
-    $logic = $config->get('logic') ?: 'country';
+    $logic = $config->get('logic') ?: 'currency';
 
     $options = [];
     foreach ($active_currencies as $currency) {
@@ -127,10 +127,10 @@ class CurrencyResolveSmartIpMapping extends ConfigFormBase {
         foreach ($active_currencies as $key => $currency) {
           $form['matrix'][$key] = [
             '#type' => 'textfield',
-            '#autocomplete_route_name' => 'commerce_currency_resolver_smart_ip.countries.autocomplete',
-            '#title' => $currency->getLabel(),
+            '#autocomplete_route_name' => 'commerce_currency_resolver.countries.autocomplete',
+            '#title' => $currency->label(),
             '#required' => TRUE,
-            '#description' => $this->t('Select countries which should be used with @currency currency', ['@currency' => $currency->getLabel()]),
+            '#description' => $this->t('Select countries which should be used with @currency currency', ['@currency' => $key]),
             '#default_value' => $data[$key] ?? '',
           ];
         }
