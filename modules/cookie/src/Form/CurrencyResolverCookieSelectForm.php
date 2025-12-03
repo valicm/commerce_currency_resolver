@@ -87,7 +87,13 @@ class CurrencyResolverCookieSelectForm extends FormBase {
     $selected_currency = $form_state->getValue('currency');
 
     // Set cookie for one day.
-    setrawcookie($this->currencyResolverManager->getCookieName(), rawurlencode($selected_currency), $this->time->getRequestTime() + 86400, '/');
+    setrawcookie($this->currencyResolverManager->getCookieName(), rawurlencode($selected_currency), [
+      'expires' => $this->time->getRequestTime() + 86400,
+      'path' => '/',
+      'httponly' => TRUE,
+      'secure' => TRUE,
+      'samesite' => 'Lax',
+    ]);
   }
 
 }
