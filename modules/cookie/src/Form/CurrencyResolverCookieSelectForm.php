@@ -55,8 +55,8 @@ class CurrencyResolverCookieSelectForm extends FormBase {
       $options[$currency->getCurrencyCode()] = $currency->label();
     }
 
-    if ($cookie && isset($options[$cookie_name])) {
-      $selected_currency = $options[$cookie_name];
+    if ($cookie && isset($options[$cookie])) {
+      $selected_currency = $cookie;
     }
 
     $form['currency'] = [
