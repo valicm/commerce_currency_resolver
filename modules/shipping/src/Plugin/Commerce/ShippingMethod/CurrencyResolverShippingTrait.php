@@ -42,7 +42,13 @@ trait CurrencyResolverShippingTrait {
    */
   public function calculateRates(ShipmentInterface $shipment): array {
     if ($order = $shipment->getOrder()) {
-      $amount = $this->getRatesAmount($order->getTotalPrice()->getCurrencyCode());
+      // An order has no total price until it holds its first item, and a draft
+      // created in the admin UI can be given a shipment before that. Passing
+      // NULL is what getRatesAmount() expects in that case: it falls back to
+      // the resolved currency, which is the one the order is going to use.
+      // Handing the work to the parent instead would return the rate in the
+      // currency the shipping method happens to be configured in.
+      $amount = $this->getRatesAmount($order->getTotalPrice()?->getCurrencyCode());
       $rates = [];
       $price = Price::fromArray($amount);
       $rates[] = new ShippingRate([
@@ -65,8 +71,11 @@ trait CurrencyResolverShippingTrait {
   public function selectRate(ShipmentInterface $shipment, ShippingRate $rate) {
     parent::selectRate($shipment, $rate);
     if ($order = $shipment->getOrder()) {
-      $order_currency = $order->getTotalPrice()->getCurrencyCode();
-      if ($order_currency && $rate->getAmount()->getCurrencyCode() !== $order_currency) {
+      // As in calculateRates(): while the order has no total price of its own,
+      // the currency it is heading for is the resolved one.
+      $order_currency = $order->getTotalPrice()?->getCurrencyCode()
+        ?: $this->currentCurrency->getCurrency()->getCurrencyCode();
+      if ($rate->getAmount()->getCurrencyCode() !== $order_currency) {
         $shipment->setOriginalAmount($this->priceExchanger->priceConversion($rate->getOriginalAmount(), $order_currency));
         $shipment->setAmount($this->priceExchanger->priceConversion($rate->getAmount(), $order_currency));
       }
