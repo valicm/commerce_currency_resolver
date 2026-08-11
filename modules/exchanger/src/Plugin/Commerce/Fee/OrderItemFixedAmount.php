@@ -27,9 +27,12 @@ class OrderItemFixedAmount extends BaseOrderItemFixedAmount {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
-    $instance = new static($configuration, $plugin_id, $plugin_definition);
-    $instance->conditionManager = $container->get('plugin.manager.commerce_condition');
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    // Build on the parent instance rather than a bare one: OrderItemFeeBase
+    // and FeeBase are what set the condition manager, the rounder and the
+    // merged configuration, and a handwritten list of those goes stale the
+    // moment they gain a dependency.
+    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->currencyResolverManager = $container->get('commerce_currency_resolver.manager');
     $instance->currentCurrency = $container->get('commerce_price.current_currency');
     $instance->priceExchanger = $container->get('commerce_currency_resolver_exchanger.calculator');

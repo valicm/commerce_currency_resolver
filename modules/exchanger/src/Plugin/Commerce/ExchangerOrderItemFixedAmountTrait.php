@@ -18,7 +18,9 @@ trait ExchangerOrderItemFixedAmountTrait {
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
     $order_item = $entity;
-    $this->configuration['amount'] = $this->getConditionAmount($order_item->getTotalPrice()->getCurrencyCode());
+    // An order item has no total price until its unit price is set.
+    // getConditionAmount() takes NULL and falls back to the resolved currency.
+    $this->configuration['amount'] = $this->getConditionAmount($order_item->getTotalPrice()?->getCurrencyCode());
     parent::apply($entity, $commerce_entity);
   }
 

@@ -45,7 +45,12 @@ class OrderTotalPrice extends CommerceOrderTotalPrice implements ContainerFactor
     $this->assertEntity($entity);
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     $order = $entity;
-    $this->configuration['amount'] = $this->getConditionAmount($order->getTotalPrice()->getCurrencyCode());
+    // A draft order has no total price until it holds its first item, and the
+    // condition is evaluated before then: adding a shipment in the admin UI
+    // runs every shipping method's conditions. getConditionAmount() takes NULL
+    // and falls back to the resolved currency, and the parent returns FALSE
+    // when there is no price to compare against.
+    $this->configuration['amount'] = $this->getConditionAmount($order->getTotalPrice()?->getCurrencyCode());
     return parent::evaluate($order);
   }
 
