@@ -10,6 +10,7 @@ use Drupal\commerce_payment\Entity\PaymentGateway;
 use Drupal\commerce_product\Entity\ProductVariationType;
 use Drupal\Tests\commerce_currency_resolver\Traits\CurrentCurrencyTrait;
 use Drupal\Tests\commerce_shipping\Traits\ShippingTestHelperTrait;
+use Drupal\commerce_shipping\Entity\Shipment;
 
 /**
  * Tests integration with the shipping module.
@@ -104,6 +105,7 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
       ->save();
 
     $this->store->setDefaultCurrencyCode('USD');
+    $this->store->save();
 
     /** @var \Drupal\commerce_payment\Entity\PaymentGateway $gateway */
     $gateway = PaymentGateway::create([
@@ -127,7 +129,7 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     $order_type->save();
 
     // Create the order field.
-    $field_definition = commerce_shipping_build_shipment_field_definition($order_type->id());
+    $field_definition = Shipment::buildShipmentsFieldDefinition($order_type->id());
     $this->container->get('commerce.configurable_field_manager')
       ->createField($field_definition);
 
@@ -258,6 +260,9 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     $this->assertSession()->pageTextContains('€10.00');
     $this->assertSession()->pageTextContains('Conference hat');
     $this->submitForm([], 'Add to cart');
+    // Navigating before the submit lands leaves the cart empty, and the
+    // checkout then redirects away from the address form.
+    $this->assertSession()->waitForText('added to your cart');
     $this->drupalGet('checkout/1');
     $address = [
       'given_name' => 'Ivan',
@@ -277,6 +282,12 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
         ->fillField($address_prefix . '[' . $property . ']', $value);
     }
     $this->assertSession()->assertWaitOnAjaxRequest();
+    // Completing the address recalculates the shipping rates, and that request
+    // is not always registered by the time assertWaitOnAjaxRequest() polls. So
+    // wait for the new rate itself: submitForm() otherwise grabs the submit
+    // button while the pane is still being replaced, and Selenium reports a
+    // stale element reference.
+    $this->assertSession()->waitForText('Shipping $1.50');
     $this->submitForm([
       'payment_information[add_payment_method][payment_details][number]' => '4111111111111111',
       'payment_information[add_payment_method][payment_details][expiration][month]' => '02',
@@ -290,7 +301,9 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     $this->drupalGet('/cart');
     $this->getSession()->getPage()->fillField('edit_quantity[0]', 10);
     $this->getSession()->getPage()->findButton('Update cart')->click();
-    $this->createScreenshot(\Drupal::root() . '/screen1.png');
+    // Updating the cart is a full page submit, so wait for the new page before
+    // reading it.
+    $this->assertSession()->waitForText('Shipping $1.00');
     $this->assertSession()->pageTextContains('Shipping $1.00');
 
     $this->drupalGet('checkout/1');
@@ -304,13 +317,18 @@ class ShippingIntegrationTest extends CommerceWebDriverTestBase {
     $this->store->save();
     $this->reloadEntity($this->store);
 
-    $this->getSession()->getPage()->findButton('Continue to review')->click();
+    // The currency is resolved per request and the order is converted when it
+    // is loaded, so the page the browser is still showing was rendered under
+    // the old currency. Reload the step to see the switch.
+    // @see \Drupal\commerce_currency_resolver\EventSubscriber\CurrencyOrderSubscriber::checkCurrency()
+    $this->drupalGet('checkout/1');
     $this->assertSession()->pageTextContains('Shipping €0.00');
 
     $this->drupalGet('cart');
     $this->assertSession()->pageTextContains('Shipping €0.00');
     $this->getSession()->getPage()->fillField('edit_quantity[0]', 3);
     $this->getSession()->getPage()->findButton('Update cart')->click();
+    $this->assertSession()->waitForText('Shipping €30.00');
     $this->assertSession()->pageTextContains('Shipping €30.00');
 
     $this->drupalGet('checkout/1');

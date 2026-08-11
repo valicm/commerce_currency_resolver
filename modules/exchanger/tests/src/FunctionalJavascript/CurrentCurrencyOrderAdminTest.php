@@ -39,8 +39,16 @@ class CurrentCurrencyOrderAdminTest extends OrderAdminTest {
 
     // Add additional currency.
     // The parent has already imported USD.
+    //
+    // The second currency has to have two fraction digits: Commerce builds its
+    // price element with min($fraction_digits) over every enabled currency, so
+    // importing a zero-decimal currency such as VUV renders every price input
+    // without decimals and breaks the assertions this class inherits from
+    // OrderAdminTest. It also must not be EUR, which the inherited
+    // testOrderCreationWithDifferentCurrencies() creates itself.
+    // @see \Drupal\commerce_price\Element\Price::processElement()
     $currency_importer = $this->container->get('commerce_price.currency_importer');
-    $currency_importer->import('VUV');
+    $currency_importer->import('CHF');
 
     // Create new exchange rates.
     $exchange_rates = ExchangeRates::create([
@@ -60,15 +68,15 @@ class CurrentCurrencyOrderAdminTest extends OrderAdminTest {
     $exchange_rates->save();
 
     $this->container->get('commerce_exchanger.manager')->setLatest($exchange_rates->id(), [
-      'VUV' => [
+      'CHF' => [
         'USD' => [
-          'value' => 0.00878642,
+          'value' => 1.256384,
           'manual' => 0,
         ],
       ],
       'USD' => [
-        'VUV' => [
-          'value' => 113.812,
+        'CHF' => [
+          'value' => 0.795936,
           'manual' => 0,
         ],
       ],

@@ -19,6 +19,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\profile\Entity\Profile;
 use Drupal\profile\Entity\ProfileType;
 use Drupal\Tests\commerce_currency_resolver\Traits\CurrentCurrencyTrait;
+use Drupal\commerce_shipping\Entity\Shipment;
 
 /**
  * Tests the shipment admin UI.
@@ -110,7 +111,7 @@ class ShippingAdminIntegrationTest extends CommerceWebDriverTestBase {
     $order_type->save();
 
     // Create the order field.
-    $field_definition = commerce_shipping_build_shipment_field_definition($order_type->id());
+    $field_definition = Shipment::buildShipmentsFieldDefinition($order_type->id());
     \Drupal::service('commerce.configurable_field_manager')->createField($field_definition);
 
     // Install the variation trait.
