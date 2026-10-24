@@ -27,7 +27,9 @@ calculating those prices and exchange rates between different currencies.
 REQUIREMENTS
 ------------
 
-This module requires Drupal Commerce 3, and it's submodule price.
+This module requires Drupal 11.1 or later (or Drupal 12), PHP 8.4 or later,
+and Drupal Commerce 3 with its price submodule. Sites on Drupal 10 stay on
+the 2.0.x branch.
 The additionally submodules have different requirements.
 
 

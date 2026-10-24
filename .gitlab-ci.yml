@@ -51,7 +51,11 @@ include:
 variables:
   _SHOW_ENVIRONMENT_VARIABLES: 1
   OPT_IN_TEST_CURRENT: 1
-  OPT_IN_TEST_PREVIOUS_MAJOR: 1
+  OPT_IN_TEST_NEXT_MAJOR: 1
+  # Opting in alone makes the next major jobs manual.
+  _AUTORUN_NEXT_MAJOR: 'all'
+  # Drupal 11 jobs default to its minimum PHP, 8.3; this branch needs 8.4.
+  _TARGET_PHP: '8.4'
   _CSPELL_WORDS: 'Medimorec,valic,bluesnap,Centarro,Foreo,geolocate,vado,fewfsfs,Horvat,Moja,ulica,Osijek'
 #   SKIP_ESLINT: '1'
 
