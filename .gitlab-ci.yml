@@ -56,6 +56,9 @@ variables:
   _AUTORUN_NEXT_MAJOR: 'all'
   # Drupal 11 jobs default to its minimum PHP, 8.3; this branch needs 8.4.
   _TARGET_PHP: '8.4'
+  # Dependencies without a Drupal 12 release yet, so the next major jobs can
+  # install them. Commerce submodules are packages of their own here.
+  _LENIENT_ALLOW_LIST: 'address,commerce,commerce_exchanger,commerce_fee,commerce_number_pattern,commerce_order,commerce_price,commerce_pricelist,commerce_store,entity,entity_reference_revisions,geoip,inline_entity_form,physical,profile,smart_ip,state_machine,token'
   _CSPELL_WORDS: 'Medimorec,valic,bluesnap,Centarro,Foreo,geolocate,vado,fewfsfs,Horvat,Moja,ulica,Osijek'
 #   SKIP_ESLINT: '1'
 
