@@ -11,6 +11,7 @@
     "require-dev": {
         "drupal/commerce_shipping": "^3",
         "drupal/commerce_fee": "^1",
+        "drupal/commerce_pricelist": "^2",
         "drupal/geoip": "3.0.x-dev@dev",
         "drupal/smart_ip": "^5"
     },

@@ -1,0 +1,9 @@
+services:
+  commerce_currency_resolver_pricelist.item_selector:
+    class: Drupal\commerce_currency_resolver_pricelist\PriceListItemSelector
+    arguments: [ '@commerce_pricelist.repository' ]
+  commerce_currency_resolver_pricelist.price_resolver:
+    class: Drupal\commerce_currency_resolver_pricelist\Resolver\PriceListCurrencyResolver
+    arguments: [ '@commerce_price.current_currency', '@config.factory', '@commerce_currency_resolver_pricelist.item_selector', '@?commerce_currency_resolver_exchanger.calculator' ]
+    tags:
+      - { name: commerce_price.price_resolver, priority: 1100 }

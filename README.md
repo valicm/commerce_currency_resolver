@@ -7,6 +7,7 @@ CONTENTS OF THIS FILE
 * Submodules
 * Configuration
 * Price setup
+* Price lists
 * Setup examples
 * Exchange rates
 * Maintainers
@@ -41,7 +42,7 @@ Visit https://www.drupal.org/node/1897420 for further information.
 SUBMODULES
 ------------
 
-The module comes with six different submodules.
+The module comes with seven different submodules.
 
   | Name      | Description                                                                                             |
   |-----------|---------------------------------------------------------------------------------------------------------|
@@ -51,6 +52,7 @@ The module comes with six different submodules.
   | cookie    | Resolving currency via cookie, providing a block for selecting desired currency.                        |
   | exchanger | Integration with Commerce Exchanger, adds feature to auto-calculate all prices based of exchange rate   |
   | shipping  | Integration with Commerce Shipping module for use with Commerce exchanger                               |
+  | pricelist | Integration with Commerce Pricelist, resolving price list prices per currency                           |
 
 CONFIGURATION
 --------------
@@ -73,7 +75,36 @@ PRICE SETUP
     2. Combo mode - once the exchanger module is enable, this is default way of working.
     3. Automatic - once the exchanger module is enabled you can do everything automatic.
 
-Currently, the module does not support price list module.
+For price lists, enable the pricelist submodule; see PRICE LISTS below.
+
+PRICE LISTS
+--------------
+The pricelist submodule makes Commerce Pricelist price lists work per
+currency. Commerce Pricelist on its own picks one item for a product whatever
+its currency, and automatic conversion converts the product price before
+price lists are looked at, so a price list was either ignored or used in the
+wrong currency.
+
+With the submodule, a product's price is resolved in this order:
+
+    1. The price list item in the current currency, from the price lists that
+       apply (store, customer, roles and dates, as in Commerce Pricelist): the
+       largest quantity tier reached, from the list with the lowest weight.
+    2. With automatic or combo conversion, the applicable price list item in
+       the product price's own currency, converted. Price list discounts
+       survive conversion.
+    3. The price field for the current currency (field and combo modes).
+    4. The product price, converted (automatic and combo modes).
+    5. The product price.
+
+"Price lists win over currency fields" on the currency resolver settings
+form (on by default) decides between 1-2 and 3. Turned off, a price field for
+the current currency wins, and price lists apply only to products without
+one.
+
+The Commerce Pricelist price resolver itself never returns an item in a
+currency other than the current one. List prices (field_name list_price) are
+resolved the same way, from the items' list price.
 
 SETUP EXAMPLES
 --------------

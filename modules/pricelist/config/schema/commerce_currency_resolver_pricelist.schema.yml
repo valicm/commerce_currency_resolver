@@ -1,0 +1,7 @@
+commerce_currency_resolver_pricelist.settings:
+  type: config_object
+  label: 'Commerce currency resolver price list settings'
+  mapping:
+    lists_win:
+      type: boolean
+      label: 'Price lists win over currency fields'
